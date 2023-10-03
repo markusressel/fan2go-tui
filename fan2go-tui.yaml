@@ -1,0 +1,7 @@
+profiling:
+  # Whether to enable the profiling webserver
+  enabled: false
+  # The host to listen for connections
+  host: localhost
+  # The port to listen for connections
+  port: 6060
