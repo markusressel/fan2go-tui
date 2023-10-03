@@ -1,3 +1,9 @@
+api:
+  # The hostname of the fan2go daemon api server
+  host: localhost
+  # The port of the fan2go daemon api server
+  port: 9002
+
 profiling:
   # Whether to enable the profiling webserver
   enabled: false

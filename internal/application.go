@@ -15,7 +15,7 @@ import (
 	"syscall"
 )
 
-func RunApplication(path string) {
+func RunApplication() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -59,7 +59,7 @@ func RunApplication(path string) {
 		g.Add(func() error {
 			pterm.Info.Printfln("Launching UI...")
 			logging.Info("Launching UI...")
-			return ui.CreateUi(path, true).Run()
+			return ui.CreateUi(true).Run()
 		}, func(err error) {
 			if err != nil {
 				logging.Warning("Error stopping UI: " + err.Error())

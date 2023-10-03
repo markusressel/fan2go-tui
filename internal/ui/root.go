@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/configuration"
 	"fan2go-tui/internal/ui/dialog"
 	"fan2go-tui/internal/ui/util"
 	"github.com/gdamore/tcell/v2"
@@ -12,11 +14,15 @@ const (
 	HelpDialog util.Page = "help"
 )
 
-func CreateUi(path string, fullscreen bool) *tview.Application {
+func CreateUi(fullscreen bool) *tview.Application {
 	application := tview.NewApplication()
 	application.EnableMouse(true)
 
-	mainPage := NewMainPage(application)
+	baseUrl := configuration.CurrentConfig.Api.Host
+	port := configuration.CurrentConfig.Api.Port
+	apiClient := client.NewApiClient(baseUrl, port)
+
+	mainPage := NewMainPage(application, apiClient)
 	helpPage := dialog.NewHelpPage()
 
 	pagesLayout := tview.NewPages().
@@ -49,7 +55,7 @@ func CreateUi(path string, fullscreen bool) *tview.Application {
 		return event
 	})
 
-	mainPage.Init(path)
+	mainPage.Init()
 
 	return application.SetRoot(pagesLayout, fullscreen) //.SetFocus(mainPage.fileBrowser.GetLayout())
 }

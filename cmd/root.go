@@ -28,18 +28,7 @@ var rootCmd = &cobra.Command{
 			return
 		}
 
-		var path string
-		if len(args) > 0 {
-			path = args[0]
-		} else {
-			currentWorkingDirectory, err := os.Getwd()
-			if err != nil {
-				logging.Fatal("Couldn't find current working dir: %v", err)
-			}
-			path = currentWorkingDirectory
-		}
-
-		internal.RunApplication(path)
+		internal.RunApplication()
 	},
 }
 

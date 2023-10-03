@@ -9,6 +9,7 @@ import (
 )
 
 type Configuration struct {
+	Api       ApiConfig       `json:"api"`
 	Profiling ProfilingConfig `json:"profiling"`
 }
 
@@ -42,6 +43,13 @@ func InitConfig(cfgFile string) {
 }
 
 func setDefaultValues() {
+	viper.SetDefault("Api", ApiConfig{
+		Host: "localhost",
+		Port: 9002,
+	})
+	viper.SetDefault("Api.Host", "localhost")
+	viper.SetDefault("Api.Port", 9002)
+
 	viper.SetDefault("Profiling", ProfilingConfig{
 		Enabled: false,
 		Host:    "localhost",
