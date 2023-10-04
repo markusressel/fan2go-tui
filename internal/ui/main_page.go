@@ -9,11 +9,14 @@ import (
 )
 
 type MainPage struct {
-	application   *tview.Application
-	header        *ApplicationHeaderComponent
-	layout        *tview.Flex
-	client        client.Fan2goApiClient
-	fanComponents []*fan.FanComponent
+	application *tview.Application
+
+	client client.Fan2goApiClient
+
+	layout               *tview.Flex
+	header               *ApplicationHeaderComponent
+	fanComponents        []*fan.FanComponent
+	fanOverviewComponent *fan.FanOverviewComponent
 }
 
 func NewMainPage(application *tview.Application, client client.Fan2goApiClient) *MainPage {
@@ -50,6 +53,10 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 	windowLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
 	//dialog := createFileBrowserActionDialog()
 
+	fanOverviewComponent := fan.NewFanOverviewComponent(mainPage.application)
+	windowLayout.AddItem(fanOverviewComponent.GetLayout(), 0, 1, true)
+	mainPage.fanOverviewComponent = fanOverviewComponent
+
 	fans := mainPage.client.GetFans()
 	var fanComponents []*fan.FanComponent
 	for _, f := range fans {
@@ -72,6 +79,18 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 }
 
 func (mainPage *MainPage) Init() {
+	fans := mainPage.client.GetFans()
+
+	// update overview
+	fanList := []*client.Fan{}
+	for _, f := range fans {
+		fanList = append(fanList, f)
+	}
+	mainPage.fanOverviewComponent.SetFans(fanList)
+
+	// update details
+	mainPage.Refresh()
+
 	//fanData := mainPage.client.GetFans()
 	//curveData := mainPage.client.GetCurves()
 	//sensorData := mainPage.client.GetSensors()
@@ -95,6 +114,14 @@ func (mainPage *MainPage) Init() {
 }
 
 func (mainPage *MainPage) Refresh() {
+	fans := mainPage.client.GetFans()
+	// update overview
+	fanList := []*client.Fan{}
+	for _, f := range fans {
+		fanList = append(fanList, f)
+	}
+	mainPage.fanOverviewComponent.SetFans(fanList)
+
 	for _, component := range mainPage.fanComponents {
 		fan := mainPage.client.GetFan(component.Fan.Label)
 		component.SetFan(fan)
