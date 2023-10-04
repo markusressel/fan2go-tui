@@ -7,6 +7,7 @@ import (
 	"fan2go-tui/internal/ui/util"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
+	"time"
 )
 
 const (
@@ -56,6 +57,16 @@ func CreateUi(fullscreen bool) *tview.Application {
 	})
 
 	mainPage.Init()
+
+	// TODO: temporary update loop
+	go func() {
+		tick := time.NewTicker(1000 * time.Millisecond)
+		for {
+			<-tick.C
+			mainPage.Refresh()
+			application.Draw()
+		}
+	}()
 
 	return application.SetRoot(pagesLayout, fullscreen) //.SetFocus(mainPage.fileBrowser.GetLayout())
 }

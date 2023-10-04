@@ -51,16 +51,14 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 	//dialog := createFileBrowserActionDialog()
 
 	fans := mainPage.client.GetFans()
+	var fanComponents []*fan.FanComponent
 	for _, f := range fans {
-		var fanComponents []*fan.FanComponent
 		fanComponent := fan.NewFanComponent(mainPage.application, &f)
 		fanComponents = append(fanComponents, fanComponent)
-
 		layout := fanComponent.GetLayout()
 		windowLayout.AddItem(layout, 0, 1, true)
-
-		mainPage.fanComponents = fanComponents
 	}
+	mainPage.fanComponents = fanComponents
 
 	infoLayout := tview.NewFlex().SetDirection(tview.FlexRow)
 	windowLayout.AddItem(infoLayout, 0, 1, false)
@@ -93,6 +91,14 @@ func (mainPage *MainPage) Init() {
 	//
 	//	mainPage.showStatusMessage(status_message.NewWarningStatusMessage(text))
 	//}
+}
+
+func (mainPage *MainPage) Refresh() {
+	for _, component := range mainPage.fanComponents {
+		fan := mainPage.client.GetFan(component.Fan.Label)
+		component.SetFan(&fan)
+		component.Refresh()
+	}
 }
 
 func (mainPage *MainPage) ToggleFocus() {

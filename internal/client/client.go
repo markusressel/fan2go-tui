@@ -8,6 +8,8 @@ import (
 
 type Fan struct {
 	Label string `json:"label"`
+	Pwm   int    `json:"pwm"`
+	Rpm   int    `json:"rpm"`
 }
 type Curve struct {
 }
@@ -29,8 +31,13 @@ type HwMonFan struct {
 
 type Fan2goApiClient interface {
 	GetFans() map[string]Fan
+	GetFan(label string) Fan
+
 	GetCurves() map[string]Curve
+	GetCurve(label string) Curve
+
 	GetSensors() map[string]Sensor
+	GetSensor(label string) Sensor
 }
 
 type Fan2goApiClientEcho struct {
@@ -53,63 +60,53 @@ func createWebserver() *http.Client {
 func (client *Fan2goApiClientEcho) GetFans() map[string]Fan {
 	url := fmt.Sprintf("http://%s/fan", client.baseUrl)
 
-	// Build the request
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		fmt.Println("Error is req: ", err)
-	}
-
-	// Do sends an HTTP request and
-	resp, err := client.webclient.Do(req)
-	if err != nil {
-		fmt.Println("error in send req: ", err)
-	}
-
-	// Defer the closing of the body
-	defer resp.Body.Close()
-
-	// Fill the data with the data from the JSON
 	var data map[string]Fan
+	data = doGet(client.webclient, url, data)
+	return data
+}
 
-	// Use json.Decode for reading streams of JSON data
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		fmt.Println(err)
-	}
+func (client *Fan2goApiClientEcho) GetFan(label string) Fan {
+	url := fmt.Sprintf("http://%s/fan/%s", client.baseUrl, label)
 
+	var data Fan
+	data = doGet(client.webclient, url, data)
 	return data
 }
 
 func (client *Fan2goApiClientEcho) GetCurves() map[string]Curve {
 	url := fmt.Sprintf("http://%s/curve", client.baseUrl)
 
-	// Build the request
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		fmt.Println("Error is req: ", err)
-	}
-
-	// Do sends an HTTP request and
-	resp, err := client.webclient.Do(req)
-	if err != nil {
-		fmt.Println("error in send req: ", err)
-	}
-
-	// Defer the closing of the body
-	defer resp.Body.Close()
-
-	// Fill the data with the data from the JSON
 	var data map[string]Curve
-
-	// Use json.Decode for reading streams of JSON data
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		fmt.Println(err)
-	}
-
+	data = doGet(client.webclient, url, data)
 	return data
 }
+
+func (client *Fan2goApiClientEcho) GetCurve(label string) Curve {
+	url := fmt.Sprintf("http://%s/curve/%s", client.baseUrl, label)
+
+	var data Curve
+	data = doGet(client.webclient, url, data)
+	return data
+}
+
 func (client *Fan2goApiClientEcho) GetSensors() map[string]Sensor {
 	url := fmt.Sprintf("http://%s/sensor", client.baseUrl)
 
+	var data map[string]Sensor
+	data = doGet(client.webclient, url, data)
+	return data
+}
+
+func (client *Fan2goApiClientEcho) GetSensor(label string) Sensor {
+	url := fmt.Sprintf("http://%s/sensor/%s", client.baseUrl, label)
+
+	var data Sensor
+	data = doGet(client.webclient, url, data)
+	return data
+}
+
+func doGet[T any](client *http.Client, url string, data T) T {
+
 	// Build the request
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -117,16 +114,13 @@ func (client *Fan2goApiClientEcho) GetSensors() map[string]Sensor {
 	}
 
 	// Do sends an HTTP request and
-	resp, err := client.webclient.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println("error in send req: ", err)
 	}
 
 	// Defer the closing of the body
 	defer resp.Body.Close()
-
-	// Fill the data with the data from the JSON
-	var data map[string]Sensor
 
 	// Use json.Decode for reading streams of JSON data
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {

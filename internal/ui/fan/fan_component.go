@@ -38,12 +38,15 @@ var (
 type FanComponent struct {
 	application *tview.Application
 
-	fan *client.Fan
+	Fan *client.Fan
 
 	layout         *tview.Flex
 	tableContainer *table.RowSelectionTable[data.FanTableEntry]
 
 	selectedEntryChangedCallback func(fileEntry *data.FanTableEntry)
+
+	pwmValueTextView *tview.TextView
+	rpmValueTextView *tview.TextView
 }
 
 func NewFanComponent(application *tview.Application, fan *client.Fan) *FanComponent {
@@ -129,7 +132,7 @@ func NewFanComponent(application *tview.Application, fan *client.Fan) *FanCompon
 
 	c := &FanComponent{
 		application:                  application,
-		fan:                          fan,
+		Fan:                          fan,
 		tableContainer:               tableContainer,
 		selectedEntryChangedCallback: func(fileEntry *data.FanTableEntry) {},
 	}
@@ -145,15 +148,34 @@ func NewFanComponent(application *tview.Application, fan *client.Fan) *FanCompon
 }
 
 func (c *FanComponent) createLayout() *tview.Flex {
-	layout := tview.NewFlex().SetDirection(tview.FlexColumn)
+	layout := tview.NewFlex().SetDirection(tview.FlexRow)
+
+	pwmValueTextView := tview.NewTextView()
+	layout.AddItem(pwmValueTextView, 3, 0, true)
+	c.pwmValueTextView = pwmValueTextView
+
+	rpmValueTextView := tview.NewTextView()
+	layout.AddItem(rpmValueTextView, 3, 0, true)
+	c.rpmValueTextView = rpmValueTextView
 
 	tableContainer := c.tableContainer.GetLayout()
-
-	layout.AddItem(tableContainer, 0, 1, true)
+	layout.AddItem(tableContainer, 0, 1, false)
 
 	return layout
 }
 
+func (c *FanComponent) Refresh() {
+	pwmText := fmt.Sprintf("PWM: %d", c.Fan.Pwm)
+	c.pwmValueTextView.SetText(pwmText)
+
+	rpmText := fmt.Sprintf("RPM: %d", c.Fan.Rpm)
+	c.rpmValueTextView.SetText(rpmText)
+}
+
 func (c *FanComponent) GetLayout() *tview.Flex {
 	return c.layout
+}
+
+func (c *FanComponent) SetFan(fan *client.Fan) {
+	c.Fan = fan
 }
