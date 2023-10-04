@@ -47,7 +47,7 @@ sudo chmod ug+x /usr/bin/fan2go-tui
 ## Configuration
 
 > **Note:**
-> The configuration is optional and currently only contains debugging settings.
+> The configuration is optional and sane defaults will be used if omitted.
 
 Then configure fan2go-tui by creating a YAML configuration file in **one** of the following locations:
 
