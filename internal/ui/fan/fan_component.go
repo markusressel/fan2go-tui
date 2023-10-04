@@ -183,18 +183,20 @@ func (c *FanComponent) Refresh() {
 	configText := ""
 	configText += fmt.Sprintf("Id: %s\n", config.Id)
 	configText += fmt.Sprintf("Curve: %s\n", config.Curve)
-	configText += fmt.Sprintf("MinPwm: %d\n", *config.MinPwm)
-	configText += fmt.Sprintf("StartPwm: %d\n", *config.StartPwm)
-	configText += fmt.Sprintf("MaxPwm: %d\n", *config.MaxPwm)
+	configText += fmt.Sprintf("Pwm: %s\n", config.Curve)
+	configText += fmt.Sprintf("  Min: %d\n", *config.MinPwm)
+	configText += fmt.Sprintf("  Start: %d\n", *config.StartPwm)
+	configText += fmt.Sprintf("  Max: %d\n", *config.MaxPwm)
+	configText += fmt.Sprintf("NeverStop: %v\n", config.NeverStop)
 
 	// value = strconv.FormatFloat(config.MinPwm, 'f', -1, 64)
 
 	if config.File != nil {
-		configText += fmt.Sprintf("File:\n")
-		configText += fmt.Sprintf("  Path: %s\n", config.File.Path)
+		configText += fmt.Sprintf("Type: File\n")
+		configText += fmt.Sprintf("  PwmPath: %s\n", config.File.Path)
 		configText += fmt.Sprintf("  RpmPath: %s\n", config.File.RpmPath)
 	} else if config.HwMon != nil {
-		configText += fmt.Sprintf("HwMon:\n")
+		configText += fmt.Sprintf("Type: HwMon\n")
 		configText += fmt.Sprintf("  Platform: %s\n", config.HwMon.Platform)
 		configText += fmt.Sprintf("  Index: %d\n", config.HwMon.Index)
 		configText += fmt.Sprintf("  PwmChannel: %d\n", config.HwMon.PwmChannel)
@@ -204,7 +206,7 @@ func (c *FanComponent) Refresh() {
 		configText += fmt.Sprintf("  PwmEnablePath: %s\n", config.HwMon.PwmEnablePath)
 		configText += fmt.Sprintf("  RpmInputPath: %s\n", config.HwMon.RpmInputPath)
 	} else if config.Cmd != nil {
-		configText += fmt.Sprintf("Cmd:\n")
+		configText += fmt.Sprintf("Type: Cmd\n")
 		configText += fmt.Sprintf("  GetPwm: %s\n", config.Cmd.GetPwm)
 		configText += fmt.Sprintf("  SetPwm: %s\n", config.Cmd.SetPwm)
 		configText += fmt.Sprintf("  GetRpm: %s\n", config.Cmd.GetRpm)
