@@ -17,6 +17,7 @@ type FanGraphComponent[T any] struct {
 	layout          *tview.Flex
 	bmScatterPlot   *tvxwidgets.Plot
 	scatterPlotData [][]float64
+	valueBufferSize int
 }
 
 func NewFanGraphComponent[T any](application *tview.Application, data *T, fetchValue func(*T) float64) *FanGraphComponent[T] {
@@ -44,15 +45,20 @@ func (c *FanGraphComponent[T]) createLayout() *tview.Flex {
 		tcell.ColorGold,
 		tcell.ColorLightSkyBlue,
 	})
-	bmScatterPlot.SetPlotType(tvxwidgets.PlotTypeScatter)
+	bmScatterPlot.SetPlotType(tvxwidgets.PlotTypeLineChart)
 	bmScatterPlot.SetMarker(tvxwidgets.PlotMarkerBraille)
 	layout.AddItem(bmScatterPlot, 0, 1, false)
+	_, _, width, _ := bmScatterPlot.GetRect()
+	c.valueBufferSize = width * 4
 
 	return layout
 }
 
 func (c *FanGraphComponent[T]) Refresh() {
 	c.bmScatterPlot.SetData(c.scatterPlotData)
+
+	_, _, width, _ := c.bmScatterPlot.GetRect()
+	c.valueBufferSize = width - 5
 }
 
 func (c *FanGraphComponent[T]) GetLayout() *tview.Flex {
@@ -67,9 +73,10 @@ func (c *FanGraphComponent[T]) SetTitle(title string) {
 func (c *FanGraphComponent[T]) InsertValue(data *T) {
 	value := c.fetchValue(data)
 	c.scatterPlotData[0] = append(c.scatterPlotData[0], value)
-	// limit data to 100 points
-	if (len(c.scatterPlotData[0])) > 100 {
-		c.scatterPlotData[0] = c.scatterPlotData[0][1:]
+	// limit data to visible data points
+	if (len(c.scatterPlotData[0])) > c.valueBufferSize {
+		overflow := len(c.scatterPlotData[0]) - c.valueBufferSize
+		c.scatterPlotData[0] = c.scatterPlotData[0][overflow:]
 	}
 	c.Refresh()
 }

@@ -4,7 +4,6 @@ import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/ui/data"
 	"fan2go-tui/internal/ui/table"
-	uiutil "fan2go-tui/internal/ui/util"
 	"fmt"
 	"github.com/gdamore/tcell/v2"
 	"github.com/navidys/tvxwidgets"
@@ -150,10 +149,8 @@ func NewFanOverviewComponent(application *tview.Application) *FanOverviewCompone
 
 func (c *FanOverviewComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
-	titleText := fmt.Sprintf("Data")
 
-	layout.SetBorder(true)
-	uiutil.SetupWindow(layout, titleText)
+	layout.SetBorder(false)
 
 	return layout
 }
