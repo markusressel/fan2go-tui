@@ -68,5 +68,5 @@ func CreateUi(fullscreen bool) *tview.Application {
 		}
 	}()
 
-	return application.SetRoot(pagesLayout, fullscreen) //.SetFocus(mainPage.fileBrowser.GetLayout())
+	return application.SetRoot(pagesLayout, fullscreen)
 }

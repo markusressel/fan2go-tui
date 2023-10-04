@@ -51,7 +51,6 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 	mainPageLayout.AddItem(header.layout, 1, 0, false)
 
 	windowLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
-	//dialog := createFileBrowserActionDialog()
 
 	fanOverviewComponent := fan.NewFanOverviewComponent(mainPage.application)
 	windowLayout.AddItem(fanOverviewComponent.GetLayout(), 0, 1, true)
@@ -90,27 +89,6 @@ func (mainPage *MainPage) Init() {
 
 	// update details
 	mainPage.Refresh()
-
-	//fanData := mainPage.client.GetFans()
-	//curveData := mainPage.client.GetCurves()
-	//sensorData := mainPage.client.GetSensors()
-	//
-	//var data []map[string]interface{}
-	//data = append(data, fanData)
-	//data = append(data, curveData)
-	//data = append(data, sensorData)
-	//
-	//for _, item := range data {
-	//	var keys []string
-	//	for pwm := range item {
-	//		keys = append(keys, pwm)
-	//	}
-	//	sort.Strings(keys)
-	//
-	//	text := fmt.Sprintf("%v", keys)
-	//
-	//	mainPage.showStatusMessage(status_message.NewWarningStatusMessage(text))
-	//}
 }
 
 func (mainPage *MainPage) Refresh() {
