@@ -1,18 +1,19 @@
-package fan
+package util
 
 import (
 	"fan2go-tui/internal/ui/theme"
-	uiutil "fan2go-tui/internal/ui/util"
 	"github.com/gdamore/tcell/v2"
 	"github.com/navidys/tvxwidgets"
 	"github.com/rivo/tview"
+	"golang.org/x/exp/slices"
 )
 
-type FanGraphComponent[T any] struct {
+type GraphComponent[T any] struct {
 	application *tview.Application
 
-	Data       *T
-	fetchValue func(*T) float64
+	Data        *T
+	fetchValue  func(*T) float64
+	fetchValue2 func(*T) float64
 
 	layout          *tview.Flex
 	bmScatterPlot   *tvxwidgets.Plot
@@ -20,11 +21,12 @@ type FanGraphComponent[T any] struct {
 	valueBufferSize int
 }
 
-func NewFanGraphComponent[T any](application *tview.Application, data *T, fetchValue func(*T) float64) *FanGraphComponent[T] {
-	c := &FanGraphComponent[T]{
+func NewGraphComponent[T any](application *tview.Application, data *T, fetchValue func(*T) float64, fetchValue2 func(*T) float64) *GraphComponent[T] {
+	c := &GraphComponent[T]{
 		application:     application,
 		Data:            data,
 		fetchValue:      fetchValue,
+		fetchValue2:     fetchValue2,
 		scatterPlotData: make([][]float64, 2),
 	}
 
@@ -33,11 +35,11 @@ func NewFanGraphComponent[T any](application *tview.Application, data *T, fetchV
 	return c
 }
 
-func (c *FanGraphComponent[T]) createLayout() *tview.Flex {
+func (c *GraphComponent[T]) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 
 	layout.SetBorder(true)
-	uiutil.SetupWindow(layout, "")
+	SetupWindow(layout, "")
 
 	bmScatterPlot := tvxwidgets.NewPlot()
 	c.bmScatterPlot = bmScatterPlot
@@ -54,29 +56,38 @@ func (c *FanGraphComponent[T]) createLayout() *tview.Flex {
 	return layout
 }
 
-func (c *FanGraphComponent[T]) Refresh() {
+func (c *GraphComponent[T]) Refresh() {
 	c.bmScatterPlot.SetData(c.scatterPlotData)
 
 	_, _, width, _ := c.bmScatterPlot.GetRect()
 	c.valueBufferSize = width - 5
 }
 
-func (c *FanGraphComponent[T]) GetLayout() *tview.Flex {
+func (c *GraphComponent[T]) GetLayout() *tview.Flex {
 	return c.layout
 }
 
-func (c *FanGraphComponent[T]) SetTitle(title string) {
+func (c *GraphComponent[T]) SetTitle(title string) {
 	titleText := theme.CreateTitleText(title)
 	c.layout.SetTitle(titleText)
 }
 
-func (c *FanGraphComponent[T]) InsertValue(data *T) {
+func (c *GraphComponent[T]) InsertValue(data *T) {
 	value := c.fetchValue(data)
-	c.scatterPlotData[0] = append(c.scatterPlotData[0], value)
+	c.scatterPlotData[0] = slices.Insert(c.scatterPlotData[0], len(c.scatterPlotData[0]), value)
 	// limit data to visible data points
 	if (len(c.scatterPlotData[0])) > c.valueBufferSize {
 		overflow := len(c.scatterPlotData[0]) - c.valueBufferSize
 		c.scatterPlotData[0] = c.scatterPlotData[0][overflow:]
 	}
+
+	value2 := c.fetchValue2(data)
+	c.scatterPlotData[1] = slices.Insert(c.scatterPlotData[1], len(c.scatterPlotData[1]), value2)
+	// limit data to visible data points
+	if (len(c.scatterPlotData[1])) > c.valueBufferSize {
+		overflow := len(c.scatterPlotData[1]) - c.valueBufferSize
+		c.scatterPlotData[1] = c.scatterPlotData[1][overflow:]
+	}
+
 	c.Refresh()
 }

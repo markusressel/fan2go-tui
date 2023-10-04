@@ -4,6 +4,7 @@ import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/ui/data"
 	"fan2go-tui/internal/ui/table"
+	"fan2go-tui/internal/ui/util"
 	"fmt"
 	"github.com/gdamore/tcell/v2"
 	"github.com/navidys/tvxwidgets"
@@ -45,7 +46,7 @@ type FanOverviewComponent struct {
 	tableContainer               *table.RowSelectionTable[data.FanTableEntry]
 	selectedEntryChangedCallback func(fileEntry *data.FanTableEntry)
 	bmScatterPlot                *tvxwidgets.Plot
-	graphComponents              map[string]*FanGraphComponent[client.Fan]
+	graphComponents              map[string]*util.GraphComponent[client.Fan]
 }
 
 func NewFanOverviewComponent(application *tview.Application) *FanOverviewComponent {
@@ -134,7 +135,7 @@ func NewFanOverviewComponent(application *tview.Application) *FanOverviewCompone
 		Fans:                         []*client.Fan{},
 		tableContainer:               tableContainer,
 		selectedEntryChangedCallback: func(fileEntry *data.FanTableEntry) {},
-		graphComponents:              map[string]*FanGraphComponent[client.Fan]{},
+		graphComponents:              map[string]*util.GraphComponent[client.Fan]{},
 	}
 
 	c.layout = c.createLayout()
@@ -159,9 +160,12 @@ func (c *FanOverviewComponent) Refresh() {
 	for _, fan := range c.Fans {
 		component, ok := c.graphComponents[fan.Label]
 		if !ok {
-			component = NewFanGraphComponent[client.Fan](c.application, fan, func(c *client.Fan) float64 {
+			component = util.NewGraphComponent[client.Fan](c.application, fan, func(c *client.Fan) float64 {
 				return float64(c.Rpm)
-			})
+			}, func(c *client.Fan) float64 {
+				return float64(c.Pwm)
+			},
+			)
 			c.graphComponents[fan.Label] = component
 			c.layout.AddItem(component.GetLayout(), 0, 1, false)
 			component.InsertValue(fan)
