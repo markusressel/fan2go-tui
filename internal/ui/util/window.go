@@ -24,6 +24,6 @@ func SetupDialogWindow[T Window[tview.Box]](window T, text string) T {
 	window.SetTitle(theme.CreateTitleText(text))
 	window.SetTitleColor(theme.Colors.Layout.Title)
 	window.SetTitleAlign(theme.GetDialogTitleAlign())
-	window.SetBorderColor(theme.GetDialogBorderColor())
+	window.SetBorderColor(theme.Colors.Layout.Border)
 	return window
 }

@@ -46,7 +46,3 @@ func GetDialogTitleAlign() int {
 func GetTitleAlign() int {
 	return tview.AlignLeft
 }
-
-func GetDialogBorderColor() tcell.Color {
-	return tcell.ColorSteelBlue
-}
