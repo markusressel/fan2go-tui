@@ -2,6 +2,7 @@ package fan
 
 import (
 	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/ui/theme"
 	uiutil "fan2go-tui/internal/ui/util"
 	"fmt"
 	"github.com/rivo/tview"
@@ -41,11 +42,11 @@ func (c *FanComponent) createLayout() *tview.Flex {
 	layout.AddItem(configTextView, 0, 1, false)
 	c.configTextView = configTextView
 
-	pwmValueTextView := tview.NewTextView()
+	pwmValueTextView := tview.NewTextView().SetTextColor(theme.Colors.Graphs.First)
 	layout.AddItem(pwmValueTextView, 1, 0, false)
 	c.pwmValueTextView = pwmValueTextView
 
-	rpmValueTextView := tview.NewTextView()
+	rpmValueTextView := tview.NewTextView().SetTextColor(theme.Colors.Graphs.Second)
 	layout.AddItem(rpmValueTextView, 1, 0, false)
 	c.rpmValueTextView = rpmValueTextView
 
