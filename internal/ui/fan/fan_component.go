@@ -4,6 +4,7 @@ import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/ui/data"
 	"fan2go-tui/internal/ui/table"
+	"fan2go-tui/internal/ui/theme"
 	"fmt"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -45,9 +46,9 @@ type FanComponent struct {
 
 	selectedEntryChangedCallback func(fileEntry *data.FanTableEntry)
 
+	configTextView   *tview.TextView
 	pwmValueTextView *tview.TextView
 	rpmValueTextView *tview.TextView
-	configTextView   *tview.TextView
 }
 
 func NewFanComponent(application *tview.Application, fan *client.Fan) *FanComponent {
@@ -150,6 +151,15 @@ func NewFanComponent(application *tview.Application, fan *client.Fan) *FanCompon
 
 func (c *FanComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
+	titleText := fmt.Sprintf("Fan: %s", c.Fan.Label)
+	layout.SetBorder(true).
+		SetTitle(theme.CreateTitleText(titleText)).
+		SetTitleAlign(theme.GetTitleAlign()).
+		SetTitleColor(theme.GetTitleColor())
+
+	configTextView := tview.NewTextView()
+	layout.AddItem(configTextView, 0, 1, false)
+	c.configTextView = configTextView
 
 	pwmValueTextView := tview.NewTextView()
 	layout.AddItem(pwmValueTextView, 1, 0, false)
@@ -158,10 +168,6 @@ func (c *FanComponent) createLayout() *tview.Flex {
 	rpmValueTextView := tview.NewTextView()
 	layout.AddItem(rpmValueTextView, 1, 0, false)
 	c.rpmValueTextView = rpmValueTextView
-
-	configTextView := tview.NewTextView()
-	layout.AddItem(configTextView, 0, 1, false)
-	c.configTextView = configTextView
 
 	tableContainer := c.tableContainer.GetLayout()
 	layout.AddItem(tableContainer, 3, 0, true)
@@ -181,7 +187,7 @@ func (c *FanComponent) Refresh() {
 	config := c.Fan.Config
 
 	configText := ""
-	configText += fmt.Sprintf("Id: %s\n", config.Id)
+	// configText += fmt.Sprintf("Id: %s\n", config.Id)
 	configText += fmt.Sprintf("Curve: %s\n", config.Curve)
 	configText += fmt.Sprintf("Pwm:\n")
 	configText += fmt.Sprintf("  Min: %d\n", *config.MinPwm)
