@@ -47,6 +47,7 @@ type FanComponent struct {
 
 	pwmValueTextView *tview.TextView
 	rpmValueTextView *tview.TextView
+	configTextView   *tview.TextView
 }
 
 func NewFanComponent(application *tview.Application, fan *client.Fan) *FanComponent {
@@ -151,25 +152,64 @@ func (c *FanComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 
 	pwmValueTextView := tview.NewTextView()
-	layout.AddItem(pwmValueTextView, 1, 0, true)
+	layout.AddItem(pwmValueTextView, 1, 0, false)
 	c.pwmValueTextView = pwmValueTextView
 
 	rpmValueTextView := tview.NewTextView()
-	layout.AddItem(rpmValueTextView, 1, 0, true)
+	layout.AddItem(rpmValueTextView, 1, 0, false)
 	c.rpmValueTextView = rpmValueTextView
 
+	configTextView := tview.NewTextView()
+	layout.AddItem(configTextView, 0, 1, false)
+	c.configTextView = configTextView
+
 	tableContainer := c.tableContainer.GetLayout()
-	layout.AddItem(tableContainer, 0, 1, false)
+	layout.AddItem(tableContainer, 3, 0, true)
 
 	return layout
 }
 
 func (c *FanComponent) Refresh() {
+	// print basic info
 	pwmText := fmt.Sprintf("PWM: %d", c.Fan.Pwm)
 	c.pwmValueTextView.SetText(pwmText)
 
 	rpmText := fmt.Sprintf("RPM: %d", c.Fan.Rpm)
 	c.rpmValueTextView.SetText(rpmText)
+
+	// print config
+	config := c.Fan.Config
+
+	configText := ""
+	configText += fmt.Sprintf("Id: %s\n", config.Id)
+	configText += fmt.Sprintf("Curve: %s\n", config.Curve)
+	configText += fmt.Sprintf("MinPwm: %d\n", *config.MinPwm)
+	configText += fmt.Sprintf("StartPwm: %d\n", *config.StartPwm)
+	configText += fmt.Sprintf("MaxPwm: %d\n", *config.MaxPwm)
+
+	// value = strconv.FormatFloat(config.MinPwm, 'f', -1, 64)
+
+	if config.File != nil {
+		configText += fmt.Sprintf("File:\n")
+		configText += fmt.Sprintf("  Path: %s\n", config.File.Path)
+		configText += fmt.Sprintf("  RpmPath: %s\n", config.File.RpmPath)
+	} else if config.HwMon != nil {
+		configText += fmt.Sprintf("HwMon:\n")
+		configText += fmt.Sprintf("  Platform: %s\n", config.HwMon.Platform)
+		configText += fmt.Sprintf("  Index: %d\n", config.HwMon.Index)
+		configText += fmt.Sprintf("  PwmChannel: %d\n", config.HwMon.PwmChannel)
+		configText += fmt.Sprintf("  RpmChannel: %d\n", config.HwMon.RpmChannel)
+		configText += fmt.Sprintf("  SysfsPath: %s\n", config.HwMon.SysfsPath)
+		configText += fmt.Sprintf("  PwmPath: %s\n", config.HwMon.PwmPath)
+		configText += fmt.Sprintf("  PwmEnablePath: %s\n", config.HwMon.PwmEnablePath)
+		configText += fmt.Sprintf("  RpmInputPath: %s\n", config.HwMon.RpmInputPath)
+	} else if config.Cmd != nil {
+		configText += fmt.Sprintf("Cmd:\n")
+		configText += fmt.Sprintf("  GetPwm: %s\n", config.Cmd.GetPwm)
+		configText += fmt.Sprintf("  SetPwm: %s\n", config.Cmd.SetPwm)
+		configText += fmt.Sprintf("  GetRpm: %s\n", config.Cmd.GetRpm)
+	}
+	c.configTextView.SetText(configText)
 }
 
 func (c *FanComponent) GetLayout() *tview.Flex {

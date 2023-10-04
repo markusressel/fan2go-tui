@@ -53,7 +53,7 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 	fans := mainPage.client.GetFans()
 	var fanComponents []*fan.FanComponent
 	for _, f := range fans {
-		fanComponent := fan.NewFanComponent(mainPage.application, &f)
+		fanComponent := fan.NewFanComponent(mainPage.application, f)
 		fanComponents = append(fanComponents, fanComponent)
 		layout := fanComponent.GetLayout()
 		windowLayout.AddItem(layout, 0, 1, true)
@@ -96,7 +96,7 @@ func (mainPage *MainPage) Init() {
 func (mainPage *MainPage) Refresh() {
 	for _, component := range mainPage.fanComponents {
 		fan := mainPage.client.GetFan(component.Fan.Label)
-		component.SetFan(&fan)
+		component.SetFan(fan)
 		component.Refresh()
 	}
 }

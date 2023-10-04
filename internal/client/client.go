@@ -8,9 +8,60 @@ import (
 
 type Fan struct {
 	Label string `json:"label"`
-	Pwm   int    `json:"pwm"`
-	Rpm   int    `json:"rpm"`
+
+	Pwm int `json:"pwm"`
+	Rpm int `json:"rpm"`
+
+	Config FanConfig `json:"config"`
 }
+
+type FanConfig struct {
+	Id          string             `json:"id"`
+	NeverStop   bool               `json:"neverStop"`
+	MinPwm      *int               `json:"minPwm,omitempty"`
+	StartPwm    *int               `json:"startPwm,omitempty"`
+	PwmMap      *map[int]int       `json:"pwmMap,omitempty"`
+	MaxPwm      *int               `json:"maxPwm,omitempty"`
+	Curve       string             `json:"curve"`
+	HwMon       *HwMonFanConfig    `json:"hwMon,omitempty"`
+	File        *FileFanConfig     `json:"file,omitempty"`
+	Cmd         *CmdFanConfig      `json:"cmd,omitempty"`
+	ControlLoop *ControlLoopConfig `json:"controlLoop,omitempty"`
+}
+
+type HwMonFanConfig struct {
+	Platform      string `json:"platform"`
+	Index         int    `json:"index"`
+	RpmChannel    int    `json:"rpmChannel"`
+	PwmChannel    int    `json:"pwmChannel"`
+	SysfsPath     string
+	RpmInputPath  string
+	PwmPath       string
+	PwmEnablePath string
+}
+
+type FileFanConfig struct {
+	Path    string `json:"path"`
+	RpmPath string `json:"rpmPath"`
+}
+
+type CmdFanConfig struct {
+	SetPwm *ExecConfig `json:"setPwm,omitempty"`
+	GetPwm *ExecConfig `json:"getPwm,omitempty"`
+	GetRpm *ExecConfig `json:"getRpm,omitempty"`
+}
+
+type ExecConfig struct {
+	Exec string   `json:"exec"`
+	Args []string `json:"args"`
+}
+
+type ControlLoopConfig struct {
+	P float64 `json:"p"`
+	I float64 `json:"i"`
+	D float64 `json:"d"`
+}
+
 type Curve struct {
 }
 type Sensor struct {
@@ -30,14 +81,14 @@ type HwMonFan struct {
 }
 
 type Fan2goApiClient interface {
-	GetFans() map[string]Fan
-	GetFan(label string) Fan
+	GetFans() map[string]*Fan
+	GetFan(label string) *Fan
 
-	GetCurves() map[string]Curve
-	GetCurve(label string) Curve
+	GetCurves() map[string]*Curve
+	GetCurve(label string) *Curve
 
-	GetSensors() map[string]Sensor
-	GetSensor(label string) Sensor
+	GetSensors() map[string]*Sensor
+	GetSensor(label string) *Sensor
 }
 
 type Fan2goApiClientEcho struct {
@@ -57,50 +108,50 @@ func createWebserver() *http.Client {
 	return &http.Client{}
 }
 
-func (client *Fan2goApiClientEcho) GetFans() map[string]Fan {
+func (client *Fan2goApiClientEcho) GetFans() map[string]*Fan {
 	url := fmt.Sprintf("http://%s/fan", client.baseUrl)
 
-	var data map[string]Fan
+	var data map[string]*Fan
 	data = doGet(client.webclient, url, data)
 	return data
 }
 
-func (client *Fan2goApiClientEcho) GetFan(label string) Fan {
+func (client *Fan2goApiClientEcho) GetFan(label string) *Fan {
 	url := fmt.Sprintf("http://%s/fan/%s", client.baseUrl, label)
 
-	var data Fan
+	var data *Fan
 	data = doGet(client.webclient, url, data)
 	return data
 }
 
-func (client *Fan2goApiClientEcho) GetCurves() map[string]Curve {
+func (client *Fan2goApiClientEcho) GetCurves() map[string]*Curve {
 	url := fmt.Sprintf("http://%s/curve", client.baseUrl)
 
-	var data map[string]Curve
+	var data map[string]*Curve
 	data = doGet(client.webclient, url, data)
 	return data
 }
 
-func (client *Fan2goApiClientEcho) GetCurve(label string) Curve {
+func (client *Fan2goApiClientEcho) GetCurve(label string) *Curve {
 	url := fmt.Sprintf("http://%s/curve/%s", client.baseUrl, label)
 
-	var data Curve
+	var data *Curve
 	data = doGet(client.webclient, url, data)
 	return data
 }
 
-func (client *Fan2goApiClientEcho) GetSensors() map[string]Sensor {
+func (client *Fan2goApiClientEcho) GetSensors() map[string]*Sensor {
 	url := fmt.Sprintf("http://%s/sensor", client.baseUrl)
 
-	var data map[string]Sensor
+	var data map[string]*Sensor
 	data = doGet(client.webclient, url, data)
 	return data
 }
 
-func (client *Fan2goApiClientEcho) GetSensor(label string) Sensor {
+func (client *Fan2goApiClientEcho) GetSensor(label string) *Sensor {
 	url := fmt.Sprintf("http://%s/sensor/%s", client.baseUrl, label)
 
-	var data Sensor
+	var data *Sensor
 	data = doGet(client.webclient, url, data)
 	return data
 }
