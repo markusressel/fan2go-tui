@@ -153,6 +153,7 @@ func (c *FanOverviewComponent) createLayout() *tview.Flex {
 	uiutil.SetupWindow(layout, titleText)
 
 	tableContainer := c.tableContainer.GetLayout()
+	tableContainer.SetBorder(false)
 	layout.AddItem(tableContainer, 0, 1, true)
 
 	return layout
