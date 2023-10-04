@@ -7,6 +7,7 @@ import (
 	uiutil "fan2go-tui/internal/ui/util"
 	"fmt"
 	"github.com/gdamore/tcell/v2"
+	"github.com/navidys/tvxwidgets"
 	"github.com/rivo/tview"
 	"sort"
 	"strings"
@@ -41,10 +42,11 @@ type FanOverviewComponent struct {
 
 	Fans []*client.Fan
 
-	layout         *tview.Flex
-	tableContainer *table.RowSelectionTable[data.FanTableEntry]
-
+	layout                       *tview.Flex
+	tableContainer               *table.RowSelectionTable[data.FanTableEntry]
 	selectedEntryChangedCallback func(fileEntry *data.FanTableEntry)
+	bmScatterPlot                *tvxwidgets.Plot
+	graphComponents              map[string]*FanGraphComponent[client.Fan]
 }
 
 func NewFanOverviewComponent(application *tview.Application) *FanOverviewComponent {
@@ -87,9 +89,9 @@ func NewFanOverviewComponent(application *tview.Application) *FanOverviewCompone
 			case columnLabel:
 				result = strings.Compare(strings.ToLower(a.Label), strings.ToLower(b.Label))
 			case columnPwm:
-				result = int(b.Pwm - a.Pwm)
+				result = b.Pwm - a.Pwm
 			case columnRpm:
-				result = int(b.Rpm - a.Rpm)
+				result = b.Rpm - a.Rpm
 			}
 
 			if inverted {
@@ -133,6 +135,7 @@ func NewFanOverviewComponent(application *tview.Application) *FanOverviewCompone
 		Fans:                         []*client.Fan{},
 		tableContainer:               tableContainer,
 		selectedEntryChangedCallback: func(fileEntry *data.FanTableEntry) {},
+		graphComponents:              map[string]*FanGraphComponent[client.Fan]{},
 	}
 
 	c.layout = c.createLayout()
@@ -147,19 +150,43 @@ func NewFanOverviewComponent(application *tview.Application) *FanOverviewCompone
 
 func (c *FanOverviewComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
-	titleText := fmt.Sprintf("Fans")
+	titleText := fmt.Sprintf("Data")
 
 	layout.SetBorder(true)
 	uiutil.SetupWindow(layout, titleText)
 
-	tableContainer := c.tableContainer.GetLayout()
-	tableContainer.SetBorder(false)
-	layout.AddItem(tableContainer, 0, 1, true)
+	bmScatterPlot := tvxwidgets.NewPlot()
+	c.bmScatterPlot = bmScatterPlot
+	bmScatterPlot.SetBorder(true)
+	bmScatterPlot.SetTitle("scatter plot (braille mode)")
+	bmScatterPlot.SetLineColor([]tcell.Color{
+		tcell.ColorGold,
+		tcell.ColorLightSkyBlue,
+	})
+	bmScatterPlot.SetPlotType(tvxwidgets.PlotTypeScatter)
+	bmScatterPlot.SetMarker(tvxwidgets.PlotMarkerBraille)
+	layout.AddItem(bmScatterPlot, 0, 1, false)
 
 	return layout
 }
 
 func (c *FanOverviewComponent) Refresh() {
+	for _, fan := range c.Fans {
+		component, ok := c.graphComponents[fan.Label]
+		if !ok {
+			component = NewFanGraphComponent[client.Fan](c.application, fan, func(c *client.Fan) float64 {
+				return float64(c.Rpm)
+			})
+			c.graphComponents[fan.Label] = component
+			c.layout.AddItem(component.GetLayout(), 0, 1, false)
+			component.InsertValue(fan)
+			component.Refresh()
+		} else {
+			component.InsertValue(fan)
+			component.Refresh()
+		}
+	}
+
 	c.updateTableEntries()
 }
 
@@ -182,6 +209,5 @@ func (c *FanOverviewComponent) updateTableEntries() {
 		}
 		tableEntries = append(tableEntries, &entry)
 	}
-
 	c.tableContainer.SetData(tableEntries)
 }

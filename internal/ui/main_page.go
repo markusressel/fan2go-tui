@@ -53,7 +53,7 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 	windowLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
 
 	fanOverviewComponent := fan.NewFanOverviewComponent(mainPage.application)
-	windowLayout.AddItem(fanOverviewComponent.GetLayout(), 0, 1, true)
+	windowLayout.AddItem(fanOverviewComponent.GetLayout(), 0, 3, true)
 	mainPage.fanOverviewComponent = fanOverviewComponent
 
 	fans := mainPage.client.GetFans()
