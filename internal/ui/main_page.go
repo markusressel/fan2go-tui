@@ -67,9 +67,6 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 	}
 	mainPage.fanComponents = fanComponents
 
-	infoLayout := tview.NewFlex().SetDirection(tview.FlexRow)
-	windowLayout.AddItem(infoLayout, 0, 1, false)
-
 	mainPageLayout.AddItem(windowLayout, 0, 1, true)
 
 	mainPage.header = header
