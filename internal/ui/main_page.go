@@ -55,6 +55,7 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 	for _, f := range fans {
 		fanComponent := fan.NewFanComponent(mainPage.application, f)
 		fanComponents = append(fanComponents, fanComponent)
+		fanComponent.Refresh()
 		layout := fanComponent.GetLayout()
 		windowLayout.AddItem(layout, 0, 1, true)
 	}

@@ -4,7 +4,7 @@ import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/ui/data"
 	"fan2go-tui/internal/ui/table"
-	"fan2go-tui/internal/ui/theme"
+	uiutil "fan2go-tui/internal/ui/util"
 	"fmt"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -152,10 +152,9 @@ func NewFanComponent(application *tview.Application, fan *client.Fan) *FanCompon
 func (c *FanComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 	titleText := fmt.Sprintf("Fan: %s", c.Fan.Label)
-	layout.SetBorder(true).
-		SetTitle(theme.CreateTitleText(titleText)).
-		SetTitleAlign(theme.GetTitleAlign()).
-		SetTitleColor(theme.GetTitleColor())
+
+	layout.SetBorder(true)
+	uiutil.SetupWindow(layout, titleText)
 
 	configTextView := tview.NewTextView()
 	layout.AddItem(configTextView, 0, 1, false)
