@@ -1,3 +1,7 @@
+ui:
+  # Defines the update interval for fetching data from the fan2go daemon
+  updateInterval: 1s
+
 api:
   # The hostname of the fan2go daemon api server
   host: localhost

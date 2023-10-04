@@ -58,9 +58,8 @@ func CreateUi(fullscreen bool) *tview.Application {
 
 	mainPage.Init()
 
-	// TODO: temporary update loop
 	go func() {
-		tick := time.NewTicker(100 * time.Millisecond)
+		tick := time.NewTicker(configuration.CurrentConfig.Ui.UpdateInterval)
 		for {
 			<-tick.C
 			mainPage.Refresh()

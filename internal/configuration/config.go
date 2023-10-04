@@ -6,11 +6,17 @@ import (
 	"github.com/spf13/viper"
 	"os"
 	path2 "path"
+	"time"
 )
 
 type Configuration struct {
 	Api       ApiConfig       `json:"api"`
 	Profiling ProfilingConfig `json:"profiling"`
+	Ui        UiConfig        `json:"ui"`
+}
+
+type UiConfig struct {
+	UpdateInterval time.Duration `json:"updateInterval"`
 }
 
 var CurrentConfig Configuration
@@ -43,6 +49,14 @@ func InitConfig(cfgFile string) {
 }
 
 func setDefaultValues() {
+	viper.SetDefault("Ui", UiConfig{
+		UpdateInterval: 100 * time.Millisecond,
+	})
+	viper.SetDefault("Ui.UpdateInterval", 100*time.Millisecond)
+
+	viper.SetDefault("Api.Host", "localhost")
+	viper.SetDefault("Api.Port", 9002)
+
 	viper.SetDefault("Api", ApiConfig{
 		Host: "localhost",
 		Port: 9002,
