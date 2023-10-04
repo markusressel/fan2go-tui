@@ -151,11 +151,11 @@ func (c *FanComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 
 	pwmValueTextView := tview.NewTextView()
-	layout.AddItem(pwmValueTextView, 3, 0, true)
+	layout.AddItem(pwmValueTextView, 1, 0, true)
 	c.pwmValueTextView = pwmValueTextView
 
 	rpmValueTextView := tview.NewTextView()
-	layout.AddItem(rpmValueTextView, 3, 0, true)
+	layout.AddItem(rpmValueTextView, 1, 0, true)
 	c.rpmValueTextView = rpmValueTextView
 
 	tableContainer := c.tableContainer.GetLayout()
