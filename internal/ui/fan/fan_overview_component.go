@@ -155,18 +155,6 @@ func (c *FanOverviewComponent) createLayout() *tview.Flex {
 	layout.SetBorder(true)
 	uiutil.SetupWindow(layout, titleText)
 
-	bmScatterPlot := tvxwidgets.NewPlot()
-	c.bmScatterPlot = bmScatterPlot
-	bmScatterPlot.SetBorder(true)
-	bmScatterPlot.SetTitle("scatter plot (braille mode)")
-	bmScatterPlot.SetLineColor([]tcell.Color{
-		tcell.ColorGold,
-		tcell.ColorLightSkyBlue,
-	})
-	bmScatterPlot.SetPlotType(tvxwidgets.PlotTypeScatter)
-	bmScatterPlot.SetMarker(tvxwidgets.PlotMarkerBraille)
-	layout.AddItem(bmScatterPlot, 0, 1, false)
-
 	return layout
 }
 
@@ -180,6 +168,7 @@ func (c *FanOverviewComponent) Refresh() {
 			c.graphComponents[fan.Label] = component
 			c.layout.AddItem(component.GetLayout(), 0, 1, false)
 			component.InsertValue(fan)
+			component.SetTitle(fan.Label)
 			component.Refresh()
 		} else {
 			component.InsertValue(fan)

@@ -1,8 +1,8 @@
 package fan
 
 import (
+	"fan2go-tui/internal/ui/theme"
 	uiutil "fan2go-tui/internal/ui/util"
-	"fmt"
 	"github.com/gdamore/tcell/v2"
 	"github.com/navidys/tvxwidgets"
 	"github.com/rivo/tview"
@@ -34,15 +34,12 @@ func NewFanGraphComponent[T any](application *tview.Application, data *T, fetchV
 
 func (c *FanGraphComponent[T]) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
-	titleText := fmt.Sprintf("Fans")
 
 	layout.SetBorder(true)
-	uiutil.SetupWindow(layout, titleText)
+	uiutil.SetupWindow(layout, "")
 
 	bmScatterPlot := tvxwidgets.NewPlot()
 	c.bmScatterPlot = bmScatterPlot
-	bmScatterPlot.SetBorder(true)
-	bmScatterPlot.SetTitle("scatter plot (braille mode)")
 	bmScatterPlot.SetLineColor([]tcell.Color{
 		tcell.ColorGold,
 		tcell.ColorLightSkyBlue,
@@ -55,7 +52,6 @@ func (c *FanGraphComponent[T]) createLayout() *tview.Flex {
 }
 
 func (c *FanGraphComponent[T]) Refresh() {
-	c.bmScatterPlot.SetTitle(fmt.Sprintf("scatter plot (braille mode)"))
 	c.bmScatterPlot.SetData(c.scatterPlotData)
 }
 
@@ -63,8 +59,17 @@ func (c *FanGraphComponent[T]) GetLayout() *tview.Flex {
 	return c.layout
 }
 
+func (c *FanGraphComponent[T]) SetTitle(title string) {
+	titleText := theme.CreateTitleText(title)
+	c.layout.SetTitle(titleText)
+}
+
 func (c *FanGraphComponent[T]) InsertValue(data *T) {
 	value := c.fetchValue(data)
 	c.scatterPlotData[0] = append(c.scatterPlotData[0], value)
+	// limit data to 100 points
+	if (len(c.scatterPlotData[0])) > 100 {
+		c.scatterPlotData[0] = c.scatterPlotData[0][1:]
+	}
 	c.Refresh()
 }
