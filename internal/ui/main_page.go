@@ -2,7 +2,9 @@ package ui
 
 import (
 	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/ui/curve"
 	"fan2go-tui/internal/ui/fan"
+	"fan2go-tui/internal/ui/sensor"
 	"fan2go-tui/internal/ui/status_message"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -34,8 +36,8 @@ type MainPage struct {
 	layout               *tview.Flex
 	header               *ApplicationHeaderComponent
 	fanComponents        []*fan.FanComponent
-	curveComponents      []*fan.CurveComponent
-	sensorComponents     []*fan.SensorComponent
+	curveComponents      []*curve.CurveComponent
+	sensorComponents     []*sensor.SensorComponent
 	fanOverviewComponent *fan.FanOverviewComponent
 	page                 Page
 	mainPagePagerLayout  *tview.Pages
@@ -103,9 +105,9 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 func createSensorsPageLayout(mainPage *MainPage) *tview.Flex {
 	sensorsPageLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
 	sensors := mainPage.client.GetSensors()
-	var sensorComponents []*fan.SensorComponent
+	var sensorComponents []*sensor.SensorComponent
 	for _, s := range sensors {
-		sensorComponent := fan.NewSensorComponent(mainPage.application, s)
+		sensorComponent := sensor.NewSensorComponent(mainPage.application, s)
 		sensorComponents = append(sensorComponents, sensorComponent)
 		sensorComponent.SetSensor(s)
 		sensorComponent.Refresh()
@@ -120,7 +122,7 @@ func createCurvesPageLayout(mainPage *MainPage) *tview.Flex {
 	curvesPageLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
 
 	curves := mainPage.client.GetCurves()
-	var curveComponents []*fan.CurveComponent
+	var curveComponents []*curve.CurveComponent
 	curvesIds := []string{}
 	for _, c := range curves {
 		curvesIds = append(curvesIds, c.Config.ID)
@@ -141,11 +143,26 @@ func createCurvesPageLayout(mainPage *MainPage) *tview.Flex {
 
 	for _, id := range curvesIds {
 		c := curves[id]
-		curveComponent := fan.NewCurveComponent(mainPage.application, c)
+
+		curveGaphsComponent := curve.NewCurveGraphsComponent(mainPage.application)
+		//curveComponents = append(curveComponents, curveGaphsComponent)
+
+		// update overview
+		curveList := []*client.Curve{}
+		for _, f := range curves {
+			curveList = append(curveList, f)
+		}
+
+		curveGaphsComponent.SetCurves(curveList)
+		curveGaphsComponent.Refresh()
+		layout := curveGaphsComponent.GetLayout()
+		curvesPageLayout.AddItem(layout, 0, 1, true)
+
+		curveComponent := curve.NewCurveComponent(mainPage.application, c)
 		curveComponents = append(curveComponents, curveComponent)
 		curveComponent.SetCurve(c)
 		curveComponent.Refresh()
-		layout := curveComponent.GetLayout()
+		layout = curveComponent.GetLayout()
 		curvesPageLayout.AddItem(layout, 0, 1, true)
 	}
 	mainPage.curveComponents = curveComponents

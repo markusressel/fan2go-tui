@@ -1,4 +1,4 @@
-package fan
+package curve
 
 import (
 	"fan2go-tui/internal/client"

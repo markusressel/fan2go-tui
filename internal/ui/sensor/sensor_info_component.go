@@ -1,4 +1,4 @@
-package fan
+package sensor
 
 import (
 	"fan2go-tui/internal/client"
