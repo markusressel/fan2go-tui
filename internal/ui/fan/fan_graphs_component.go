@@ -37,7 +37,7 @@ var (
 	}
 )
 
-type FanOverviewComponent struct {
+type FanGraphsComponent struct {
 	application *tview.Application
 
 	Fans []*client.Fan
@@ -49,7 +49,7 @@ type FanOverviewComponent struct {
 	graphComponents              map[string]*util.GraphComponent[client.Fan]
 }
 
-func NewFanOverviewComponent(application *tview.Application) *FanOverviewComponent {
+func NewFanGraphsComponent(application *tview.Application) *FanGraphsComponent {
 	toTableCellsFunction := func(row int, columns []*table.Column, entry *data.FanTableEntry) (cells []*tview.TableCell) {
 		for _, column := range columns {
 			var cellColor = tcell.ColorWhite
@@ -130,7 +130,7 @@ func NewFanOverviewComponent(application *tview.Application) *FanOverviewCompone
 		tableEntrySortFunction,
 	)
 
-	c := &FanOverviewComponent{
+	c := &FanGraphsComponent{
 		application:                  application,
 		Fans:                         []*client.Fan{},
 		tableContainer:               tableContainer,
@@ -148,7 +148,7 @@ func NewFanOverviewComponent(application *tview.Application) *FanOverviewCompone
 	return c
 }
 
-func (c *FanOverviewComponent) createLayout() *tview.Flex {
+func (c *FanGraphsComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 
 	layout.SetBorder(false)
@@ -156,7 +156,7 @@ func (c *FanOverviewComponent) createLayout() *tview.Flex {
 	return layout
 }
 
-func (c *FanOverviewComponent) Refresh() {
+func (c *FanGraphsComponent) Refresh() {
 	for _, fan := range c.Fans {
 		component, ok := c.graphComponents[fan.Label]
 		if !ok {
@@ -180,16 +180,16 @@ func (c *FanOverviewComponent) Refresh() {
 	c.updateTableEntries()
 }
 
-func (c *FanOverviewComponent) GetLayout() *tview.Flex {
+func (c *FanGraphsComponent) GetLayout() *tview.Flex {
 	return c.layout
 }
 
-func (c *FanOverviewComponent) SetFans(fans []*client.Fan) {
+func (c *FanGraphsComponent) SetFans(fans []*client.Fan) {
 	c.Fans = fans
 	c.Refresh()
 }
 
-func (c *FanOverviewComponent) updateTableEntries() {
+func (c *FanGraphsComponent) updateTableEntries() {
 	var tableEntries []*data.FanTableEntry
 	for _, fan := range c.Fans {
 		entry := data.FanTableEntry{

@@ -40,7 +40,7 @@ type MainPage struct {
 	curveComponents  []*curve.CurveComponent
 	sensorComponents []*sensor.SensorComponent
 
-	fanOverviewComponent  *fan.FanOverviewComponent
+	fanOverviewComponent  *fan.FanGraphsComponent
 	curveGraphsComponent  *curve.CurveGraphsComponent
 	sensorGraphsComponent *sensor.SensorGraphsComponent
 
@@ -211,7 +211,7 @@ func createFansPageLayout(mainPage *MainPage) *tview.Flex {
 	infosList := tview.NewFlex().SetDirection(tview.FlexRow)
 	splitLayout.AddItem(infosList, 0, 1, true)
 
-	fanOverviewComponent := fan.NewFanOverviewComponent(mainPage.application)
+	fanOverviewComponent := fan.NewFanGraphsComponent(mainPage.application)
 	splitLayout.AddItem(fanOverviewComponent.GetLayout(), 0, 3, true)
 	mainPage.fanOverviewComponent = fanOverviewComponent
 
