@@ -91,8 +91,8 @@ func (applicationHeader *ApplicationHeaderComponent) createLayout() {
 	layout.AddItem(nameTextView, len(nameText), 0, false)
 	layout.AddItem(versionTextView, len(versionText), 0, false)
 	layout.AddItem(statusTextView, 0, 1, false)
-	layout.AddItem(applicationHeader.updateIntervalTextView, len(pageIndicatorText)+4, 0, false)
 	layout.AddItem(pageIndicatorTextView, len(pageIndicatorText)+4, 0, false)
+	layout.AddItem(applicationHeader.updateIntervalTextView, len(pageIndicatorText)+4, 0, false)
 	layout.AddItem(helpTextView, len(helpText)+4, 0, false)
 
 	applicationHeader.statusTextView = statusTextView
