@@ -16,6 +16,7 @@ type MainPage struct {
 	layout               *tview.Flex
 	header               *ApplicationHeaderComponent
 	fanComponents        []*fan.FanComponent
+	curveComponents      []*fan.CurveComponent
 	fanOverviewComponent *fan.FanOverviewComponent
 }
 
@@ -56,6 +57,7 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 	windowLayout.AddItem(fanOverviewComponent.GetLayout(), 0, 3, true)
 	mainPage.fanOverviewComponent = fanOverviewComponent
 
+	// fans
 	fans := mainPage.client.GetFans()
 	var fanComponents []*fan.FanComponent
 	for _, f := range fans {
@@ -66,6 +68,18 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 		windowLayout.AddItem(layout, 0, 1, true)
 	}
 	mainPage.fanComponents = fanComponents
+
+	// curves
+	curves := mainPage.client.GetCurves()
+	var curveComponents []*fan.CurveComponent
+	for _, c := range curves {
+		curveComponent := fan.NewCurveComponent(mainPage.application, c)
+		curveComponent.SetCurve(c)
+		curveComponent.Refresh()
+		layout := curveComponent.GetLayout()
+		windowLayout.AddItem(layout, 0, 1, true)
+	}
+	mainPage.curveComponents = curveComponents
 
 	mainPageLayout.AddItem(windowLayout, 0, 1, true)
 
@@ -98,8 +112,14 @@ func (mainPage *MainPage) Refresh() {
 	mainPage.fanOverviewComponent.SetFans(fanList)
 
 	for _, component := range mainPage.fanComponents {
-		fan := mainPage.client.GetFan(component.Fan.Label)
-		component.SetFan(fan)
+		f := mainPage.client.GetFan(component.Fan.Label)
+		component.SetFan(f)
+		component.Refresh()
+	}
+
+	for _, component := range mainPage.curveComponents {
+		curve := mainPage.client.GetCurve(component.Curve.Config.ID)
+		component.SetCurve(curve)
 		component.Refresh()
 	}
 }

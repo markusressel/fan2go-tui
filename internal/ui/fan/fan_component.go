@@ -33,7 +33,7 @@ func NewFanComponent(application *tview.Application, fan *client.Fan) *FanCompon
 
 func (c *FanComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
-	titleText := fmt.Sprintf("Data: %s", c.Fan.Label)
+	titleText := fmt.Sprintf("Fan: %s", c.Fan.Label)
 
 	layout.SetBorder(true)
 	uiutil.SetupWindow(layout, titleText)
@@ -42,13 +42,13 @@ func (c *FanComponent) createLayout() *tview.Flex {
 	layout.AddItem(configTextView, 0, 1, false)
 	c.configTextView = configTextView
 
-	pwmValueTextView := tview.NewTextView().SetTextColor(theme.Colors.Graphs.First)
-	layout.AddItem(pwmValueTextView, 1, 0, false)
-	c.pwmValueTextView = pwmValueTextView
-
-	rpmValueTextView := tview.NewTextView().SetTextColor(theme.Colors.Graphs.Second)
+	rpmValueTextView := tview.NewTextView().SetTextColor(theme.Colors.Graphs.Rpm)
 	layout.AddItem(rpmValueTextView, 1, 0, false)
 	c.rpmValueTextView = rpmValueTextView
+
+	pwmValueTextView := tview.NewTextView().SetTextColor(theme.Colors.Graphs.Pwm)
+	layout.AddItem(pwmValueTextView, 1, 0, false)
+	c.pwmValueTextView = pwmValueTextView
 
 	return layout
 }
@@ -67,7 +67,7 @@ func (c *FanComponent) Refresh() {
 	configText := ""
 	// configText += fmt.Sprintf("Id: %s\n", config.Id)
 	configText += fmt.Sprintf("Curve: %s\n", config.Curve)
-	configText += fmt.Sprintf("Pwm:\n")
+	configText += fmt.Sprintf("Rpm:\n")
 	configText += fmt.Sprintf("  Min: %d\n", *config.MinPwm)
 	configText += fmt.Sprintf("  Start: %d\n", *config.StartPwm)
 	configText += fmt.Sprintf("  Max: %d\n", *config.MaxPwm)

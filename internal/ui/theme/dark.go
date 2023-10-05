@@ -13,11 +13,28 @@ var (
 			Title:  tcell.ColorBlue,
 		},
 		Graphs: GraphsColors{
-			First:  tcell.ColorRed,
-			Second: tcell.ColorGreen,
+			Rpm:   tcell.ColorBlue,
+			Pwm:   tcell.ColorSteelBlue,
+			Curve: tcell.ColorYellow,
+		},
+	}
+
+	Style = StyleStruct{
+		Layout: LayoutStyle{
+			TitleAlign:       tview.AlignCenter,
+			DialogTitleAlign: tview.AlignCenter,
 		},
 	}
 )
+
+type StyleStruct struct {
+	Layout LayoutStyle
+}
+
+type LayoutStyle struct {
+	TitleAlign       int
+	DialogTitleAlign int
+}
 
 type Color struct {
 	Layout LayoutColors
@@ -25,8 +42,9 @@ type Color struct {
 }
 
 type GraphsColors struct {
-	First  tcell.Color
-	Second tcell.Color
+	Rpm   tcell.Color
+	Pwm   tcell.Color
+	Curve tcell.Color
 }
 
 type LayoutColors struct {
@@ -37,12 +55,4 @@ type LayoutColors struct {
 func CreateTitleText(text string) string {
 	titleText := fmt.Sprintf(" %s ", text)
 	return titleText
-}
-
-func GetDialogTitleAlign() int {
-	return tview.AlignCenter
-}
-
-func GetTitleAlign() int {
-	return tview.AlignLeft
 }
