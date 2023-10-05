@@ -155,14 +155,14 @@ type HwMonFan struct {
 }
 
 type Fan2goApiClient interface {
-	GetFans() map[string]*Fan
-	GetFan(label string) *Fan
+	GetFans() (*map[string]*Fan, error)
+	GetFan(label string) (*Fan, error)
 
-	GetCurves() map[string]*Curve
-	GetCurve(label string) *Curve
+	GetCurves() (*map[string]*Curve, error)
+	GetCurve(label string) (*Curve, error)
 
-	GetSensors() map[string]*Sensor
-	GetSensor(label string) *Sensor
+	GetSensors() (*map[string]*Sensor, error)
+	GetSensor(label string) (*Sensor, error)
 }
 
 type Fan2goApiClientEcho struct {
@@ -182,55 +182,74 @@ func createWebserver() *http.Client {
 	return &http.Client{}
 }
 
-func (client *Fan2goApiClientEcho) GetFans() map[string]*Fan {
+func (client *Fan2goApiClientEcho) GetFans() (*map[string]*Fan, error) {
 	url := fmt.Sprintf("http://%s/fan", client.baseUrl)
 
 	var data map[string]*Fan
-	data = doGet(client.webclient, url, data)
-	return data
+	return doGet(client.webclient, url, data)
 }
 
-func (client *Fan2goApiClientEcho) GetFan(label string) *Fan {
+func (client *Fan2goApiClientEcho) GetFan(label string) (*Fan, error) {
 	url := fmt.Sprintf("http://%s/fan/%s", client.baseUrl, label)
 
 	var data *Fan
-	data = doGet(client.webclient, url, data)
-	return data
+	result, err := doGet(client.webclient, url, data)
+	if err != nil {
+		return *result, err
+	} else {
+		return nil, err
+	}
 }
 
-func (client *Fan2goApiClientEcho) GetCurves() map[string]*Curve {
+func (client *Fan2goApiClientEcho) GetCurves() (*map[string]*Curve, error) {
 	url := fmt.Sprintf("http://%s/curve", client.baseUrl)
 
 	var data map[string]*Curve
-	data = doGet(client.webclient, url, data)
-	return data
+	result, err := doGet(client.webclient, url, data)
+	if err != nil {
+		return result, err
+	} else {
+		return nil, err
+	}
 }
 
-func (client *Fan2goApiClientEcho) GetCurve(label string) *Curve {
+func (client *Fan2goApiClientEcho) GetCurve(label string) (*Curve, error) {
 	url := fmt.Sprintf("http://%s/curve/%s", client.baseUrl, label)
 
 	var data *Curve
-	data = doGet(client.webclient, url, data)
-	return data
+	result, err := doGet(client.webclient, url, data)
+	if err != nil {
+		return *result, err
+	} else {
+		return nil, err
+	}
 }
 
-func (client *Fan2goApiClientEcho) GetSensors() map[string]*Sensor {
+func (client *Fan2goApiClientEcho) GetSensors() (*map[string]*Sensor, error) {
 	url := fmt.Sprintf("http://%s/sensor", client.baseUrl)
 
 	var data map[string]*Sensor
-	data = doGet(client.webclient, url, data)
-	return data
+	result, err := doGet(client.webclient, url, data)
+	if err != nil {
+		return result, err
+	} else {
+		return nil, err
+	}
 }
 
-func (client *Fan2goApiClientEcho) GetSensor(label string) *Sensor {
+func (client *Fan2goApiClientEcho) GetSensor(label string) (*Sensor, error) {
 	url := fmt.Sprintf("http://%s/sensor/%s", client.baseUrl, label)
 
 	var data *Sensor
-	data = doGet(client.webclient, url, data)
-	return data
+	result, err := doGet(client.webclient, url, data)
+	if err != nil {
+		return *result, err
+	} else {
+		return nil, err
+	}
 }
 
-func doGet[T any](client *http.Client, url string, data T) T {
+func doGet[T any](client *http.Client, url string, data T) (*T, error) {
 
 	// Build the request
 	req, err := http.NewRequest("GET", url, nil)
@@ -242,6 +261,7 @@ func doGet[T any](client *http.Client, url string, data T) T {
 	resp, err := client.Do(req)
 	if err != nil {
 		logging.Warning("error in send req: %v", err)
+		return nil, err
 	}
 
 	// Defer the closing of the body
@@ -257,5 +277,5 @@ func doGet[T any](client *http.Client, url string, data T) T {
 		logging.Warning("%v", err)
 	}
 
-	return data
+	return &data, err
 }

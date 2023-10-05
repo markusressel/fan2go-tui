@@ -82,10 +82,12 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 	mainPageLayout := tview.NewFlex().SetDirection(tview.FlexRow)
 
 	header := NewApplicationHeader(mainPage.application)
+	mainPage.header = header
 	mainPageLayout.AddItem(header.layout, 1, 0, false)
 
 	mainPagePagerLayout := tview.NewPages()
 	mainPage.mainPagePagerLayout = mainPagePagerLayout
+	mainPageLayout.AddItem(mainPagePagerLayout, 0, 1, true)
 
 	fansPageLayout := createFansPageLayout(mainPage)
 	curvesPageLayout := createCurvesPageLayout(mainPage)
@@ -95,18 +97,18 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 	mainPagePagerLayout.AddPage(string(CurvesPage), curvesPageLayout, true, false)
 	mainPagePagerLayout.AddPage(string(SensorsPage), sensorsPageLayout, true, false)
 
-	mainPageLayout.AddItem(mainPagePagerLayout, 0, 1, true)
-
-	mainPage.header = header
-
 	return mainPageLayout
 }
 
 func createSensorsPageLayout(mainPage *MainPage) *tview.Flex {
 	sensorsPageLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
-	sensors := mainPage.client.GetSensors()
+	sensors, err := mainPage.client.GetSensors()
+	if err != nil {
+		mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
+		return sensorsPageLayout
+	}
 	var sensorComponents []*sensor.SensorComponent
-	for _, s := range sensors {
+	for _, s := range *sensors {
 		sensorComponent := sensor.NewSensorComponent(mainPage.application, s)
 		sensorComponents = append(sensorComponents, sensorComponent)
 		sensorComponent.SetSensor(s)
@@ -121,10 +123,14 @@ func createSensorsPageLayout(mainPage *MainPage) *tview.Flex {
 func createCurvesPageLayout(mainPage *MainPage) *tview.Flex {
 	curvesPageLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
 
-	curves := mainPage.client.GetCurves()
+	curves, err := mainPage.client.GetCurves()
+	if err != nil {
+		mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
+		return curvesPageLayout
+	}
 	var curveComponents []*curve.CurveComponent
 	curvesIds := []string{}
-	for _, c := range curves {
+	for _, c := range *curves {
 		curvesIds = append(curvesIds, c.Config.ID)
 	}
 
@@ -142,30 +148,30 @@ func createCurvesPageLayout(mainPage *MainPage) *tview.Flex {
 	})
 
 	for _, id := range curvesIds {
-		c := curves[id]
-
-		curveGaphsComponent := curve.NewCurveGraphsComponent(mainPage.application)
-		//curveComponents = append(curveComponents, curveGaphsComponent)
-
-		// update overview
-		curveList := []*client.Curve{}
-		for _, f := range curves {
-			curveList = append(curveList, f)
-		}
-
-		curveGaphsComponent.SetCurves(curveList)
-		curveGaphsComponent.Refresh()
-		layout := curveGaphsComponent.GetLayout()
-		curvesPageLayout.AddItem(layout, 0, 1, true)
+		c := (*curves)[id]
 
 		curveComponent := curve.NewCurveComponent(mainPage.application, c)
 		curveComponents = append(curveComponents, curveComponent)
 		curveComponent.SetCurve(c)
 		curveComponent.Refresh()
-		layout = curveComponent.GetLayout()
+		layout := curveComponent.GetLayout()
 		curvesPageLayout.AddItem(layout, 0, 1, true)
 	}
 	mainPage.curveComponents = curveComponents
+
+	curveGaphsComponent := curve.NewCurveGraphsComponent(mainPage.application)
+	//curveComponents = append(curveComponents, curveGaphsComponent)
+
+	// update overview
+	curveList := []*client.Curve{}
+	for _, f := range *curves {
+		curveList = append(curveList, f)
+	}
+
+	curveGaphsComponent.SetCurves(curveList)
+	curveGaphsComponent.Refresh()
+	layout := curveGaphsComponent.GetLayout()
+	curvesPageLayout.AddItem(layout, 0, 1, true)
 
 	return curvesPageLayout
 }
@@ -180,9 +186,13 @@ func createFansPageLayout(mainPage *MainPage) *tview.Flex {
 	splitLayout.AddItem(fanOverviewComponent.GetLayout(), 0, 3, true)
 	mainPage.fanOverviewComponent = fanOverviewComponent
 
-	fans := mainPage.client.GetFans()
+	fans, err := mainPage.client.GetFans()
+	if err != nil {
+		mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
+		return splitLayout
+	}
 	var fanComponents []*fan.FanComponent
-	for _, f := range fans {
+	for _, f := range *fans {
 		fanComponent := fan.NewFanComponent(mainPage.application, f)
 		fanComponents = append(fanComponents, fanComponent)
 		fanComponent.Refresh()
@@ -195,11 +205,15 @@ func createFansPageLayout(mainPage *MainPage) *tview.Flex {
 }
 
 func (mainPage *MainPage) Init() {
-	fans := mainPage.client.GetFans()
+	fans, err := mainPage.client.GetFans()
+	if err != nil {
+		mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
+		return
+	}
 
 	// update overview
 	fanList := []*client.Fan{}
-	for _, f := range fans {
+	for _, f := range *fans {
 		fanList = append(fanList, f)
 	}
 	mainPage.fanOverviewComponent.SetFans(fanList)
@@ -210,16 +224,24 @@ func (mainPage *MainPage) Init() {
 
 func (mainPage *MainPage) Refresh() {
 	// always update fans, to get the latest values while on other pages
-	fans := mainPage.client.GetFans()
+	fans, err := mainPage.client.GetFans()
+	if err != nil {
+		mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
+		return
+	}
 	// update overview
 	fanList := []*client.Fan{}
-	for _, f := range fans {
+	for _, f := range *fans {
 		fanList = append(fanList, f)
 	}
 	mainPage.fanOverviewComponent.SetFans(fanList)
 
 	for _, component := range mainPage.fanComponents {
-		f := mainPage.client.GetFan(component.Fan.Config.Id)
+		f, err := mainPage.client.GetFan(component.Fan.Config.Id)
+		if err != nil {
+			mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
+			continue
+		}
 		component.SetFan(f)
 		component.Refresh()
 	}
@@ -227,15 +249,23 @@ func (mainPage *MainPage) Refresh() {
 	switch mainPage.page {
 	case CurvesPage:
 		for _, component := range mainPage.curveComponents {
-			curve := mainPage.client.GetCurve(component.Curve.Config.ID)
-			component.SetCurve(curve)
+			c, err := mainPage.client.GetCurve(component.Curve.Config.ID)
+			if err != nil {
+				mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
+				continue
+			}
+			component.SetCurve(c)
 			component.Refresh()
 		}
 
 	case SensorsPage:
 		for _, component := range mainPage.sensorComponents {
-			sensor := mainPage.client.GetSensor(component.Sensor.Config.ID)
-			component.SetSensor(sensor)
+			s, err := mainPage.client.GetSensor(component.Sensor.Config.ID)
+			if err != nil {
+				mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
+				continue
+			}
+			component.SetSensor(s)
 			component.Refresh()
 		}
 	}
