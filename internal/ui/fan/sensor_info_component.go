@@ -32,7 +32,7 @@ func NewSensorComponent(application *tview.Application, sensor *client.Sensor) *
 
 func (c *SensorComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
-	titleText := fmt.Sprintf("Curve: %s", c.Sensor.Config.ID)
+	titleText := fmt.Sprintf("Sensor: %s", c.Sensor.Config.ID)
 
 	layout.SetBorder(true)
 	uiutil.SetupWindow(layout, titleText)
