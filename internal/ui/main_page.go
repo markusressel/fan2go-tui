@@ -18,6 +18,14 @@ const (
 	SensorsPage Page = "sensors"
 )
 
+var (
+	Pages = []Page{
+		FansPage,
+		CurvesPage,
+		SensorsPage,
+	}
+)
+
 type MainPage struct {
 	application *tview.Application
 
@@ -50,11 +58,17 @@ func NewMainPage(application *tview.Application, client client.Fan2goApiClient) 
 		} else if key == tcell.KeyCtrlR {
 
 		} else if rune == int32(49) {
-			mainPage.SetPage(FansPage)
+			page := Pages[0]
+			mainPage.header.SetPage(page)
+			mainPage.SetPage(page)
 		} else if rune == int32(50) {
-			mainPage.SetPage(CurvesPage)
+			page := Pages[1]
+			mainPage.header.SetPage(page)
+			mainPage.SetPage(page)
 		} else if rune == int32(51) {
-			mainPage.SetPage(SensorsPage)
+			page := Pages[2]
+			mainPage.header.SetPage(page)
+			mainPage.SetPage(page)
 		}
 		return event
 	})
