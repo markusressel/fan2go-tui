@@ -39,7 +39,7 @@ func (c *CurvesPage) createLayout() *tview.Flex {
 	curveInfosLayout := tview.NewFlex().SetDirection(tview.FlexRow)
 	curvesPageLayout.AddItem(curveInfosLayout, 0, 1, true)
 	curveGraphsLayout := tview.NewFlex().SetDirection(tview.FlexRow)
-	curvesPageLayout.AddItem(curveGraphsLayout, 0, 1, true)
+	curvesPageLayout.AddItem(curveGraphsLayout, 0, 3, true)
 
 	curves, err := c.client.GetCurves()
 	if err != nil {

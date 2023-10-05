@@ -36,7 +36,7 @@ func (c *SensorsPage) createLayout() *tview.Flex {
 	sensorInfoLayout := tview.NewFlex().SetDirection(tview.FlexRow)
 	sensorsPageLayout.AddItem(sensorInfoLayout, 0, 1, true)
 	sensorGraphsLayout := tview.NewFlex().SetDirection(tview.FlexRow)
-	sensorsPageLayout.AddItem(sensorGraphsLayout, 0, 1, false)
+	sensorsPageLayout.AddItem(sensorGraphsLayout, 0, 3, false)
 
 	sensors, err := c.client.GetSensors()
 	if err != nil {

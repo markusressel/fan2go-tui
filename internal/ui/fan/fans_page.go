@@ -33,16 +33,18 @@ func NewFansPage(application *tview.Application, client client.Fan2goApiClient) 
 
 func (c *FansPage) createLayout() *tview.Flex {
 
-	splitLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
+	fansPageLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
 
-	infosList := tview.NewFlex().SetDirection(tview.FlexRow)
-	splitLayout.AddItem(infosList, 0, 1, true)
+	fanInfoLayout := tview.NewFlex().SetDirection(tview.FlexRow)
+	fansPageLayout.AddItem(fanInfoLayout, 0, 1, true)
+	fanGraphsLayout := tview.NewFlex().SetDirection(tview.FlexRow)
+	fansPageLayout.AddItem(fanGraphsLayout, 0, 3, true)
 
 	fans, err := c.fetchFans()
 	if err != nil {
 		// TODO: handle error
 		//c.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
-		return splitLayout
+		return fansPageLayout
 	}
 	c.Fans = *fans
 
@@ -51,17 +53,17 @@ func (c *FansPage) createLayout() *tview.Flex {
 		c.fanInfoComponents = append(c.fanInfoComponents, fanInfoComponent)
 		fanInfoComponent.Refresh()
 		layout := fanInfoComponent.GetLayout()
-		infosList.AddItem(layout, 0, 1, true)
+		fanInfoLayout.AddItem(layout, 0, 1, true)
 
 		fanGraphComponent := NewFanGraphComponent(c.application, f)
 		c.fanGraphComponents = append(c.fanGraphComponents, fanGraphComponent)
 		fanGraphComponent.SetTitle(f.Config.Id)
 		fanGraphComponent.Refresh()
 		layout = fanGraphComponent.GetLayout()
-		infosList.AddItem(layout, 0, 1, false)
+		fanGraphsLayout.AddItem(layout, 0, 1, false)
 	}
 
-	return splitLayout
+	return fansPageLayout
 }
 
 func (c *FansPage) fetchFans() (*map[string]*client.Fan, error) {
