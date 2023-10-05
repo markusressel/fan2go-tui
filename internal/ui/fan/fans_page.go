@@ -16,9 +16,8 @@ type FansPage struct {
 
 	layout *tview.Flex
 
-	fanInfoComponents    []*FanInfoComponent
-	fanOverviewComponent *FanGraphsComponent
-	fanGraphComponents   []*FanGraphComponent
+	fanInfoComponents  []*FanInfoComponent
+	fanGraphComponents []*FanGraphComponent
 }
 
 func NewFansPage(application *tview.Application, client client.Fan2goApiClient) FansPage {
