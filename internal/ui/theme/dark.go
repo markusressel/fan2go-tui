@@ -8,6 +8,9 @@ import (
 
 var (
 	Colors = Color{
+		Dialog: DialogColors{
+			Border: tcell.ColorSteelBlue,
+		},
 		Layout: LayoutColors{
 			Border: tcell.ColorSteelBlue,
 			Title:  tcell.ColorBlue,
@@ -27,6 +30,10 @@ var (
 	}
 )
 
+type DialogColors struct {
+	Border tcell.Color
+}
+
 type StyleStruct struct {
 	Layout LayoutStyle
 }
@@ -37,6 +44,7 @@ type LayoutStyle struct {
 }
 
 type Color struct {
+	Dialog DialogColors
 	Layout LayoutColors
 	Graphs GraphsColors
 }
