@@ -4,7 +4,6 @@ import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/ui/data"
 	"fan2go-tui/internal/ui/table"
-	"fan2go-tui/internal/ui/util"
 	"fmt"
 	"github.com/gdamore/tcell/v2"
 	"github.com/navidys/tvxwidgets"
@@ -46,7 +45,7 @@ type FanGraphsComponent struct {
 	tableContainer               *table.RowSelectionTable[data.FanTableEntry]
 	selectedEntryChangedCallback func(fileEntry *data.FanTableEntry)
 	bmScatterPlot                *tvxwidgets.Plot
-	graphComponents              map[string]*util.GraphComponent[client.Fan]
+	graphComponents              map[string]*FanGraphComponent
 }
 
 func NewFanGraphsComponent(application *tview.Application) *FanGraphsComponent {
@@ -135,7 +134,7 @@ func NewFanGraphsComponent(application *tview.Application) *FanGraphsComponent {
 		Fans:                         []*client.Fan{},
 		tableContainer:               tableContainer,
 		selectedEntryChangedCallback: func(fileEntry *data.FanTableEntry) {},
-		graphComponents:              map[string]*util.GraphComponent[client.Fan]{},
+		graphComponents:              map[string]*FanGraphComponent{},
 	}
 
 	c.layout = c.createLayout()
@@ -158,22 +157,17 @@ func (c *FanGraphsComponent) createLayout() *tview.Flex {
 
 func (c *FanGraphsComponent) Refresh() {
 	for _, fan := range c.Fans {
-		component, ok := c.graphComponents[fan.Label]
+		fanGraphComponent, ok := c.graphComponents[fan.Label]
 		if !ok {
-			component = util.NewGraphComponent[client.Fan](c.application, fan, func(c *client.Fan) float64 {
-				return float64(c.Rpm)
-			}, func(c *client.Fan) float64 {
-				return float64(c.Pwm)
-			},
-			)
-			c.graphComponents[fan.Label] = component
-			c.layout.AddItem(component.GetLayout(), 0, 1, false)
-			component.InsertValue(fan)
-			component.SetTitle(fan.Label)
-			component.Refresh()
+			fanGraphComponent = NewFanGraphComponent(c.application, fan)
+			c.graphComponents[fan.Label] = fanGraphComponent
+			c.layout.AddItem(fanGraphComponent.GetLayout(), 0, 1, false)
+			fanGraphComponent.InsertValue(fan)
+			fanGraphComponent.SetTitle(fan.Label)
+			fanGraphComponent.Refresh()
 		} else {
-			component.InsertValue(fan)
-			component.Refresh()
+			fanGraphComponent.InsertValue(fan)
+			fanGraphComponent.Refresh()
 		}
 	}
 
