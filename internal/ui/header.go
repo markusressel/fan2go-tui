@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
+	"strings"
 	"time"
 )
 
@@ -70,7 +71,7 @@ func (applicationHeader *ApplicationHeaderComponent) createLayout() {
 	pageName := string(applicationHeader.page)
 	pageIdx := indexOf(page, Pages)
 	pageCount := len(Pages)
-	pageIndicatorText := fmt.Sprintf("Page: %s %d/%d", pageName, pageIdx+1, pageCount)
+	pageIndicatorText := fmt.Sprintf("%-7s %d/%d", pageName, pageIdx+1, pageCount)
 
 	pageIndicatorTextView := tview.NewTextView()
 	pageIndicatorTextView.SetText(pageIndicatorText).
@@ -86,7 +87,7 @@ func (applicationHeader *ApplicationHeaderComponent) createLayout() {
 	layout.AddItem(nameTextView, len(nameText), 0, false)
 	layout.AddItem(versionTextView, len(versionText), 0, false)
 	layout.AddItem(statusTextView, 0, 1, false)
-	layout.AddItem(pageIndicatorTextView, len(pageIndicatorText)+6, 0, false)
+	layout.AddItem(pageIndicatorTextView, len(pageIndicatorText)+4, 0, false)
 	layout.AddItem(helpTextView, len(helpText)+4, 0, false)
 
 	applicationHeader.statusTextView = statusTextView
@@ -97,18 +98,11 @@ func (applicationHeader *ApplicationHeaderComponent) createLayout() {
 
 func (applicationHeader *ApplicationHeaderComponent) updateUi() {
 	page := applicationHeader.page
-	pageName := string(applicationHeader.page)
+	pageName := strings.ToUpper(string(applicationHeader.page))
 	pageIdx := indexOf(page, Pages)
 	pageCount := len(Pages)
-	pageIndicatorText := fmt.Sprintf("Page: %s %d/%d", pageName, pageIdx+1, pageCount)
-
+	pageIndicatorText := fmt.Sprintf("%-7s %d/%d", pageName, pageIdx+1, pageCount)
 	applicationHeader.pageIndicatorTextView.SetText(pageIndicatorText)
-	applicationHeader.layout.GetItem(3).SetRect(0, 0, len(pageIndicatorText)+8, 1)
-
-	//applicationHeader.pageIndicatorTextView.SetRect(0, 0, len(pageIndicatorText)+4, 1)
-	//applicationHeader.pageIndicatorTextView.SetLabelWidth(len(pageIndicatorText) + 4)
-	//applicationHeader.pageIndicatorTextView.SetLabel(pageIndicatorText)
-
 }
 
 func (applicationHeader *ApplicationHeaderComponent) SetStatus(status *status_message.StatusMessage) {
