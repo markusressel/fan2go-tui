@@ -2,7 +2,6 @@ package sensor
 
 import (
 	"fan2go-tui/internal/client"
-	"fan2go-tui/internal/ui/util"
 	"github.com/navidys/tvxwidgets"
 	"github.com/rivo/tview"
 )
@@ -14,14 +13,14 @@ type SensorGraphsComponent struct {
 
 	layout          *tview.Flex
 	bmScatterPlot   *tvxwidgets.Plot
-	graphComponents map[string]*util.GraphComponent[client.Sensor]
+	graphComponents map[string]*SensorGraphComponent
 }
 
 func NewSensorGraphsComponent(application *tview.Application) *SensorGraphsComponent {
 	c := &SensorGraphsComponent{
 		application:     application,
 		Sensors:         []*client.Sensor{},
-		graphComponents: map[string]*util.GraphComponent[client.Sensor]{},
+		graphComponents: map[string]*SensorGraphComponent{},
 	}
 
 	c.layout = c.createLayout()
@@ -41,14 +40,7 @@ func (c *SensorGraphsComponent) Refresh() {
 	for _, sensor := range c.Sensors {
 		component, ok := c.graphComponents[sensor.Config.ID]
 		if !ok {
-			component = util.NewGraphComponent[client.Sensor](
-				c.application,
-				sensor,
-				func(c *client.Sensor) float64 {
-					return c.MovingAvg / 1000
-				},
-				nil,
-			)
+			component = NewSensorGraphComponent(c.application, sensor)
 			c.graphComponents[sensor.Config.ID] = component
 			c.layout.AddItem(component.GetLayout(), 0, 1, false)
 			component.InsertValue(sensor)

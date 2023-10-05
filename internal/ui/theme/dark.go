@@ -16,9 +16,10 @@ var (
 			Title:  tcell.ColorBlue,
 		},
 		Graphs: GraphsColors{
-			Rpm:   tcell.ColorBlue,
-			Pwm:   tcell.ColorSteelBlue,
-			Curve: tcell.ColorYellow,
+			Rpm:    tcell.ColorBlue,
+			Pwm:    tcell.ColorSteelBlue,
+			Curve:  tcell.ColorBlue,
+			Sensor: tcell.ColorBlue,
 		},
 	}
 
@@ -50,9 +51,10 @@ type Color struct {
 }
 
 type GraphsColors struct {
-	Rpm   tcell.Color
-	Pwm   tcell.Color
-	Curve tcell.Color
+	Rpm    tcell.Color
+	Pwm    tcell.Color
+	Curve  tcell.Color
+	Sensor tcell.Color
 }
 
 type LayoutColors struct {
