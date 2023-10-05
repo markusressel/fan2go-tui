@@ -1,5 +1,5 @@
 <h1 align="center">fan2go-tui</h1>
-<h4 align="center">Terminal UI for fan2go.</h4>
+<h4 align="center">Terminal UI for <a href="https://github.com/markusressel/fan2go">fan2go</a>.</h4>
 
 <div align="center">
 
