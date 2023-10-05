@@ -195,9 +195,9 @@ func (client *Fan2goApiClientEcho) GetFan(label string) (*Fan, error) {
 	var data *Fan
 	result, err := doGet(client.webclient, url, data)
 	if err != nil {
-		return *result, err
-	} else {
 		return nil, err
+	} else {
+		return *result, err
 	}
 }
 
@@ -207,9 +207,9 @@ func (client *Fan2goApiClientEcho) GetCurves() (*map[string]*Curve, error) {
 	var data map[string]*Curve
 	result, err := doGet(client.webclient, url, data)
 	if err != nil {
-		return result, err
-	} else {
 		return nil, err
+	} else {
+		return result, err
 	}
 }
 
@@ -219,9 +219,9 @@ func (client *Fan2goApiClientEcho) GetCurve(label string) (*Curve, error) {
 	var data *Curve
 	result, err := doGet(client.webclient, url, data)
 	if err != nil {
-		return *result, err
-	} else {
 		return nil, err
+	} else {
+		return *result, err
 	}
 }
 
@@ -231,9 +231,9 @@ func (client *Fan2goApiClientEcho) GetSensors() (*map[string]*Sensor, error) {
 	var data map[string]*Sensor
 	result, err := doGet(client.webclient, url, data)
 	if err != nil {
-		return result, err
-	} else {
 		return nil, err
+	} else {
+		return result, err
 	}
 }
 
@@ -243,9 +243,9 @@ func (client *Fan2goApiClientEcho) GetSensor(label string) (*Sensor, error) {
 	var data *Sensor
 	result, err := doGet(client.webclient, url, data)
 	if err != nil {
-		return *result, err
-	} else {
 		return nil, err
+	} else {
+		return *result, err
 	}
 }
 
