@@ -11,9 +11,9 @@
 
 # Features
 
-* [ ] Visualize detected and configured fans
-* [ ] Monitor curve values
-* [ ] Inspect sensor readings
+* [x] Visualize detected and configured fans
+* [x] Monitor curve values
+* [x] Inspect sensor readings
 
 # How to use
 
