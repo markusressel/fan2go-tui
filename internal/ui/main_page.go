@@ -178,21 +178,22 @@ func (mainPage *MainPage) Init() {
 }
 
 func (mainPage *MainPage) Refresh() {
-	switch mainPage.page {
-	case FansPage:
-		fans := mainPage.client.GetFans()
-		// update overview
-		fanList := []*client.Fan{}
-		for _, f := range fans {
-			fanList = append(fanList, f)
-		}
-		mainPage.fanOverviewComponent.SetFans(fanList)
+	// always update fans, to get the latest values while on other pages
+	fans := mainPage.client.GetFans()
+	// update overview
+	fanList := []*client.Fan{}
+	for _, f := range fans {
+		fanList = append(fanList, f)
+	}
+	mainPage.fanOverviewComponent.SetFans(fanList)
 
-		for _, component := range mainPage.fanComponents {
-			f := mainPage.client.GetFan(component.Fan.Config.Id)
-			component.SetFan(f)
-			component.Refresh()
-		}
+	for _, component := range mainPage.fanComponents {
+		f := mainPage.client.GetFan(component.Fan.Config.Id)
+		component.SetFan(f)
+		component.Refresh()
+	}
+
+	switch mainPage.page {
 	case CurvesPage:
 		for _, component := range mainPage.curveComponents {
 			curve := mainPage.client.GetCurve(component.Curve.Config.ID)
