@@ -8,6 +8,14 @@ import (
 	"github.com/rivo/tview"
 )
 
+type Page string
+
+const (
+	FansPage    Page = "fans"
+	CurvesPage  Page = "curves"
+	SensorsPage Page = "sensors"
+)
+
 type MainPage struct {
 	application *tview.Application
 
@@ -17,7 +25,9 @@ type MainPage struct {
 	header               *ApplicationHeaderComponent
 	fanComponents        []*fan.FanComponent
 	curveComponents      []*fan.CurveComponent
+	sensorComponents     []*fan.SensorComponent
 	fanOverviewComponent *fan.FanOverviewComponent
+	page                 Page
 }
 
 func NewMainPage(application *tview.Application, client client.Fan2goApiClient) *MainPage {
@@ -25,6 +35,7 @@ func NewMainPage(application *tview.Application, client client.Fan2goApiClient) 
 	mainPage := &MainPage{
 		application: application,
 		client:      client,
+		page:        FansPage,
 	}
 
 	//fileBrowser.SetStatusCallback(func(message *status_message.StatusMessage) {
@@ -58,28 +69,48 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 	mainPage.fanOverviewComponent = fanOverviewComponent
 
 	// fans
-	fans := mainPage.client.GetFans()
-	var fanComponents []*fan.FanComponent
-	for _, f := range fans {
-		fanComponent := fan.NewFanComponent(mainPage.application, f)
-		fanComponents = append(fanComponents, fanComponent)
-		fanComponent.Refresh()
-		layout := fanComponent.GetLayout()
-		windowLayout.AddItem(layout, 0, 1, true)
+	if mainPage.page == FansPage {
+		fans := mainPage.client.GetFans()
+		var fanComponents []*fan.FanComponent
+		for _, f := range fans {
+			fanComponent := fan.NewFanComponent(mainPage.application, f)
+			fanComponents = append(fanComponents, fanComponent)
+			fanComponent.Refresh()
+			layout := fanComponent.GetLayout()
+			windowLayout.AddItem(layout, 0, 1, true)
+		}
+		mainPage.fanComponents = fanComponents
 	}
-	mainPage.fanComponents = fanComponents
 
 	// curves
-	curves := mainPage.client.GetCurves()
-	var curveComponents []*fan.CurveComponent
-	for _, c := range curves {
-		curveComponent := fan.NewCurveComponent(mainPage.application, c)
-		curveComponent.SetCurve(c)
-		curveComponent.Refresh()
-		layout := curveComponent.GetLayout()
-		windowLayout.AddItem(layout, 0, 1, true)
+	if mainPage.page == CurvesPage {
+		curves := mainPage.client.GetCurves()
+		var curveComponents []*fan.CurveComponent
+		for _, c := range curves {
+			curveComponent := fan.NewCurveComponent(mainPage.application, c)
+			curveComponents = append(curveComponents, curveComponent)
+			curveComponent.SetCurve(c)
+			curveComponent.Refresh()
+			layout := curveComponent.GetLayout()
+			windowLayout.AddItem(layout, 0, 1, true)
+		}
+		mainPage.curveComponents = curveComponents
 	}
-	mainPage.curveComponents = curveComponents
+
+	// sensors
+	if mainPage.page == SensorsPage {
+		sensors := mainPage.client.GetSensors()
+		var sensorComponents []*fan.SensorComponent
+		for _, s := range sensors {
+			sensorComponent := fan.NewSensorComponent(mainPage.application, s)
+			sensorComponents = append(sensorComponents, sensorComponent)
+			sensorComponent.SetSensor(s)
+			sensorComponent.Refresh()
+			layout := sensorComponent.GetLayout()
+			windowLayout.AddItem(layout, 0, 1, true)
+		}
+		mainPage.sensorComponents = sensorComponents
+	}
 
 	mainPageLayout.AddItem(windowLayout, 0, 1, true)
 
@@ -112,7 +143,7 @@ func (mainPage *MainPage) Refresh() {
 	mainPage.fanOverviewComponent.SetFans(fanList)
 
 	for _, component := range mainPage.fanComponents {
-		f := mainPage.client.GetFan(component.Fan.Label)
+		f := mainPage.client.GetFan(component.Fan.Config.Id)
 		component.SetFan(f)
 		component.Refresh()
 	}
@@ -122,10 +153,20 @@ func (mainPage *MainPage) Refresh() {
 		component.SetCurve(curve)
 		component.Refresh()
 	}
+
+	for _, component := range mainPage.sensorComponents {
+		sensor := mainPage.client.GetSensor(component.Sensor.Config.ID)
+		component.SetSensor(sensor)
+		component.Refresh()
+	}
 }
 
 func (mainPage *MainPage) ToggleFocus() {
 
+}
+
+func (mainPage *MainPage) SetPage(page Page) {
+	mainPage.page = page
 }
 
 func (mainPage *MainPage) showStatusMessage(status *status_message.StatusMessage) {
