@@ -4,6 +4,7 @@ import (
 	"fan2go-tui/cmd/global"
 	"fan2go-tui/internal/configuration"
 	"fan2go-tui/internal/ui/status_message"
+	"fan2go-tui/internal/ui/theme"
 	uiutil "fan2go-tui/internal/ui/util"
 	"fmt"
 	"github.com/gdamore/tcell/v2"
@@ -45,21 +46,17 @@ func NewApplicationHeader(application *tview.Application) *ApplicationHeaderComp
 
 func (applicationHeader *ApplicationHeaderComponent) createLayout() {
 	layout := tview.NewFlex().SetDirection(tview.FlexColumn)
-	// TODO: check colors
-	layout.SetBackgroundColor(tcell.ColorRed)
-	layout.SetTitleColor(tcell.ColorRed)
-	layout.SetBorderColor(tcell.ColorGreen)
 
 	nameTextView := tview.NewTextView()
-	nameTextView.SetTextColor(tcell.ColorWhite)
-	nameTextView.SetBackgroundColor(tcell.ColorDodgerBlue)
+	nameTextView.SetTextColor(theme.Colors.Header.Name)
+	nameTextView.SetBackgroundColor(theme.Colors.Header.NameBackground)
 	nameText := fmt.Sprintf(" %s ", applicationHeader.name)
 	nameTextView.SetText(nameText)
 	nameTextView.SetTextAlign(tview.AlignCenter)
 
 	versionTextView := tview.NewTextView()
-	versionTextView.SetBackgroundColor(tcell.ColorGreenYellow)
-	versionTextView.SetTextColor(tcell.ColorBlack)
+	versionTextView.SetBackgroundColor(theme.Colors.Header.VersionBackground)
+	versionTextView.SetTextColor(theme.Colors.Header.Version)
 	versionText := fmt.Sprintf("  %s  ", applicationHeader.version)
 	versionTextView.SetText(versionText)
 	versionTextView.SetTextAlign(tview.AlignCenter)
@@ -70,10 +67,9 @@ func (applicationHeader *ApplicationHeaderComponent) createLayout() {
 	statusTextView.SetTextAlign(tview.AlignLeft)
 
 	applicationHeader.updateIntervalTextView = tview.NewTextView()
-	applicationHeader.updateIntervalTextView.SetBackgroundColor(tcell.ColorWhite)
-	applicationHeader.updateIntervalTextView.SetTextColor(tcell.ColorBlack)
+	applicationHeader.updateIntervalTextView.SetBackgroundColor(theme.Colors.Header.UpdateIntervalBackground)
+	applicationHeader.updateIntervalTextView.SetTextColor(theme.Colors.Header.UpdateInterval)
 	applicationHeader.updateIntervalTextView.SetTextAlign(tview.AlignCenter)
-	applicationHeader.updateIntervalTextView.SetText("Test")
 
 	page := applicationHeader.page
 	pageName := string(applicationHeader.page)
@@ -83,9 +79,9 @@ func (applicationHeader *ApplicationHeaderComponent) createLayout() {
 
 	pageIndicatorTextView := tview.NewTextView()
 	pageIndicatorTextView.SetText(pageIndicatorText).
-		SetTextColor(tcell.ColorWhite).
+		SetTextColor(theme.Colors.Header.PageIndicator).
 		SetTextAlign(tview.AlignCenter).
-		SetBackgroundColor(tcell.ColorBlue)
+		SetBackgroundColor(theme.Colors.Header.PageIndicatorBackground)
 
 	applicationHeader.pageIndicatorTextView = pageIndicatorTextView
 

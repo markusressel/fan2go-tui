@@ -8,6 +8,19 @@ import (
 
 var (
 	Colors = Color{
+		Header: HeaderColors{
+			Name:           tcell.ColorWhite,
+			NameBackground: tcell.ColorDodgerBlue,
+
+			PageIndicator:           tcell.ColorWhite,
+			PageIndicatorBackground: tcell.ColorBlue,
+
+			UpdateInterval:           tcell.ColorWhite,
+			UpdateIntervalBackground: tcell.ColorSteelBlue,
+
+			Version:           tcell.ColorBlack,
+			VersionBackground: tcell.ColorGreenYellow,
+		},
 		Dialog: DialogColors{
 			Border: tcell.ColorSteelBlue,
 		},
@@ -31,6 +44,20 @@ var (
 	}
 )
 
+type HeaderColors struct {
+	Name           tcell.Color
+	NameBackground tcell.Color
+
+	PageIndicator           tcell.Color
+	PageIndicatorBackground tcell.Color
+
+	UpdateInterval           tcell.Color
+	UpdateIntervalBackground tcell.Color
+
+	Version           tcell.Color
+	VersionBackground tcell.Color
+}
+
 type DialogColors struct {
 	Border tcell.Color
 }
@@ -45,6 +72,7 @@ type LayoutStyle struct {
 }
 
 type Color struct {
+	Header HeaderColors
 	Dialog DialogColors
 	Layout LayoutColors
 	Graphs GraphsColors
