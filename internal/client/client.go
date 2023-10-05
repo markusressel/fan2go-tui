@@ -2,7 +2,9 @@ package client
 
 import (
 	"encoding/json"
+	"fan2go-tui/internal/logging"
 	"fmt"
+	"io"
 	"net/http"
 )
 
@@ -233,21 +235,26 @@ func doGet[T any](client *http.Client, url string, data T) T {
 	// Build the request
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		fmt.Println("Error is req: ", err)
+		logging.Warning("Error is req: %v", err)
 	}
 
 	// Do sends an HTTP request and
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println("error in send req: ", err)
+		logging.Warning("error in send req: %v", err)
 	}
 
 	// Defer the closing of the body
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			logging.Warning("error in close resp: %v", err)
+		}
+	}(resp.Body)
 
 	// Use json.Decode for reading streams of JSON data
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		fmt.Println(err)
+		logging.Warning("%v", err)
 	}
 
 	return data
