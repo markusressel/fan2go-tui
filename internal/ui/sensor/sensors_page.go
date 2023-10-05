@@ -56,7 +56,6 @@ func (c *SensorsPage) createLayout() *tview.Flex {
 
 		sensorGraphComponent := NewSensorGraphComponent(c.application, s)
 		c.sensorGraphComponents = append(c.sensorGraphComponents, sensorGraphComponent)
-		sensorGraphComponent.SetTitle(s.Config.ID)
 		sensorGraphComponent.SetSensor(s)
 		sensorGraphComponent.Refresh()
 		layout = sensorGraphComponent.GetLayout()

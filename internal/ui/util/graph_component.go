@@ -38,7 +38,6 @@ func NewGraphComponent[T any](application *tview.Application, data *T, fetchValu
 func (c *GraphComponent[T]) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 
-	layout.SetBorder(true)
 	SetupWindow(layout, "")
 
 	bmScatterPlot := tvxwidgets.NewPlot()

@@ -35,7 +35,6 @@ func (c *FanInfoComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 	titleText := fmt.Sprintf("Fan: %s", c.Fan.Label)
 
-	layout.SetBorder(true)
 	uiutil.SetupWindow(layout, titleText)
 
 	configTextView := tview.NewTextView()

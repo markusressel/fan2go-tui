@@ -60,7 +60,6 @@ func (c *CurvesPage) createLayout() *tview.Flex {
 
 		curveGraphComponent := NewCurveGraphComponent(c.application, curve)
 		c.curveGraphComponent = append(c.curveGraphComponent, curveGraphComponent)
-		curveGraphComponent.SetTitle(curve.Config.ID)
 		curveGraphComponent.SetCurve(curve)
 		curveGraphComponent.Refresh()
 		layout = curveGraphComponent.GetLayout()

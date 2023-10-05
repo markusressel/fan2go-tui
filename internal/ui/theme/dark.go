@@ -91,6 +91,9 @@ type LayoutColors struct {
 }
 
 func CreateTitleText(text string) string {
+	if len(text) <= 0 {
+		return ""
+	}
 	titleText := fmt.Sprintf(" %s ", text)
 	return titleText
 }

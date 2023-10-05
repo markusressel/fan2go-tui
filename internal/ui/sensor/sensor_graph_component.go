@@ -38,9 +38,6 @@ func NewSensorGraphComponent(application *tview.Application, sensor *client.Sens
 
 func (c *SensorGraphComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
-
-	layout.SetBorder(false)
-
 	return layout
 }
 

@@ -2,6 +2,7 @@ package fan
 
 import (
 	"fan2go-tui/internal/client"
+	uiutil "fan2go-tui/internal/ui/util"
 	"github.com/rivo/tview"
 	"sort"
 	"strings"
@@ -34,12 +35,10 @@ func NewFansPage(application *tview.Application, client client.Fan2goApiClient) 
 
 func (c *FansPage) createLayout() *tview.Flex {
 
-	fansPageLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
+	fansPageLayout := tview.NewFlex().SetDirection(tview.FlexRow)
 
-	fanInfoLayout := tview.NewFlex().SetDirection(tview.FlexRow)
-	fansPageLayout.AddItem(fanInfoLayout, 0, 1, true)
-	fanGraphsLayout := tview.NewFlex().SetDirection(tview.FlexRow)
-	fansPageLayout.AddItem(fanGraphsLayout, 0, 3, true)
+	fanRowLayout := tview.NewFlex().SetDirection(tview.FlexRow)
+	fansPageLayout.AddItem(fanRowLayout, 0, 1, true)
 
 	fans, fanIds, err := c.fetchFans()
 	if err != nil {
@@ -50,19 +49,28 @@ func (c *FansPage) createLayout() *tview.Flex {
 	c.Fans = *fans
 
 	for _, fId := range fanIds {
+		fanColumnLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
+		uiutil.SetupWindow(fanColumnLayout, fId)
+		fanColumnLayout.SetTitleAlign(tview.AlignLeft)
+		fanColumnLayout.SetBorder(true)
+		fanRowLayout.AddItem(fanColumnLayout, 0, 1, true)
+
 		f := (*fans)[fId]
 		fanInfoComponent := NewFanInfoComponent(c.application, f)
 		c.fanInfoComponents = append(c.fanInfoComponents, fanInfoComponent)
 		fanInfoComponent.Refresh()
 		layout := fanInfoComponent.GetLayout()
-		fanInfoLayout.AddItem(layout, 0, 1, true)
+
+		fanColumnLayout.AddItem(layout, 0, 1, true)
+		//fanInfoLayout.AddItem(layout, 0, 1, true)
 
 		fanGraphComponent := NewFanGraphComponent(c.application, f)
 		c.fanGraphComponents = append(c.fanGraphComponents, fanGraphComponent)
-		fanGraphComponent.SetTitle(f.Config.Id)
+		//fanGraphComponent.SetTitle(f.Config.Id)
+		fanGraphComponent.SetTitle("")
 		fanGraphComponent.Refresh()
 		layout = fanGraphComponent.GetLayout()
-		fanGraphsLayout.AddItem(layout, 0, 1, false)
+		fanColumnLayout.AddItem(layout, 0, 3, true)
 	}
 
 	return fansPageLayout
