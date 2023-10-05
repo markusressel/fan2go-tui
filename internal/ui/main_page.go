@@ -62,10 +62,13 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 	header := NewApplicationHeader(mainPage.application)
 	mainPageLayout.AddItem(header.layout, 1, 0, false)
 
-	windowLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
+	splitLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
+
+	infosList := tview.NewFlex().SetDirection(tview.FlexRow)
+	splitLayout.AddItem(infosList, 0, 1, true)
 
 	fanOverviewComponent := fan.NewFanOverviewComponent(mainPage.application)
-	windowLayout.AddItem(fanOverviewComponent.GetLayout(), 0, 3, true)
+	splitLayout.AddItem(fanOverviewComponent.GetLayout(), 0, 3, true)
 	mainPage.fanOverviewComponent = fanOverviewComponent
 
 	// fans
@@ -77,7 +80,7 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 			fanComponents = append(fanComponents, fanComponent)
 			fanComponent.Refresh()
 			layout := fanComponent.GetLayout()
-			windowLayout.AddItem(layout, 0, 1, true)
+			infosList.AddItem(layout, 0, 1, true)
 		}
 		mainPage.fanComponents = fanComponents
 	}
@@ -92,7 +95,7 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 			curveComponent.SetCurve(c)
 			curveComponent.Refresh()
 			layout := curveComponent.GetLayout()
-			windowLayout.AddItem(layout, 0, 1, true)
+			infosList.AddItem(layout, 0, 1, true)
 		}
 		mainPage.curveComponents = curveComponents
 	}
@@ -107,12 +110,12 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 			sensorComponent.SetSensor(s)
 			sensorComponent.Refresh()
 			layout := sensorComponent.GetLayout()
-			windowLayout.AddItem(layout, 0, 1, true)
+			infosList.AddItem(layout, 0, 1, true)
 		}
 		mainPage.sensorComponents = sensorComponents
 	}
 
-	mainPageLayout.AddItem(windowLayout, 0, 1, true)
+	mainPageLayout.AddItem(splitLayout, 0, 1, true)
 
 	mainPage.header = header
 
