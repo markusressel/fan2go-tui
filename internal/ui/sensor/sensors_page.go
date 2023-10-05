@@ -15,8 +15,7 @@ type SensorsPage struct {
 	layout *tview.Flex
 
 	sensorComponents      []*SensorComponent
-	sensorGraphComponent  *SensorGraphComponent
-	sensorGraphsComponent *SensorGraphsComponent
+	sensorGraphComponents []*SensorGraphComponent
 }
 
 func NewSensorsPage(application *tview.Application, client client.Fan2goApiClient) SensorsPage {
@@ -36,37 +35,30 @@ func (c *SensorsPage) createLayout() *tview.Flex {
 
 	sensorInfoLayout := tview.NewFlex().SetDirection(tview.FlexRow)
 	sensorsPageLayout.AddItem(sensorInfoLayout, 0, 1, true)
+	sensorGraphsLayout := tview.NewFlex().SetDirection(tview.FlexRow)
+	sensorsPageLayout.AddItem(sensorGraphsLayout, 0, 1, false)
 
 	sensors, err := c.client.GetSensors()
 	if err != nil {
 		//c.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
 		return sensorsPageLayout
 	}
-	var sensorComponents []*SensorComponent
 	for _, s := range *sensors {
 		sensorComponent := NewSensorComponent(c.application, s)
-		sensorComponents = append(sensorComponents, sensorComponent)
+		c.sensorComponents = append(c.sensorComponents, sensorComponent)
 		sensorComponent.SetSensor(s)
 		sensorComponent.Refresh()
 		layout := sensorComponent.GetLayout()
 		sensorInfoLayout.AddItem(layout, 0, 1, true)
+
+		sensorGraphComponent := NewSensorGraphComponent(c.application, s)
+		c.sensorGraphComponents = append(c.sensorGraphComponents, sensorGraphComponent)
+		sensorGraphComponent.SetTitle(s.Config.ID)
+		sensorGraphComponent.SetSensor(s)
+		sensorGraphComponent.Refresh()
+		layout = sensorGraphComponent.GetLayout()
+		sensorGraphsLayout.AddItem(layout, 0, 1, false)
 	}
-	c.sensorComponents = sensorComponents
-
-	sensorGraphsComponent := NewSensorGraphsComponent(c.application)
-	c.sensorGraphsComponent = sensorGraphsComponent
-	// sensorComponents = append(sensorComponents, sensorGaphsComponent)
-
-	// update overview
-	sensorList := []*client.Sensor{}
-	for _, f := range *sensors {
-		sensorList = append(sensorList, f)
-	}
-
-	sensorGraphsComponent.SetSensors(sensorList)
-	sensorGraphsComponent.Refresh()
-	layout := sensorGraphsComponent.GetLayout()
-	sensorsPageLayout.AddItem(layout, 0, 1, true)
 
 	return sensorsPageLayout
 }
@@ -85,15 +77,24 @@ func (c *SensorsPage) Refresh() {
 	}
 	c.Sensors = *sensors
 
-	for _, s := range c.Sensors {
-		for _, component := range c.sensorComponents {
-			if component.Sensor.Config.ID == s.Config.ID {
-				component.SetSensor(s)
-				component.Refresh()
-			}
+	for _, component := range c.sensorComponents {
+		sensor, ok := (*sensors)[component.Sensor.Config.ID]
+		if !ok {
+			continue
 		}
+		component.SetSensor(sensor)
+		component.Refresh()
 	}
 
-	//c.sensorGraphsComponent.SetSensors(sensors)
-	c.sensorGraphsComponent.Refresh()
+	for _, component := range c.sensorGraphComponents {
+		if component.Sensor == nil {
+			continue
+		}
+		sensor, ok := (*sensors)[component.Sensor.Config.ID]
+		if !ok || sensor == nil {
+			continue
+		}
+		component.SetSensor(sensor)
+		component.Refresh()
+	}
 }

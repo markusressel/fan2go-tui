@@ -16,9 +16,8 @@ type CurvesPage struct {
 
 	layout *tview.Flex
 
-	curveComponents      []*CurveComponent
-	curveGraphsComponent *CurveGraphsComponent
-	curveGraphComponent  *CurveGraphComponent
+	curveComponents     []*CurveComponent
+	curveGraphComponent []*CurveGraphComponent
 }
 
 func NewCurvesPage(application *tview.Application, client client.Fan2goApiClient) CurvesPage {
@@ -37,8 +36,10 @@ func (c *CurvesPage) createLayout() *tview.Flex {
 
 	curvesPageLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
 
-	curveInfoLayout := tview.NewFlex().SetDirection(tview.FlexRow)
-	curvesPageLayout.AddItem(curveInfoLayout, 0, 1, true)
+	curveInfosLayout := tview.NewFlex().SetDirection(tview.FlexRow)
+	curvesPageLayout.AddItem(curveInfosLayout, 0, 1, true)
+	curveGraphsLayout := tview.NewFlex().SetDirection(tview.FlexRow)
+	curvesPageLayout.AddItem(curveGraphsLayout, 0, 1, true)
 
 	curves, err := c.client.GetCurves()
 	if err != nil {
@@ -46,7 +47,7 @@ func (c *CurvesPage) createLayout() *tview.Flex {
 		//c.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
 		return curvesPageLayout
 	}
-	var curveComponents []*CurveComponent
+
 	curvesIds := []string{}
 	for _, c := range *curves {
 		curvesIds = append(curvesIds, c.Config.ID)
@@ -69,28 +70,20 @@ func (c *CurvesPage) createLayout() *tview.Flex {
 		curve := (*curves)[id]
 
 		curveComponent := NewCurveComponent(c.application, curve)
-		curveComponents = append(curveComponents, curveComponent)
+		c.curveComponents = append(c.curveComponents, curveComponent)
 		curveComponent.SetCurve(curve)
 		curveComponent.Refresh()
 		layout := curveComponent.GetLayout()
-		curveInfoLayout.AddItem(layout, 0, 1, true)
+		curveInfosLayout.AddItem(layout, 0, 1, true)
+
+		curveGraphComponent := NewCurveGraphComponent(c.application, curve)
+		c.curveGraphComponent = append(c.curveGraphComponent, curveGraphComponent)
+		curveGraphComponent.SetTitle(curve.Config.ID)
+		curveGraphComponent.SetCurve(curve)
+		curveGraphComponent.Refresh()
+		layout = curveGraphComponent.GetLayout()
+		curveGraphsLayout.AddItem(layout, 0, 1, true)
 	}
-	c.curveComponents = curveComponents
-
-	curveGraphsComponent := NewCurveGraphsComponent(c.application)
-	c.curveGraphsComponent = curveGraphsComponent
-	//curveComponents = append(curveComponents, curveGaphsComponent)
-
-	// update overview
-	curveList := []*client.Curve{}
-	for _, f := range *curves {
-		curveList = append(curveList, f)
-	}
-
-	curveGraphsComponent.SetCurves(curveList)
-	curveGraphsComponent.Refresh()
-	layout := curveGraphsComponent.GetLayout()
-	curvesPageLayout.AddItem(layout, 0, 1, true)
 
 	return curvesPageLayout
 }
@@ -112,6 +105,18 @@ func (c *CurvesPage) Refresh() {
 	for _, component := range c.curveComponents {
 		curve, ok := (*curves)[component.Curve.Config.ID]
 		if !ok {
+			continue
+		}
+		component.SetCurve(curve)
+		component.Refresh()
+	}
+
+	for _, component := range c.curveGraphComponent {
+		if component.Curve == nil {
+			continue
+		}
+		curve, ok := (*curves)[component.Curve.Config.ID]
+		if !ok || curve == nil {
 			continue
 		}
 		component.SetCurve(curve)
