@@ -74,20 +74,24 @@ func (c *GraphComponent[T]) SetTitle(title string) {
 }
 
 func (c *GraphComponent[T]) InsertValue(data *T) {
-	value := c.fetchValue(data)
-	c.scatterPlotData[0] = slices.Insert(c.scatterPlotData[0], len(c.scatterPlotData[0]), value)
-	// limit data to visible data points
-	if (len(c.scatterPlotData[0])) > c.valueBufferSize {
-		overflow := len(c.scatterPlotData[0]) - c.valueBufferSize
-		c.scatterPlotData[0] = c.scatterPlotData[0][overflow:]
+	if c.fetchValue != nil {
+		value := c.fetchValue(data)
+		c.scatterPlotData[0] = slices.Insert(c.scatterPlotData[0], len(c.scatterPlotData[0]), value)
+		// limit data to visible data points
+		if (len(c.scatterPlotData[0])) > c.valueBufferSize {
+			overflow := len(c.scatterPlotData[0]) - c.valueBufferSize
+			c.scatterPlotData[0] = c.scatterPlotData[0][overflow:]
+		}
 	}
 
-	value2 := c.fetchValue2(data)
-	c.scatterPlotData[1] = slices.Insert(c.scatterPlotData[1], len(c.scatterPlotData[1]), value2)
-	// limit data to visible data points
-	if (len(c.scatterPlotData[1])) > c.valueBufferSize {
-		overflow := len(c.scatterPlotData[1]) - c.valueBufferSize
-		c.scatterPlotData[1] = c.scatterPlotData[1][overflow:]
+	if c.fetchValue2 != nil {
+		value2 := c.fetchValue2(data)
+		c.scatterPlotData[1] = slices.Insert(c.scatterPlotData[1], len(c.scatterPlotData[1]), value2)
+		// limit data to visible data points
+		if (len(c.scatterPlotData[1])) > c.valueBufferSize {
+			overflow := len(c.scatterPlotData[1]) - c.valueBufferSize
+			c.scatterPlotData[1] = c.scatterPlotData[1][overflow:]
+		}
 	}
 
 	c.Refresh()

@@ -41,11 +41,13 @@ func (c *CurveGraphsComponent) Refresh() {
 	for _, curve := range c.Curves {
 		component, ok := c.graphComponents[curve.Config.ID]
 		if !ok {
-			component = util.NewGraphComponent[client.Curve](c.application, curve, func(c *client.Curve) float64 {
-				return float64(c.Value)
-			}, func(c *client.Curve) float64 {
-				return 0
-			},
+			component = util.NewGraphComponent[client.Curve](
+				c.application,
+				curve,
+				func(c *client.Curve) float64 {
+					return c.Value
+				},
+				nil,
 			)
 			c.graphComponents[curve.Config.ID] = component
 			c.layout.AddItem(component.GetLayout(), 0, 1, false)
