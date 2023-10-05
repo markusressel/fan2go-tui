@@ -8,6 +8,7 @@ import (
 	"fan2go-tui/internal/ui/status_message"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
+	"slices"
 )
 
 type Page string
@@ -60,15 +61,12 @@ func NewMainPage(application *tview.Application, client client.Fan2goApiClient) 
 
 		} else if rune == int32(49) {
 			page := Pages[0]
-			mainPage.header.SetPage(page)
 			mainPage.SetPage(page)
 		} else if rune == int32(50) {
 			page := Pages[1]
-			mainPage.header.SetPage(page)
 			mainPage.SetPage(page)
 		} else if rune == int32(51) {
 			page := Pages[2]
-			mainPage.header.SetPage(page)
 			mainPage.SetPage(page)
 		}
 		return event
@@ -117,51 +115,6 @@ func (mainPage *MainPage) Refresh() {
 	mainPage.fansPage.Refresh()
 	mainPage.curvesPage.Refresh()
 	mainPage.sensorsPage.Refresh()
-
-	//curves, err := mainPage.client.GetCurves()
-	//if err != nil {
-	//	mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
-	//	return
-	//}
-	//// update overview
-	//curveList := []*client.Curve{}
-	//for _, f := range *curves {
-	//	curveList = append(curveList, f)
-	//}
-	//mainPage.curveGraphsComponent.SetCurves(curveList)
-
-	//for _, component := range mainPage.curveComponents {
-	//	c, err := mainPage.client.GetCurve(component.Curve.Config.ID)
-	//	if err != nil {
-	//		mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
-	//		continue
-	//	}
-	//	component.SetCurve(c)
-	//	component.Refresh()
-	//}
-
-	//sensors, err := mainPage.client.GetSensors()
-	//if err != nil {
-	//	mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
-	//	return
-	//}
-	//// update overview
-	//sensorList := []*client.Sensor{}
-	//for _, f := range *sensors {
-	//	sensorList = append(sensorList, f)
-	//}
-	//mainPage.sensorGraphsComponent.SetSensors(sensorList)
-
-	//for _, component := range mainPage.sensorComponents {
-	//	s, err := mainPage.client.GetSensor(component.Sensor.Config.ID)
-	//	if err != nil {
-	//		mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
-	//		continue
-	//	}
-	//	component.SetSensor(s)
-	//	component.Refresh()
-	//}
-
 	mainPage.application.ForceDraw()
 }
 
@@ -171,8 +124,22 @@ func (mainPage *MainPage) ToggleFocus() {
 
 func (mainPage *MainPage) SetPage(page Page) {
 	mainPage.page = page
+	mainPage.header.SetPage(page)
 	mainPage.mainPagePagerLayout.SwitchToPage(string(page))
+	mainPage.UpdateHeader()
 	mainPage.Refresh()
+}
+
+func (mainPage *MainPage) PreviousPage() {
+	currentIndex := slices.Index(Pages, mainPage.page)
+	nextIndex := (len(Pages) + currentIndex - 1) % len(Pages)
+	mainPage.SetPage(Pages[nextIndex])
+}
+
+func (mainPage *MainPage) NextPage() {
+	currentIndex := slices.Index(Pages, mainPage.page)
+	nextIndex := (currentIndex + 1) % len(Pages)
+	mainPage.SetPage(Pages[nextIndex])
 }
 
 func (mainPage *MainPage) showStatusMessage(status *status_message.StatusMessage) {
