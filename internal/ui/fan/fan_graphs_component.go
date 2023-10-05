@@ -3,7 +3,7 @@ package fan
 import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/ui/data"
-	"fan2go-tui/internal/ui/table"
+	"fan2go-tui/internal/ui/util"
 	"fmt"
 	"github.com/gdamore/tcell/v2"
 	"github.com/navidys/tvxwidgets"
@@ -13,23 +13,23 @@ import (
 )
 
 var (
-	columnLabel = &table.Column{
+	columnLabel = &util.Column{
 		Id:        0,
 		Title:     "Label",
 		Alignment: tview.AlignLeft,
 	}
-	columnPwm = &table.Column{
+	columnPwm = &util.Column{
 		Id:        1,
 		Title:     "PWM",
 		Alignment: tview.AlignLeft,
 	}
-	columnRpm = &table.Column{
+	columnRpm = &util.Column{
 		Id:        2,
 		Title:     "RPM",
 		Alignment: tview.AlignCenter,
 	}
 
-	tableColumns = []*table.Column{
+	tableColumns = []*util.Column{
 		columnLabel,
 		columnPwm,
 		columnRpm,
@@ -42,14 +42,14 @@ type FanGraphsComponent struct {
 	Fans []*client.Fan
 
 	layout                       *tview.Flex
-	tableContainer               *table.RowSelectionTable[data.FanTableEntry]
+	tableContainer               *util.RowSelectionTable[data.FanTableEntry]
 	selectedEntryChangedCallback func(fileEntry *data.FanTableEntry)
 	bmScatterPlot                *tvxwidgets.Plot
 	graphComponents              map[string]*FanGraphComponent
 }
 
 func NewFanGraphsComponent(application *tview.Application) *FanGraphsComponent {
-	toTableCellsFunction := func(row int, columns []*table.Column, entry *data.FanTableEntry) (cells []*tview.TableCell) {
+	toTableCellsFunction := func(row int, columns []*util.Column, entry *data.FanTableEntry) (cells []*tview.TableCell) {
 		for _, column := range columns {
 			var cellColor = tcell.ColorWhite
 			var cellText string
@@ -78,7 +78,7 @@ func NewFanGraphsComponent(application *tview.Application) *FanGraphsComponent {
 		return cells
 	}
 
-	tableEntrySortFunction := func(entries []*data.FanTableEntry, columnToSortBy *table.Column, inverted bool) []*data.FanTableEntry {
+	tableEntrySortFunction := func(entries []*data.FanTableEntry, columnToSortBy *util.Column, inverted bool) []*data.FanTableEntry {
 		sort.SliceStable(entries, func(i, j int) bool {
 			a := entries[i]
 			b := entries[j]
@@ -123,7 +123,7 @@ func NewFanGraphsComponent(application *tview.Application) *FanGraphsComponent {
 		return entries
 	}
 
-	tableContainer := table.NewTableContainer[data.FanTableEntry](
+	tableContainer := util.NewTableContainer[data.FanTableEntry](
 		application,
 		toTableCellsFunction,
 		tableEntrySortFunction,

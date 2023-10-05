@@ -1,7 +1,6 @@
-package table
+package util
 
 import (
-	uiutil "fan2go-tui/internal/ui/util"
 	"fmt"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -77,7 +76,7 @@ func (c *RowSelectionTable[T]) createLayout() {
 	// fixed header row
 	table.SetFixed(1, 0)
 
-	uiutil.SetupWindow(table, "")
+	SetupWindow(table, "")
 
 	table.SetSelectable(true, false)
 	table.SetSelectionChangedFunc(func(row, column int) {
@@ -114,7 +113,7 @@ func (c *RowSelectionTable[T]) GetLayout() *tview.Table {
 }
 
 func (c *RowSelectionTable[T]) SetTitle(title string) {
-	uiutil.SetupWindow(c.layout, title)
+	SetupWindow(c.layout, title)
 }
 
 func (c *RowSelectionTable[T]) SetColumnSpec(columns []*Column, defaultSortColumn *Column, inverted bool) {
