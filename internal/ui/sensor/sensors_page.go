@@ -3,6 +3,8 @@ package sensor
 import (
 	"fan2go-tui/internal/client"
 	"github.com/rivo/tview"
+	"sort"
+	"strings"
 )
 
 type SensorsPage struct {
@@ -38,12 +40,13 @@ func (c *SensorsPage) createLayout() *tview.Flex {
 	sensorGraphsLayout := tview.NewFlex().SetDirection(tview.FlexRow)
 	sensorsPageLayout.AddItem(sensorGraphsLayout, 0, 3, false)
 
-	sensors, err := c.client.GetSensors()
+	sensors, sensorIds, err := c.fetchSensors()
 	if err != nil {
 		//c.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
 		return sensorsPageLayout
 	}
-	for _, s := range *sensors {
+	for _, sId := range sensorIds {
+		s := (*sensors)[sId]
 		sensorComponent := NewSensorComponent(c.application, s)
 		c.sensorComponents = append(c.sensorComponents, sensorComponent)
 		sensorComponent.SetSensor(s)
@@ -63,15 +66,37 @@ func (c *SensorsPage) createLayout() *tview.Flex {
 	return sensorsPageLayout
 }
 
-func (c *SensorsPage) fetchSensors() (*map[string]*client.Sensor, error) {
-	return c.client.GetSensors()
+func (c *SensorsPage) fetchSensors() (*map[string]*client.Sensor, []string, error) {
+	result, err := c.client.GetSensors()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var sensorIds []string
+	for _, s := range *result {
+		sensorIds = append(sensorIds, s.Config.ID)
+	}
+	sort.SliceStable(sensorIds, func(i, j int) bool {
+		a := sensorIds[i]
+		b := sensorIds[j]
+
+		result := strings.Compare(strings.ToLower(a), strings.ToLower(b))
+
+		if result <= 0 {
+			return true
+		} else {
+			return false
+		}
+	})
+
+	return result, sensorIds, err
 }
 
 func (c *SensorsPage) GetLayout() *tview.Flex {
 	return c.layout
 }
 func (c *SensorsPage) Refresh() {
-	sensors, err := c.fetchSensors()
+	sensors, _, err := c.fetchSensors()
 	if err != nil {
 		return
 	}

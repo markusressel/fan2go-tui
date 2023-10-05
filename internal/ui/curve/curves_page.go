@@ -41,32 +41,14 @@ func (c *CurvesPage) createLayout() *tview.Flex {
 	curveGraphsLayout := tview.NewFlex().SetDirection(tview.FlexRow)
 	curvesPageLayout.AddItem(curveGraphsLayout, 0, 3, true)
 
-	curves, err := c.client.GetCurves()
+	curves, curveIds, err := c.fetchCurves()
 	if err != nil {
 		// TODO: handle error
 		//c.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
 		return curvesPageLayout
 	}
 
-	curvesIds := []string{}
-	for _, c := range *curves {
-		curvesIds = append(curvesIds, c.Config.ID)
-	}
-
-	sort.SliceStable(curvesIds, func(i, j int) bool {
-		a := curvesIds[i]
-		b := curvesIds[j]
-
-		result := strings.Compare(strings.ToLower(a), strings.ToLower(b))
-
-		if result <= 0 {
-			return true
-		} else {
-			return false
-		}
-	})
-
-	for _, id := range curvesIds {
+	for _, id := range curveIds {
 		curve := (*curves)[id]
 
 		curveComponent := NewCurveComponent(c.application, curve)
@@ -88,8 +70,30 @@ func (c *CurvesPage) createLayout() *tview.Flex {
 	return curvesPageLayout
 }
 
-func (c *CurvesPage) fetchCurves() (*map[string]*client.Curve, error) {
-	return c.client.GetCurves()
+func (c *CurvesPage) fetchCurves() (*map[string]*client.Curve, []string, error) {
+	result, err := c.client.GetCurves()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var curveIds []string
+	for _, c := range *result {
+		curveIds = append(curveIds, c.Config.ID)
+	}
+	sort.SliceStable(curveIds, func(i, j int) bool {
+		a := curveIds[i]
+		b := curveIds[j]
+
+		result := strings.Compare(strings.ToLower(a), strings.ToLower(b))
+
+		if result <= 0 {
+			return true
+		} else {
+			return false
+		}
+	})
+
+	return result, curveIds, err
 }
 
 func (c *CurvesPage) GetLayout() *tview.Flex {

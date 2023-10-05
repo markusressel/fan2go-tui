@@ -3,6 +3,8 @@ package fan
 import (
 	"fan2go-tui/internal/client"
 	"github.com/rivo/tview"
+	"sort"
+	"strings"
 )
 
 type FansPage struct {
@@ -40,7 +42,7 @@ func (c *FansPage) createLayout() *tview.Flex {
 	fanGraphsLayout := tview.NewFlex().SetDirection(tview.FlexRow)
 	fansPageLayout.AddItem(fanGraphsLayout, 0, 3, true)
 
-	fans, err := c.fetchFans()
+	fans, fanIds, err := c.fetchFans()
 	if err != nil {
 		// TODO: handle error
 		//c.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
@@ -48,7 +50,8 @@ func (c *FansPage) createLayout() *tview.Flex {
 	}
 	c.Fans = *fans
 
-	for _, f := range c.Fans {
+	for _, fId := range fanIds {
+		f := (*fans)[fId]
 		fanInfoComponent := NewFanInfoComponent(c.application, f)
 		c.fanInfoComponents = append(c.fanInfoComponents, fanInfoComponent)
 		fanInfoComponent.Refresh()
@@ -66,8 +69,31 @@ func (c *FansPage) createLayout() *tview.Flex {
 	return fansPageLayout
 }
 
-func (c *FansPage) fetchFans() (*map[string]*client.Fan, error) {
-	return c.client.GetFans()
+func (c *FansPage) fetchFans() (*map[string]*client.Fan, []string, error) {
+	result, err := c.client.GetFans()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var fanIds []string
+	for _, f := range *result {
+		fanIds = append(fanIds, f.Config.Id)
+	}
+
+	sort.SliceStable(fanIds, func(i, j int) bool {
+		a := fanIds[i]
+		b := fanIds[j]
+
+		result := strings.Compare(strings.ToLower(a), strings.ToLower(b))
+
+		if result <= 0 {
+			return true
+		} else {
+			return false
+		}
+	})
+
+	return result, fanIds, nil
 }
 
 func (c *FansPage) GetLayout() *tview.Flex {
@@ -75,7 +101,7 @@ func (c *FansPage) GetLayout() *tview.Flex {
 }
 
 func (c *FansPage) Refresh() {
-	fans, err := c.fetchFans()
+	fans, _, err := c.fetchFans()
 	if err != nil {
 		return
 	}
