@@ -67,7 +67,7 @@ func (c *FanComponent) Refresh() {
 	configText := ""
 	// configText += fmt.Sprintf("Id: %s\n", config.Id)
 	configText += fmt.Sprintf("Curve: %s\n", config.Curve)
-	configText += fmt.Sprintf("Rpm:\n")
+	configText += fmt.Sprintf("Pwm:\n")
 	configText += fmt.Sprintf("  Min: %d\n", *config.MinPwm)
 	configText += fmt.Sprintf("  Start: %d\n", *config.StartPwm)
 	configText += fmt.Sprintf("  Max: %d\n", *config.MaxPwm)
