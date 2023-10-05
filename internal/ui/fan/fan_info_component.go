@@ -8,7 +8,7 @@ import (
 	"github.com/rivo/tview"
 )
 
-type FanComponent struct {
+type FanInfoComponent struct {
 	application *tview.Application
 
 	Fan *client.Fan
@@ -20,8 +20,8 @@ type FanComponent struct {
 	rpmValueTextView *tview.TextView
 }
 
-func NewFanComponent(application *tview.Application, fan *client.Fan) *FanComponent {
-	c := &FanComponent{
+func NewFanInfoComponent(application *tview.Application, fan *client.Fan) *FanInfoComponent {
+	c := &FanInfoComponent{
 		application: application,
 		Fan:         fan,
 	}
@@ -31,7 +31,7 @@ func NewFanComponent(application *tview.Application, fan *client.Fan) *FanCompon
 	return c
 }
 
-func (c *FanComponent) createLayout() *tview.Flex {
+func (c *FanInfoComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 	titleText := fmt.Sprintf("Fan: %s", c.Fan.Label)
 
@@ -53,7 +53,7 @@ func (c *FanComponent) createLayout() *tview.Flex {
 	return layout
 }
 
-func (c *FanComponent) Refresh() {
+func (c *FanInfoComponent) Refresh() {
 	// print basic info
 	pwmText := fmt.Sprintf("PWM: %d", c.Fan.Pwm)
 	c.pwmValueTextView.SetText(pwmText)
@@ -98,10 +98,10 @@ func (c *FanComponent) Refresh() {
 	c.configTextView.SetText(configText)
 }
 
-func (c *FanComponent) GetLayout() *tview.Flex {
+func (c *FanInfoComponent) GetLayout() *tview.Flex {
 	return c.layout
 }
 
-func (c *FanComponent) SetFan(fan *client.Fan) {
+func (c *FanInfoComponent) SetFan(fan *client.Fan) {
 	c.Fan = fan
 }

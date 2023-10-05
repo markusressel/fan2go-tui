@@ -29,6 +29,7 @@ func NewFanGraphComponent(application *tview.Application, fan *client.Fan) *FanG
 	c := &FanGraphComponent{
 		application:    application,
 		graphComponent: graphComponent,
+		Fan:            fan,
 	}
 
 	c.layout = c.createLayout()

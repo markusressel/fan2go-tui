@@ -2,7 +2,6 @@ package curve
 
 import (
 	"fan2go-tui/internal/client"
-	"fan2go-tui/internal/ui/util"
 	"github.com/navidys/tvxwidgets"
 	"github.com/rivo/tview"
 )
@@ -14,14 +13,14 @@ type CurveGraphsComponent struct {
 
 	layout          *tview.Flex
 	bmScatterPlot   *tvxwidgets.Plot
-	graphComponents map[string]*util.GraphComponent[client.Curve]
+	graphComponents map[string]*CurveGraphComponent
 }
 
 func NewCurveGraphsComponent(application *tview.Application) *CurveGraphsComponent {
 	c := &CurveGraphsComponent{
 		application:     application,
 		Curves:          []*client.Curve{},
-		graphComponents: map[string]*util.GraphComponent[client.Curve]{},
+		graphComponents: map[string]*CurveGraphComponent{},
 	}
 
 	c.layout = c.createLayout()
@@ -41,14 +40,8 @@ func (c *CurveGraphsComponent) Refresh() {
 	for _, curve := range c.Curves {
 		component, ok := c.graphComponents[curve.Config.ID]
 		if !ok {
-			component = util.NewGraphComponent[client.Curve](
-				c.application,
-				curve,
-				func(c *client.Curve) float64 {
-					return c.Value
-				},
-				nil,
-			)
+
+			component = NewCurveGraphComponent(c.application, curve)
 			c.graphComponents[curve.Config.ID] = component
 			c.layout.AddItem(component.GetLayout(), 0, 1, false)
 			component.InsertValue(curve)

@@ -27,6 +27,7 @@ func NewSensorGraphComponent(application *tview.Application, sensor *client.Sens
 	c := &SensorGraphComponent{
 		application:    application,
 		graphComponent: graphComponent,
+		Sensor:         sensor,
 	}
 
 	c.layout = c.createLayout()
