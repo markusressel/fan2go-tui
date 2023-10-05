@@ -2,6 +2,7 @@ package ui
 
 import (
 	"fan2go-tui/cmd/global"
+	"fan2go-tui/internal/configuration"
 	"fan2go-tui/internal/ui/status_message"
 	uiutil "fan2go-tui/internal/ui/util"
 	"fmt"
@@ -21,8 +22,9 @@ type ApplicationHeaderComponent struct {
 	statusTextView        *tview.TextView
 	pageIndicatorTextView *tview.TextView
 
-	lastStatus *status_message.StatusMessage
-	page       Page
+	lastStatus             *status_message.StatusMessage
+	page                   Page
+	updateIntervalTextView *tview.TextView
 }
 
 func NewApplicationHeader(application *tview.Application) *ApplicationHeaderComponent {
@@ -67,6 +69,12 @@ func (applicationHeader *ApplicationHeaderComponent) createLayout() {
 	statusTextView.SetTextColor(tcell.ColorGray)
 	statusTextView.SetTextAlign(tview.AlignLeft)
 
+	applicationHeader.updateIntervalTextView = tview.NewTextView()
+	applicationHeader.updateIntervalTextView.SetBackgroundColor(tcell.ColorWhite)
+	applicationHeader.updateIntervalTextView.SetTextColor(tcell.ColorBlack)
+	applicationHeader.updateIntervalTextView.SetTextAlign(tview.AlignCenter)
+	applicationHeader.updateIntervalTextView.SetText("Test")
+
 	page := applicationHeader.page
 	pageName := string(applicationHeader.page)
 	pageIdx := indexOf(page, Pages)
@@ -87,6 +95,7 @@ func (applicationHeader *ApplicationHeaderComponent) createLayout() {
 	layout.AddItem(nameTextView, len(nameText), 0, false)
 	layout.AddItem(versionTextView, len(versionText), 0, false)
 	layout.AddItem(statusTextView, 0, 1, false)
+	layout.AddItem(applicationHeader.updateIntervalTextView, len(pageIndicatorText)+4, 0, false)
 	layout.AddItem(pageIndicatorTextView, len(pageIndicatorText)+4, 0, false)
 	layout.AddItem(helpTextView, len(helpText)+4, 0, false)
 
@@ -128,6 +137,12 @@ func (applicationHeader *ApplicationHeaderComponent) ResetStatus() {
 func (applicationHeader *ApplicationHeaderComponent) SetPage(page Page) {
 	applicationHeader.page = page
 	applicationHeader.updateUi()
+}
+
+func (applicationHeader *ApplicationHeaderComponent) Refresh() {
+	millis := configuration.CurrentConfig.Ui.UpdateInterval.Milliseconds()
+	updateIntervalText := fmt.Sprintf("- %d ms +", millis)
+	applicationHeader.updateIntervalTextView.SetText(updateIntervalText)
 }
 
 func indexOf[T comparable](word T, data []T) int {

@@ -113,6 +113,7 @@ func (mainPage *MainPage) Init() {
 }
 
 func (mainPage *MainPage) Refresh() {
+	mainPage.UpdateHeader()
 	mainPage.fansPage.Refresh()
 	mainPage.curvesPage.Refresh()
 	mainPage.sensorsPage.Refresh()
@@ -176,4 +177,8 @@ func (mainPage *MainPage) SetPage(page Page) {
 
 func (mainPage *MainPage) showStatusMessage(status *status_message.StatusMessage) {
 	mainPage.header.SetStatus(status)
+}
+
+func (mainPage *MainPage) UpdateHeader() {
+	mainPage.header.Refresh()
 }

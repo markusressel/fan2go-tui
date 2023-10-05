@@ -15,7 +15,13 @@ const (
 	HelpDialog util.Page = "help"
 )
 
+var (
+	UpdateTicker *time.Ticker
+)
+
 func CreateUi(fullscreen bool) *tview.Application {
+	UpdateTicker = time.NewTicker(configuration.CurrentConfig.Ui.UpdateInterval)
+
 	application := tview.NewApplication()
 	application.EnableMouse(true)
 
@@ -44,6 +50,21 @@ func CreateUi(fullscreen bool) *tview.Application {
 		} else if event.Rune() == '?' || event.Key() == tcell.KeyF1 {
 			pagesLayout.ShowPage(string(HelpDialog))
 			return nil
+		} else if event.Rune() == '+' {
+			configuration.CurrentConfig.Ui.UpdateInterval += 100 * time.Millisecond
+			UpdateTicker.Reset(configuration.CurrentConfig.Ui.UpdateInterval)
+			mainPage.UpdateHeader()
+			return nil
+		} else if event.Rune() == '-' {
+			stepSize := 100 * time.Millisecond
+			if configuration.CurrentConfig.Ui.UpdateInterval <= stepSize {
+				configuration.CurrentConfig.Ui.UpdateInterval = stepSize
+			} else {
+				configuration.CurrentConfig.Ui.UpdateInterval -= stepSize
+			}
+			UpdateTicker.Reset(configuration.CurrentConfig.Ui.UpdateInterval)
+			mainPage.UpdateHeader()
+			return nil
 		}
 		return event
 	})
@@ -59,9 +80,8 @@ func CreateUi(fullscreen bool) *tview.Application {
 	mainPage.Init()
 
 	go func() {
-		tick := time.NewTicker(configuration.CurrentConfig.Ui.UpdateInterval)
 		for {
-			<-tick.C
+			<-UpdateTicker.C
 			mainPage.Refresh()
 			application.Draw()
 		}
