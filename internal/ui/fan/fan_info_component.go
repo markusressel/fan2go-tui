@@ -67,9 +67,20 @@ func (c *FanInfoComponent) Refresh() {
 	// configText += fmt.Sprintf("Id: %s\n", config.Id)
 	configText += fmt.Sprintf("Curve: %s\n", config.Curve)
 	configText += fmt.Sprintf("Pwm:\n")
-	configText += fmt.Sprintf("  Min: %d\n", *config.MinPwm)
-	configText += fmt.Sprintf("  Start: %d\n", *config.StartPwm)
-	configText += fmt.Sprintf("  Max: %d\n", *config.MaxPwm)
+	minPwmText := "N/A"
+	if config.MinPwm != nil {
+		minPwmText = fmt.Sprintf("%d", *config.MinPwm)
+	}
+	configText += fmt.Sprintf("  Min: %s\n", minPwmText)
+	startPwmText := "N/A"
+	if config.StartPwm != nil {
+		startPwmText = fmt.Sprintf("%d", *config.StartPwm)
+	}
+	configText += fmt.Sprintf("  Start: %s\n", startPwmText)
+	if config.MaxPwm != nil {
+		maxPwmText = fmt.Sprintf("%d", *config.MaxPwm)
+	}
+	configText += fmt.Sprintf("  Max: %s\n", maxPwmText)
 	configText += fmt.Sprintf("NeverStop: %v\n", config.NeverStop)
 
 	// value = strconv.FormatFloat(config.MinPwm, 'f', -1, 64)
