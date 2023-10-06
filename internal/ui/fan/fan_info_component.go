@@ -77,6 +77,7 @@ func (c *FanInfoComponent) Refresh() {
 		startPwmText = fmt.Sprintf("%d", *config.StartPwm)
 	}
 	configText += fmt.Sprintf("  Start: %s\n", startPwmText)
+	maxPwmText := "N/A"
 	if config.MaxPwm != nil {
 		maxPwmText = fmt.Sprintf("%d", *config.MaxPwm)
 	}
