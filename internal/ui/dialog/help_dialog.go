@@ -32,8 +32,9 @@ func (p *HelpPage) createLayout() {
 
 	helpTableEntries := []*TableEntry{
 		{Key: "F1, ?", Value: "Opens help dialog"},
-		{Key: "1, 2, 3", Value: "Switch to the given Page"},
-		{Key: "tab, shift+tab", Value: "Cycles window focus forwards"},
+		{Key: "1, 2, 3", Value: "Switches to the given page"},
+		{Key: "PgUp, PgDw", Value: "Cycles backwards/forwards through all pages"},
+		{Key: "tab, shift+tab", Value: "Cycles window focus forwards/backwards"},
 		{Key: "shift+tab", Value: "Cycles window focus backwards"},
 		{Key: "Mousescroll", Value: "Scroll within scrollable views"},
 		{Key: "ctrl+r", Value: "Refreshes all data"},
