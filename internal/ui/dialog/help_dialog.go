@@ -35,7 +35,6 @@ func (p *HelpPage) createLayout() {
 		{Key: "1, 2, 3", Value: "Switches to the given page"},
 		{Key: "PgUp, PgDw", Value: "Cycles backwards/forwards through all pages"},
 		{Key: "tab, shift+tab", Value: "Cycles window focus forwards/backwards"},
-		{Key: "shift+tab", Value: "Cycles window focus backwards"},
 		{Key: "Mousescroll", Value: "Scroll within scrollable views"},
 		{Key: "ctrl+r", Value: "Refreshes all data"},
 		emptyEntry,
