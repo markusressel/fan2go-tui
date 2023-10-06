@@ -62,11 +62,9 @@ func (c *FansPage) createLayout() *tview.Flex {
 		layout := fanInfoComponent.GetLayout()
 
 		fanColumnLayout.AddItem(layout, 0, 1, true)
-		//fanInfoLayout.AddItem(layout, 0, 1, true)
 
 		fanGraphComponent := NewFanGraphComponent(c.application, f)
 		c.fanGraphComponents = append(c.fanGraphComponents, fanGraphComponent)
-		//fanGraphComponent.SetTitle(f.Config.Id)
 		fanGraphComponent.Refresh()
 		layout = fanGraphComponent.GetLayout()
 		fanColumnLayout.AddItem(layout, 0, 3, true)
