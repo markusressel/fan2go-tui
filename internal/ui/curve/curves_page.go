@@ -2,8 +2,8 @@ package curve
 
 import (
 	"fan2go-tui/internal/client"
-	uiutil "fan2go-tui/internal/ui/util"
 	"github.com/rivo/tview"
+	"golang.org/x/exp/maps"
 	"sort"
 	"strings"
 )
@@ -15,17 +15,18 @@ type CurvesPage struct {
 
 	Curves map[string]*client.Curve
 
-	layout *tview.Flex
+	layout         *tview.Flex
+	curveRowLayout *tview.Flex
 
-	curveComponents     []*CurveInfoComponent
-	curveGraphComponent []*CurveGraphComponent
+	curveListItemComponents map[string]*CurveListItemComponent
 }
 
 func NewCurvesPage(application *tview.Application, client client.Fan2goApiClient) CurvesPage {
 
 	curvesPage := CurvesPage{
-		application: application,
-		client:      client,
+		application:             application,
+		client:                  client,
+		curveListItemComponents: map[string]*CurveListItemComponent{},
 	}
 
 	curvesPage.layout = curvesPage.createLayout()
@@ -34,43 +35,12 @@ func NewCurvesPage(application *tview.Application, client client.Fan2goApiClient
 }
 
 func (c *CurvesPage) createLayout() *tview.Flex {
+	fansPageLayout := tview.NewFlex().SetDirection(tview.FlexRow)
 
-	curvesPageLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
+	c.curveRowLayout = tview.NewFlex().SetDirection(tview.FlexRow)
+	fansPageLayout.AddItem(c.curveRowLayout, 0, 1, true)
 
-	curveRowLayout := tview.NewFlex().SetDirection(tview.FlexRow)
-	curvesPageLayout.AddItem(curveRowLayout, 0, 1, true)
-
-	curves, curveIds, err := c.fetchCurves()
-	if err != nil {
-		// TODO: handle error
-		//c.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
-		return curvesPageLayout
-	}
-
-	for _, id := range curveIds {
-		curveColumnLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
-		uiutil.SetupWindow(curveColumnLayout, id)
-		curveColumnLayout.SetTitleAlign(tview.AlignLeft)
-		curveColumnLayout.SetBorder(true)
-		curveRowLayout.AddItem(curveColumnLayout, 0, 1, true)
-
-		curve := (*curves)[id]
-		curveInfoComponent := NewCurveInfoComponent(c.application, curve)
-		c.curveComponents = append(c.curveComponents, curveInfoComponent)
-		curveInfoComponent.SetCurve(curve)
-		curveInfoComponent.Refresh()
-		layout := curveInfoComponent.GetLayout()
-		curveColumnLayout.AddItem(layout, 0, 1, true)
-
-		curveGraphComponent := NewCurveGraphComponent(c.application, curve)
-		c.curveGraphComponent = append(c.curveGraphComponent, curveGraphComponent)
-		curveGraphComponent.SetCurve(curve)
-		curveGraphComponent.Refresh()
-		layout = curveGraphComponent.GetLayout()
-		curveColumnLayout.AddItem(layout, 0, 3, true)
-	}
-
-	return curvesPageLayout
+	return fansPageLayout
 }
 
 func (c *CurvesPage) fetchCurves() (*map[string]*client.Curve, []string, error) {
@@ -104,29 +74,35 @@ func (c *CurvesPage) GetLayout() *tview.Flex {
 }
 
 func (c *CurvesPage) Refresh() {
-	curves, err := c.client.GetCurves()
-	if err != nil {
-		return
+	fans, curveIds, err := c.fetchCurves()
+	if err != nil || fans == nil {
+		fans = &map[string]*client.Curve{}
 	}
 
-	for _, component := range c.curveComponents {
-		curve, ok := (*curves)[component.Curve.Config.ID]
+	oldCIds := maps.Keys(c.curveListItemComponents)
+	// remove now nonexisting entries
+	for _, oldFId := range oldCIds {
+		_, ok := (*fans)[oldFId]
 		if !ok {
-			continue
+			fanListItemComponent := c.curveListItemComponents[oldFId]
+			c.curveRowLayout.RemoveItem(fanListItemComponent.GetLayout())
+			delete(c.curveListItemComponents, oldFId)
 		}
-		component.SetCurve(curve)
-		component.Refresh()
 	}
 
-	for _, component := range c.curveGraphComponent {
-		if component.Curve == nil {
-			continue
+	// add new entries / update existing entries
+	for _, cId := range curveIds {
+		curve := (*fans)[cId]
+		fanListItemComponent, ok := c.curveListItemComponents[cId]
+		if ok {
+			fanListItemComponent.SetCurve(curve)
+			fanListItemComponent.Refresh()
+		} else {
+			fanListItemComponent = NewCurveListItemComponent(c.application, curve)
+			c.curveListItemComponents[cId] = fanListItemComponent
+			fanListItemComponent.SetCurve(curve)
+			fanListItemComponent.Refresh()
+			c.curveRowLayout.AddItem(fanListItemComponent.GetLayout(), 0, 1, true)
 		}
-		curve, ok := (*curves)[component.Curve.Config.ID]
-		if !ok || curve == nil {
-			continue
-		}
-		component.SetCurve(curve)
-		component.Refresh()
 	}
 }
