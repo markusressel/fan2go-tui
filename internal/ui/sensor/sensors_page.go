@@ -2,8 +2,8 @@ package sensor
 
 import (
 	"fan2go-tui/internal/client"
-	uiutil "fan2go-tui/internal/ui/util"
 	"github.com/rivo/tview"
+	"golang.org/x/exp/maps"
 	"sort"
 	"strings"
 )
@@ -15,17 +15,18 @@ type SensorsPage struct {
 
 	Sensors map[string]*client.Sensor
 
-	layout *tview.Flex
+	layout          *tview.Flex
+	sensorRowLayout *tview.Flex
 
-	sensorInfoComponents  []*SensorInfoComponent
-	sensorGraphComponents []*SensorGraphComponent
+	sensorListItemComponents map[string]*SensorListItemComponent
 }
 
 func NewSensorsPage(application *tview.Application, client client.Fan2goApiClient) SensorsPage {
 
 	sensorsPage := SensorsPage{
-		application: application,
-		client:      client,
+		application:              application,
+		client:                   client,
+		sensorListItemComponents: map[string]*SensorListItemComponent{},
 	}
 
 	sensorsPage.layout = sensorsPage.createLayout()
@@ -34,38 +35,10 @@ func NewSensorsPage(application *tview.Application, client client.Fan2goApiClien
 }
 
 func (c *SensorsPage) createLayout() *tview.Flex {
-	sensorsPageLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
+	sensorsPageLayout := tview.NewFlex().SetDirection(tview.FlexRow)
 
-	sensorRowLayout := tview.NewFlex().SetDirection(tview.FlexRow)
-	sensorsPageLayout.AddItem(sensorRowLayout, 0, 1, true)
-
-	sensors, sensorIds, err := c.fetchSensors()
-	if err != nil {
-		//c.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
-		return sensorsPageLayout
-	}
-	for _, sId := range sensorIds {
-		sensorColumnLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
-		uiutil.SetupWindow(sensorColumnLayout, sId)
-		sensorColumnLayout.SetTitleAlign(tview.AlignLeft)
-		sensorColumnLayout.SetBorder(true)
-		sensorRowLayout.AddItem(sensorColumnLayout, 0, 1, true)
-
-		s := (*sensors)[sId]
-		sensorInfoComponent := NewSensorInfoComponent(c.application, s)
-		c.sensorInfoComponents = append(c.sensorInfoComponents, sensorInfoComponent)
-		sensorInfoComponent.SetSensor(s)
-		sensorInfoComponent.Refresh()
-		layout := sensorInfoComponent.GetLayout()
-		sensorColumnLayout.AddItem(layout, 0, 1, true)
-
-		sensorGraphComponent := NewSensorGraphComponent(c.application, s)
-		c.sensorGraphComponents = append(c.sensorGraphComponents, sensorGraphComponent)
-		sensorGraphComponent.SetSensor(s)
-		sensorGraphComponent.Refresh()
-		layout = sensorGraphComponent.GetLayout()
-		sensorColumnLayout.AddItem(layout, 0, 3, false)
-	}
+	c.sensorRowLayout = tview.NewFlex().SetDirection(tview.FlexRow)
+	sensorsPageLayout.AddItem(c.sensorRowLayout, 0, 1, true)
 
 	return sensorsPageLayout
 }
@@ -99,31 +72,35 @@ func (c *SensorsPage) fetchSensors() (*map[string]*client.Sensor, []string, erro
 func (c *SensorsPage) GetLayout() *tview.Flex {
 	return c.layout
 }
+
 func (c *SensorsPage) Refresh() {
-	sensors, _, err := c.fetchSensors()
-	if err != nil {
-		return
+	sensors, sensorIds, err := c.fetchSensors()
+	if err != nil || sensors == nil {
+		sensors = &map[string]*client.Sensor{}
 	}
-	c.Sensors = *sensors
 
-	for _, component := range c.sensorInfoComponents {
-		sensor, ok := (*sensors)[component.Sensor.Config.ID]
+	oldCIds := maps.Keys(c.sensorListItemComponents)
+	// remove now nonexisting entries
+	for _, oldFId := range oldCIds {
+		_, ok := (*sensors)[oldFId]
 		if !ok {
-			continue
+			sensorListItemComponent := c.sensorListItemComponents[oldFId]
+			c.sensorRowLayout.RemoveItem(sensorListItemComponent.GetLayout())
+			delete(c.sensorListItemComponents, oldFId)
 		}
-		component.SetSensor(sensor)
-		component.Refresh()
 	}
 
-	for _, component := range c.sensorGraphComponents {
-		if component.Sensor == nil {
-			continue
+	// add new entries / update existing entries
+	for _, cId := range sensorIds {
+		sensor := (*sensors)[cId]
+		sensorListItemComponent, ok := c.sensorListItemComponents[cId]
+		if ok {
+			sensorListItemComponent.SetSensor(sensor)
+		} else {
+			sensorListItemComponent = NewSensorListItemComponent(c.application, sensor)
+			c.sensorListItemComponents[cId] = sensorListItemComponent
+			sensorListItemComponent.SetSensor(sensor)
+			c.sensorRowLayout.AddItem(sensorListItemComponent.GetLayout(), 0, 1, true)
 		}
-		sensor, ok := (*sensors)[component.Sensor.Config.ID]
-		if !ok || sensor == nil {
-			continue
-		}
-		component.SetSensor(sensor)
-		component.Refresh()
 	}
 }

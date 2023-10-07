@@ -59,6 +59,7 @@ func (c *CurveListItemComponent) GetLayout() *tview.Flex {
 
 func (c *CurveListItemComponent) SetCurve(curve *client.Curve) {
 	c.Curve = curve
+	c.Refresh()
 }
 
 func (c *CurveListItemComponent) Refresh() {
