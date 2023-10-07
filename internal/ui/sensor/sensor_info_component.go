@@ -43,6 +43,15 @@ func (c *SensorInfoComponent) createLayout() *tview.Flex {
 	return layout
 }
 
+func (c *SensorInfoComponent) GetLayout() *tview.Flex {
+	return c.layout
+}
+
+func (c *SensorInfoComponent) SetSensor(sensor *client.Sensor) {
+	c.Sensor = sensor
+	c.refresh()
+}
+
 func (c *SensorInfoComponent) refresh() {
 	// print basic info
 	valueText := fmt.Sprintf("Avg: %f", c.Sensor.MovingAvg/1000)
@@ -70,13 +79,4 @@ func (c *SensorInfoComponent) refresh() {
 		configText += fmt.Sprintf("  Args: %s\n", config.Cmd.Args)
 	}
 	c.configTextView.SetText(configText)
-}
-
-func (c *SensorInfoComponent) GetLayout() *tview.Flex {
-	return c.layout
-}
-
-func (c *SensorInfoComponent) SetSensor(sensor *client.Sensor) {
-	c.Sensor = sensor
-	c.refresh()
 }

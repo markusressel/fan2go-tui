@@ -126,7 +126,6 @@ func (mainPage *MainPage) SetPage(page Page) {
 	mainPage.page = page
 	mainPage.header.SetPage(page)
 	mainPage.mainPagePagerLayout.SwitchToPage(string(page))
-	mainPage.UpdateHeader()
 	mainPage.Refresh()
 }
 

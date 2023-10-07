@@ -59,12 +59,6 @@ func (c *SensorGraphComponent) SetSensor(sensor *client.Sensor) {
 	c.refresh()
 }
 
-func (c *SensorGraphComponent) InsertValue(sensor *client.Sensor) {
-	c.Sensor = sensor
-	c.graphComponent.InsertValue(sensor)
-	c.refresh()
-}
-
 func (c *SensorGraphComponent) SetTitle(label string) {
 	c.graphComponent.SetTitle(label)
 }

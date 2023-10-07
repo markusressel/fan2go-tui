@@ -64,5 +64,5 @@ func (c *SensorListItemComponent) SetSensor(sensor *client.Sensor) {
 
 func (c *SensorListItemComponent) refresh() {
 	c.sensorInfoComponent.SetSensor(c.Sensor)
-	c.sensorGraphComponent.InsertValue(c.Sensor)
+	c.sensorGraphComponent.SetSensor(c.Sensor)
 }

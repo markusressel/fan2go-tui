@@ -63,11 +63,6 @@ func (c *CurveGraphComponent) SetCurve(curve *client.Curve) {
 	c.refresh()
 }
 
-func (c *CurveGraphComponent) InsertValue(curve *client.Curve) {
-	c.graphComponent.InsertValue(curve)
-	c.refresh()
-}
-
 func (c *CurveGraphComponent) SetTitle(label string) {
 	c.graphComponent.SetTitle(label)
 }

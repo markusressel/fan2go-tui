@@ -64,5 +64,5 @@ func (c *CurveListItemComponent) SetCurve(curve *client.Curve) {
 
 func (c *CurveListItemComponent) refresh() {
 	c.curveInfoComponent.SetCurve(c.Curve)
-	c.curveGraphComponent.InsertValue(c.Curve)
+	c.curveGraphComponent.SetCurve(c.Curve)
 }

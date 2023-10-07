@@ -59,9 +59,10 @@ func (c *FanListItemComponent) GetLayout() *tview.Flex {
 
 func (c *FanListItemComponent) SetFan(fan *client.Fan) {
 	c.Fan = fan
+	c.refresh()
 }
 
 func (c *FanListItemComponent) refresh() {
 	c.fanInfoComponent.SetFan(c.Fan)
-	c.fanGraphComponent.InsertValue(c.Fan)
+	c.fanGraphComponent.SetFan(c.Fan)
 }

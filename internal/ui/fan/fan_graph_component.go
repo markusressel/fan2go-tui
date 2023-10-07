@@ -64,11 +64,6 @@ func (c *FanGraphComponent) SetFan(fan *client.Fan) {
 	c.refresh()
 }
 
-func (c *FanGraphComponent) InsertValue(fan *client.Fan) {
-	c.graphComponent.InsertValue(fan)
-	c.refresh()
-}
-
 func (c *FanGraphComponent) SetTitle(label string) {
 	c.graphComponent.SetTitle(label)
 }

@@ -43,6 +43,15 @@ func (c *CurveInfoComponent) createLayout() *tview.Flex {
 	return layout
 }
 
+func (c *CurveInfoComponent) GetLayout() *tview.Flex {
+	return c.layout
+}
+
+func (c *CurveInfoComponent) SetCurve(curve *client.Curve) {
+	c.Curve = curve
+	c.refresh()
+}
+
 func (c *CurveInfoComponent) refresh() {
 	// print basic info
 	valueText := fmt.Sprintf("Value: %d", int(c.Curve.Value))
@@ -74,13 +83,4 @@ func (c *CurveInfoComponent) refresh() {
 		configText += fmt.Sprintf("  Curves: %s\n", config.Function.Curves)
 	}
 	c.configTextView.SetText(configText)
-}
-
-func (c *CurveInfoComponent) GetLayout() *tview.Flex {
-	return c.layout
-}
-
-func (c *CurveInfoComponent) SetCurve(curve *client.Curve) {
-	c.Curve = curve
-	c.refresh()
 }
