@@ -53,7 +53,6 @@ func (c *FanGraphComponent) Refresh() {
 	}
 	component := c.graphComponent
 	component.InsertValue(fan)
-	component.Refresh()
 }
 
 func (c *FanGraphComponent) GetLayout() *tview.Flex {

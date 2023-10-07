@@ -48,7 +48,6 @@ func (c *SensorGraphComponent) Refresh() {
 	}
 	component := c.graphComponent
 	component.InsertValue(sensor)
-	component.Refresh()
 }
 
 func (c *SensorGraphComponent) GetLayout() *tview.Flex {

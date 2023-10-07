@@ -42,7 +42,6 @@ func (c *FanListItemComponent) createLayout() *tview.Flex {
 	c.fanInfoComponent = fanInfoComponent
 	fanInfoComponent.Refresh()
 	layout := fanInfoComponent.GetLayout()
-
 	fanColumnLayout.AddItem(layout, 0, 1, true)
 
 	fanGraphComponent := NewFanGraphComponent(c.application, f)

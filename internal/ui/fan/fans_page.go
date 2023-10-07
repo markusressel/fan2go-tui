@@ -13,8 +13,6 @@ type FansPage struct {
 
 	client client.Fan2goApiClient
 
-	Fans map[string]*client.Fan
-
 	layout       *tview.Flex
 	fanRowLayout *tview.Flex
 
@@ -26,7 +24,6 @@ func NewFansPage(application *tview.Application, c client.Fan2goApiClient) FansP
 	fansPage := FansPage{
 		application:           application,
 		client:                c,
-		Fans:                  map[string]*client.Fan{},
 		fanListItemComponents: map[string]*FanListItemComponent{},
 	}
 
@@ -83,6 +80,15 @@ func (c *FansPage) Refresh() {
 	}
 
 	oldFIds := maps.Keys(c.fanListItemComponents)
+	// remove now nonexisting entries
+	for _, oldFId := range oldFIds {
+		_, ok := (*fans)[oldFId]
+		if !ok {
+			fanListItemComponent := c.fanListItemComponents[oldFId]
+			c.fanRowLayout.RemoveItem(fanListItemComponent.GetLayout())
+			delete(c.fanListItemComponents, oldFId)
+		}
+	}
 
 	// add new entries / update existing entries
 	for _, fId := range fanIds {
@@ -94,17 +100,9 @@ func (c *FansPage) Refresh() {
 		} else {
 			fanListItemComponent = NewFanListItemComponent(c.application, fan)
 			c.fanListItemComponents[fId] = fanListItemComponent
+			fanListItemComponent.SetFan(fan)
+			fanListItemComponent.Refresh()
 			c.fanRowLayout.AddItem(fanListItemComponent.GetLayout(), 0, 1, true)
 		}
 	}
-	// remove now nonexisting entries
-	for _, oldFId := range oldFIds {
-		_, ok := (*fans)[oldFId]
-		if !ok {
-			fanListItemComponent := c.fanListItemComponents[oldFId]
-			c.fanRowLayout.RemoveItem(fanListItemComponent.GetLayout())
-			delete(c.fanListItemComponents, oldFId)
-		}
-	}
-	c.Fans = *fans
 }

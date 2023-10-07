@@ -111,4 +111,5 @@ func (c *FanInfoComponent) GetLayout() *tview.Flex {
 
 func (c *FanInfoComponent) SetFan(fan *client.Fan) {
 	c.Fan = fan
+	c.Refresh()
 }
