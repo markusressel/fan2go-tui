@@ -3,7 +3,6 @@ package curve
 import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/ui/theme"
-	uiutil "fan2go-tui/internal/ui/util"
 	"fmt"
 	"github.com/rivo/tview"
 )
@@ -32,10 +31,6 @@ func NewCurveInfoComponent(application *tview.Application, curve *client.Curve) 
 
 func (c *CurveInfoComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
-	titleText := fmt.Sprintf("Curve: %s", c.Curve.Config.ID)
-
-	layout.SetBorder(true)
-	uiutil.SetupWindow(layout, titleText)
 
 	configTextView := tview.NewTextView()
 	layout.AddItem(configTextView, 0, 1, false)

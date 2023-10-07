@@ -2,6 +2,7 @@ package sensor
 
 import (
 	"fan2go-tui/internal/client"
+	uiutil "fan2go-tui/internal/ui/util"
 	"github.com/rivo/tview"
 	"sort"
 	"strings"
@@ -35,10 +36,8 @@ func NewSensorsPage(application *tview.Application, client client.Fan2goApiClien
 func (c *SensorsPage) createLayout() *tview.Flex {
 	sensorsPageLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
 
-	sensorInfoLayout := tview.NewFlex().SetDirection(tview.FlexRow)
-	sensorsPageLayout.AddItem(sensorInfoLayout, 0, 1, true)
-	sensorGraphLayout := tview.NewFlex().SetDirection(tview.FlexRow)
-	sensorsPageLayout.AddItem(sensorGraphLayout, 0, 3, false)
+	sensorRowLayout := tview.NewFlex().SetDirection(tview.FlexRow)
+	sensorsPageLayout.AddItem(sensorRowLayout, 0, 1, true)
 
 	sensors, sensorIds, err := c.fetchSensors()
 	if err != nil {
@@ -46,20 +45,26 @@ func (c *SensorsPage) createLayout() *tview.Flex {
 		return sensorsPageLayout
 	}
 	for _, sId := range sensorIds {
+		sensorColumnLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
+		uiutil.SetupWindow(sensorColumnLayout, sId)
+		sensorColumnLayout.SetTitleAlign(tview.AlignLeft)
+		sensorColumnLayout.SetBorder(true)
+		sensorRowLayout.AddItem(sensorColumnLayout, 0, 1, true)
+
 		s := (*sensors)[sId]
 		sensorInfoComponent := NewSensorInfoComponent(c.application, s)
 		c.sensorInfoComponents = append(c.sensorInfoComponents, sensorInfoComponent)
 		sensorInfoComponent.SetSensor(s)
 		sensorInfoComponent.Refresh()
 		layout := sensorInfoComponent.GetLayout()
-		sensorInfoLayout.AddItem(layout, 0, 1, true)
+		sensorColumnLayout.AddItem(layout, 0, 1, true)
 
 		sensorGraphComponent := NewSensorGraphComponent(c.application, s)
 		c.sensorGraphComponents = append(c.sensorGraphComponents, sensorGraphComponent)
 		sensorGraphComponent.SetSensor(s)
 		sensorGraphComponent.Refresh()
 		layout = sensorGraphComponent.GetLayout()
-		sensorGraphLayout.AddItem(layout, 0, 1, false)
+		sensorColumnLayout.AddItem(layout, 0, 3, false)
 	}
 
 	return sensorsPageLayout

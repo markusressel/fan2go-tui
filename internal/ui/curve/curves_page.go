@@ -2,6 +2,7 @@ package curve
 
 import (
 	"fan2go-tui/internal/client"
+	uiutil "fan2go-tui/internal/ui/util"
 	"github.com/rivo/tview"
 	"sort"
 	"strings"
@@ -36,10 +37,8 @@ func (c *CurvesPage) createLayout() *tview.Flex {
 
 	curvesPageLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
 
-	curveInfosLayout := tview.NewFlex().SetDirection(tview.FlexRow)
-	curvesPageLayout.AddItem(curveInfosLayout, 0, 1, true)
-	curveGraphsLayout := tview.NewFlex().SetDirection(tview.FlexRow)
-	curvesPageLayout.AddItem(curveGraphsLayout, 0, 3, true)
+	curveRowLayout := tview.NewFlex().SetDirection(tview.FlexRow)
+	curvesPageLayout.AddItem(curveRowLayout, 0, 1, true)
 
 	curves, curveIds, err := c.fetchCurves()
 	if err != nil {
@@ -49,21 +48,26 @@ func (c *CurvesPage) createLayout() *tview.Flex {
 	}
 
 	for _, id := range curveIds {
-		curve := (*curves)[id]
+		curveColumnLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
+		uiutil.SetupWindow(curveColumnLayout, id)
+		curveColumnLayout.SetTitleAlign(tview.AlignLeft)
+		curveColumnLayout.SetBorder(true)
+		curveRowLayout.AddItem(curveColumnLayout, 0, 1, true)
 
-		curveComponent := NewCurveInfoComponent(c.application, curve)
-		c.curveComponents = append(c.curveComponents, curveComponent)
-		curveComponent.SetCurve(curve)
-		curveComponent.Refresh()
-		layout := curveComponent.GetLayout()
-		curveInfosLayout.AddItem(layout, 0, 1, true)
+		curve := (*curves)[id]
+		curveInfoComponent := NewCurveInfoComponent(c.application, curve)
+		c.curveComponents = append(c.curveComponents, curveInfoComponent)
+		curveInfoComponent.SetCurve(curve)
+		curveInfoComponent.Refresh()
+		layout := curveInfoComponent.GetLayout()
+		curveColumnLayout.AddItem(layout, 0, 1, true)
 
 		curveGraphComponent := NewCurveGraphComponent(c.application, curve)
 		c.curveGraphComponent = append(c.curveGraphComponent, curveGraphComponent)
 		curveGraphComponent.SetCurve(curve)
 		curveGraphComponent.Refresh()
 		layout = curveGraphComponent.GetLayout()
-		curveGraphsLayout.AddItem(layout, 0, 1, true)
+		curveColumnLayout.AddItem(layout, 0, 3, true)
 	}
 
 	return curvesPageLayout

@@ -3,7 +3,6 @@ package fan
 import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/ui/theme"
-	uiutil "fan2go-tui/internal/ui/util"
 	"fmt"
 	"github.com/rivo/tview"
 )
@@ -33,9 +32,6 @@ func NewFanInfoComponent(application *tview.Application, fan *client.Fan) *FanIn
 
 func (c *FanInfoComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
-	titleText := fmt.Sprintf("Fan: %s", c.Fan.Label)
-
-	uiutil.SetupWindow(layout, titleText)
 
 	configTextView := tview.NewTextView()
 	layout.AddItem(configTextView, 0, 1, false)
