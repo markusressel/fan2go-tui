@@ -61,7 +61,7 @@ func (c *FanListItemComponent) SetFan(fan *client.Fan) {
 	c.Fan = fan
 }
 
-func (c *FanListItemComponent) Refresh() {
+func (c *FanListItemComponent) refresh() {
 	c.fanInfoComponent.SetFan(c.Fan)
 	c.fanGraphComponent.InsertValue(c.Fan)
 }
