@@ -50,7 +50,7 @@ sudo chmod ug+x /usr/bin/fan2go-tui
 
 ### fan2go (daemon)
 
-Open the configuration of fan2go and enable the api:
+Open the configuration of [fan2go](https://github.com/markusressel/fan2go) and enable the api:
 
 ```yaml
 api:
