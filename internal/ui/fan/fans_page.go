@@ -96,12 +96,10 @@ func (c *FansPage) Refresh() {
 		fanListItemComponent, ok := c.fanListItemComponents[fId]
 		if ok {
 			fanListItemComponent.SetFan(fan)
-			fanListItemComponent.refresh()
 		} else {
 			fanListItemComponent = NewFanListItemComponent(c.application, fan)
 			c.fanListItemComponents[fId] = fanListItemComponent
 			fanListItemComponent.SetFan(fan)
-			fanListItemComponent.refresh()
 			c.fanRowLayout.AddItem(fanListItemComponent.GetLayout(), 0, 1, true)
 		}
 	}

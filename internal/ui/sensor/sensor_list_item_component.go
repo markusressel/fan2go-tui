@@ -40,13 +40,13 @@ func (c *SensorListItemComponent) createLayout() *tview.Flex {
 	f := c.Sensor
 	sensorInfoComponent := NewSensorInfoComponent(c.application, f)
 	c.sensorInfoComponent = sensorInfoComponent
-	sensorInfoComponent.refresh()
+	sensorInfoComponent.SetSensor(f)
 	layout := sensorInfoComponent.GetLayout()
 	sensorColumnLayout.AddItem(layout, 0, 1, true)
 
 	sensorGraphComponent := NewSensorGraphComponent(c.application, f)
 	c.sensorGraphComponent = sensorGraphComponent
-	sensorGraphComponent.refresh()
+	sensorGraphComponent.SetSensor(f)
 	layout = sensorGraphComponent.GetLayout()
 	sensorColumnLayout.AddItem(layout, 0, 3, true)
 
