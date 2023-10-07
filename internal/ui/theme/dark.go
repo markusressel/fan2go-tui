@@ -7,30 +7,37 @@ import (
 )
 
 var (
+	PrimaryColor        = tcell.ColorDodgerBlue
+	PrimaryVariantColor = tcell.ColorSteelBlue
+	SecondaryColor      = tcell.ColorGreenYellow
+
+	OnPrimaryColor = tcell.ColorWhite
+	OnSecondary    = tcell.ColorBlack
+
 	Colors = Color{
 		Header: HeaderColors{
-			Name:           tcell.ColorWhite,
-			NameBackground: tcell.ColorDodgerBlue,
+			Name:           OnPrimaryColor,
+			NameBackground: PrimaryColor,
 
-			PageIndicator:           tcell.ColorWhite,
+			PageIndicator:           OnPrimaryColor,
 			PageIndicatorBackground: tcell.ColorBlue,
 
-			UpdateInterval:           tcell.ColorWhite,
-			UpdateIntervalBackground: tcell.ColorSteelBlue,
+			UpdateInterval:           OnPrimaryColor,
+			UpdateIntervalBackground: PrimaryVariantColor,
 
-			Version:           tcell.ColorBlack,
-			VersionBackground: tcell.ColorGreenYellow,
+			Version:           OnSecondary,
+			VersionBackground: SecondaryColor,
 		},
 		Dialog: DialogColors{
-			Border: tcell.ColorSteelBlue,
+			Border: PrimaryVariantColor,
 		},
 		Layout: LayoutColors{
-			Border: tcell.ColorSteelBlue,
+			Border: PrimaryVariantColor,
 			Title:  tcell.ColorBlue,
 		},
 		Graphs: GraphsColors{
 			Rpm:    tcell.ColorBlue,
-			Pwm:    tcell.ColorSteelBlue,
+			Pwm:    PrimaryVariantColor,
 			Curve:  tcell.ColorBlue,
 			Sensor: tcell.ColorBlue,
 		},
