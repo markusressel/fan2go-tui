@@ -8,7 +8,7 @@ import (
 	"github.com/rivo/tview"
 )
 
-type SensorComponent struct {
+type SensorInfoComponent struct {
 	application *tview.Application
 
 	Sensor *client.Sensor
@@ -19,8 +19,8 @@ type SensorComponent struct {
 	valueTextView  *tview.TextView
 }
 
-func NewSensorComponent(application *tview.Application, sensor *client.Sensor) *SensorComponent {
-	c := &SensorComponent{
+func NewSensorInfoComponent(application *tview.Application, sensor *client.Sensor) *SensorInfoComponent {
+	c := &SensorInfoComponent{
 		application: application,
 		Sensor:      sensor,
 	}
@@ -30,7 +30,7 @@ func NewSensorComponent(application *tview.Application, sensor *client.Sensor) *
 	return c
 }
 
-func (c *SensorComponent) createLayout() *tview.Flex {
+func (c *SensorInfoComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 	titleText := fmt.Sprintf("Sensor: %s", c.Sensor.Config.ID)
 
@@ -48,7 +48,7 @@ func (c *SensorComponent) createLayout() *tview.Flex {
 	return layout
 }
 
-func (c *SensorComponent) Refresh() {
+func (c *SensorInfoComponent) Refresh() {
 	// print basic info
 	valueText := fmt.Sprintf("Avg: %f", c.Sensor.MovingAvg/1000)
 	c.valueTextView.SetText(valueText)
@@ -77,10 +77,10 @@ func (c *SensorComponent) Refresh() {
 	c.configTextView.SetText(configText)
 }
 
-func (c *SensorComponent) GetLayout() *tview.Flex {
+func (c *SensorInfoComponent) GetLayout() *tview.Flex {
 	return c.layout
 }
 
-func (c *SensorComponent) SetSensor(sensor *client.Sensor) {
+func (c *SensorInfoComponent) SetSensor(sensor *client.Sensor) {
 	c.Sensor = sensor
 }

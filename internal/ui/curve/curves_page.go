@@ -16,7 +16,7 @@ type CurvesPage struct {
 
 	layout *tview.Flex
 
-	curveComponents     []*CurveComponent
+	curveComponents     []*CurveInfoComponent
 	curveGraphComponent []*CurveGraphComponent
 }
 
@@ -51,7 +51,7 @@ func (c *CurvesPage) createLayout() *tview.Flex {
 	for _, id := range curveIds {
 		curve := (*curves)[id]
 
-		curveComponent := NewCurveComponent(c.application, curve)
+		curveComponent := NewCurveInfoComponent(c.application, curve)
 		c.curveComponents = append(c.curveComponents, curveComponent)
 		curveComponent.SetCurve(curve)
 		curveComponent.Refresh()

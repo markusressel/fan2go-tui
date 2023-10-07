@@ -16,7 +16,7 @@ type SensorsPage struct {
 
 	layout *tview.Flex
 
-	sensorComponents      []*SensorComponent
+	sensorInfoComponents  []*SensorInfoComponent
 	sensorGraphComponents []*SensorGraphComponent
 }
 
@@ -37,8 +37,8 @@ func (c *SensorsPage) createLayout() *tview.Flex {
 
 	sensorInfoLayout := tview.NewFlex().SetDirection(tview.FlexRow)
 	sensorsPageLayout.AddItem(sensorInfoLayout, 0, 1, true)
-	sensorGraphsLayout := tview.NewFlex().SetDirection(tview.FlexRow)
-	sensorsPageLayout.AddItem(sensorGraphsLayout, 0, 3, false)
+	sensorGraphLayout := tview.NewFlex().SetDirection(tview.FlexRow)
+	sensorsPageLayout.AddItem(sensorGraphLayout, 0, 3, false)
 
 	sensors, sensorIds, err := c.fetchSensors()
 	if err != nil {
@@ -47,11 +47,11 @@ func (c *SensorsPage) createLayout() *tview.Flex {
 	}
 	for _, sId := range sensorIds {
 		s := (*sensors)[sId]
-		sensorComponent := NewSensorComponent(c.application, s)
-		c.sensorComponents = append(c.sensorComponents, sensorComponent)
-		sensorComponent.SetSensor(s)
-		sensorComponent.Refresh()
-		layout := sensorComponent.GetLayout()
+		sensorInfoComponent := NewSensorInfoComponent(c.application, s)
+		c.sensorInfoComponents = append(c.sensorInfoComponents, sensorInfoComponent)
+		sensorInfoComponent.SetSensor(s)
+		sensorInfoComponent.Refresh()
+		layout := sensorInfoComponent.GetLayout()
 		sensorInfoLayout.AddItem(layout, 0, 1, true)
 
 		sensorGraphComponent := NewSensorGraphComponent(c.application, s)
@@ -59,7 +59,7 @@ func (c *SensorsPage) createLayout() *tview.Flex {
 		sensorGraphComponent.SetSensor(s)
 		sensorGraphComponent.Refresh()
 		layout = sensorGraphComponent.GetLayout()
-		sensorGraphsLayout.AddItem(layout, 0, 1, false)
+		sensorGraphLayout.AddItem(layout, 0, 1, false)
 	}
 
 	return sensorsPageLayout
@@ -101,7 +101,7 @@ func (c *SensorsPage) Refresh() {
 	}
 	c.Sensors = *sensors
 
-	for _, component := range c.sensorComponents {
+	for _, component := range c.sensorInfoComponents {
 		sensor, ok := (*sensors)[component.Sensor.Config.ID]
 		if !ok {
 			continue

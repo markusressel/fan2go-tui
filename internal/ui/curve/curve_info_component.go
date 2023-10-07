@@ -8,7 +8,7 @@ import (
 	"github.com/rivo/tview"
 )
 
-type CurveComponent struct {
+type CurveInfoComponent struct {
 	application *tview.Application
 
 	Curve *client.Curve
@@ -19,8 +19,8 @@ type CurveComponent struct {
 	valueTextView  *tview.TextView
 }
 
-func NewCurveComponent(application *tview.Application, curve *client.Curve) *CurveComponent {
-	c := &CurveComponent{
+func NewCurveInfoComponent(application *tview.Application, curve *client.Curve) *CurveInfoComponent {
+	c := &CurveInfoComponent{
 		application: application,
 		Curve:       curve,
 	}
@@ -30,7 +30,7 @@ func NewCurveComponent(application *tview.Application, curve *client.Curve) *Cur
 	return c
 }
 
-func (c *CurveComponent) createLayout() *tview.Flex {
+func (c *CurveInfoComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 	titleText := fmt.Sprintf("Curve: %s", c.Curve.Config.ID)
 
@@ -48,7 +48,7 @@ func (c *CurveComponent) createLayout() *tview.Flex {
 	return layout
 }
 
-func (c *CurveComponent) Refresh() {
+func (c *CurveInfoComponent) Refresh() {
 	// print basic info
 	valueText := fmt.Sprintf("Value: %d", int(c.Curve.Value))
 	c.valueTextView.SetText(valueText)
@@ -81,10 +81,10 @@ func (c *CurveComponent) Refresh() {
 	c.configTextView.SetText(configText)
 }
 
-func (c *CurveComponent) GetLayout() *tview.Flex {
+func (c *CurveInfoComponent) GetLayout() *tview.Flex {
 	return c.layout
 }
 
-func (c *CurveComponent) SetCurve(curve *client.Curve) {
+func (c *CurveInfoComponent) SetCurve(curve *client.Curve) {
 	c.Curve = curve
 }
