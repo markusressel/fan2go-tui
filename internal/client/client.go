@@ -9,8 +9,6 @@ import (
 )
 
 type Fan struct {
-	Label string `json:"label"`
-
 	Pwm int `json:"pwm"`
 	Rpm int `json:"rpm"`
 
