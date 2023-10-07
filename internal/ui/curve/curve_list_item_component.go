@@ -40,13 +40,13 @@ func (c *CurveListItemComponent) createLayout() *tview.Flex {
 	f := c.Curve
 	curveInfoComponent := NewCurveInfoComponent(c.application, f)
 	c.curveInfoComponent = curveInfoComponent
-	curveInfoComponent.Refresh()
+	curveInfoComponent.SetCurve(f)
 	layout := curveInfoComponent.GetLayout()
 	curveColumnLayout.AddItem(layout, 0, 1, true)
 
 	curveGraphComponent := NewCurveGraphComponent(c.application, f)
 	c.curveGraphComponent = curveGraphComponent
-	curveGraphComponent.Refresh()
+	curveGraphComponent.SetCurve(f)
 	layout = curveGraphComponent.GetLayout()
 	curveColumnLayout.AddItem(layout, 0, 3, true)
 

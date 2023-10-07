@@ -40,13 +40,13 @@ func (c *SensorListItemComponent) createLayout() *tview.Flex {
 	f := c.Sensor
 	sensorInfoComponent := NewSensorInfoComponent(c.application, f)
 	c.sensorInfoComponent = sensorInfoComponent
-	sensorInfoComponent.Refresh()
+	sensorInfoComponent.refresh()
 	layout := sensorInfoComponent.GetLayout()
 	sensorColumnLayout.AddItem(layout, 0, 1, true)
 
 	sensorGraphComponent := NewSensorGraphComponent(c.application, f)
 	c.sensorGraphComponent = sensorGraphComponent
-	sensorGraphComponent.Refresh()
+	sensorGraphComponent.refresh()
 	layout = sensorGraphComponent.GetLayout()
 	sensorColumnLayout.AddItem(layout, 0, 3, true)
 
@@ -59,10 +59,10 @@ func (c *SensorListItemComponent) GetLayout() *tview.Flex {
 
 func (c *SensorListItemComponent) SetSensor(sensor *client.Sensor) {
 	c.Sensor = sensor
-	c.Refresh()
+	c.refresh()
 }
 
-func (c *SensorListItemComponent) Refresh() {
+func (c *SensorListItemComponent) refresh() {
 	c.sensorInfoComponent.SetSensor(c.Sensor)
 	c.sensorGraphComponent.InsertValue(c.Sensor)
 }

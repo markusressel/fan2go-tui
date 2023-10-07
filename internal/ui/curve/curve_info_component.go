@@ -43,7 +43,7 @@ func (c *CurveInfoComponent) createLayout() *tview.Flex {
 	return layout
 }
 
-func (c *CurveInfoComponent) Refresh() {
+func (c *CurveInfoComponent) refresh() {
 	// print basic info
 	valueText := fmt.Sprintf("Value: %d", int(c.Curve.Value))
 	c.valueTextView.SetText(valueText)
@@ -82,4 +82,5 @@ func (c *CurveInfoComponent) GetLayout() *tview.Flex {
 
 func (c *CurveInfoComponent) SetCurve(curve *client.Curve) {
 	c.Curve = curve
+	c.refresh()
 }

@@ -81,12 +81,12 @@ func (c *CurvesPage) Refresh() {
 
 	oldCIds := maps.Keys(c.curveListItemComponents)
 	// remove now nonexisting entries
-	for _, oldFId := range oldCIds {
-		_, ok := (*curves)[oldFId]
+	for _, oldCId := range oldCIds {
+		_, ok := (*curves)[oldCId]
 		if !ok {
-			curveListItemComponent := c.curveListItemComponents[oldFId]
+			curveListItemComponent := c.curveListItemComponents[oldCId]
 			c.curveRowLayout.RemoveItem(curveListItemComponent.GetLayout())
-			delete(c.curveListItemComponents, oldFId)
+			delete(c.curveListItemComponents, oldCId)
 		}
 	}
 

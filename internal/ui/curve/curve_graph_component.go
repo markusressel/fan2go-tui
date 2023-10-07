@@ -44,7 +44,7 @@ func (c *CurveGraphComponent) createLayout() *tview.Flex {
 	return layout
 }
 
-func (c *CurveGraphComponent) Refresh() {
+func (c *CurveGraphComponent) refresh() {
 	curve := c.Curve
 	if curve == nil {
 		return
@@ -60,12 +60,12 @@ func (c *CurveGraphComponent) GetLayout() *tview.Flex {
 
 func (c *CurveGraphComponent) SetCurve(curve *client.Curve) {
 	c.Curve = curve
-	c.Refresh()
+	c.refresh()
 }
 
 func (c *CurveGraphComponent) InsertValue(curve *client.Curve) {
 	c.graphComponent.InsertValue(curve)
-	c.Refresh()
+	c.refresh()
 }
 
 func (c *CurveGraphComponent) SetTitle(label string) {

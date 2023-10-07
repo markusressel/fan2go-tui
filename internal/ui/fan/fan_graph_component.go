@@ -46,7 +46,7 @@ func (c *FanGraphComponent) createLayout() *tview.Flex {
 	return layout
 }
 
-func (c *FanGraphComponent) Refresh() {
+func (c *FanGraphComponent) refresh() {
 	fan := c.Fan
 	if fan == nil {
 		return
@@ -61,12 +61,12 @@ func (c *FanGraphComponent) GetLayout() *tview.Flex {
 
 func (c *FanGraphComponent) SetFan(fan *client.Fan) {
 	c.Fan = fan
-	c.Refresh()
+	c.refresh()
 }
 
 func (c *FanGraphComponent) InsertValue(fan *client.Fan) {
 	c.graphComponent.InsertValue(fan)
-	c.Refresh()
+	c.refresh()
 }
 
 func (c *FanGraphComponent) SetTitle(label string) {

@@ -48,7 +48,7 @@ func (c *FanInfoComponent) createLayout() *tview.Flex {
 	return layout
 }
 
-func (c *FanInfoComponent) Refresh() {
+func (c *FanInfoComponent) refresh() {
 	// print basic info
 	pwmText := fmt.Sprintf("PWM: %d", c.Fan.Pwm)
 	c.pwmValueTextView.SetText(pwmText)
@@ -111,5 +111,5 @@ func (c *FanInfoComponent) GetLayout() *tview.Flex {
 
 func (c *FanInfoComponent) SetFan(fan *client.Fan) {
 	c.Fan = fan
-	c.Refresh()
+	c.refresh()
 }

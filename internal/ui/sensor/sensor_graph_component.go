@@ -41,7 +41,7 @@ func (c *SensorGraphComponent) createLayout() *tview.Flex {
 	return layout
 }
 
-func (c *SensorGraphComponent) Refresh() {
+func (c *SensorGraphComponent) refresh() {
 	sensor := c.Sensor
 	if sensor == nil {
 		return
@@ -56,12 +56,13 @@ func (c *SensorGraphComponent) GetLayout() *tview.Flex {
 
 func (c *SensorGraphComponent) SetSensor(sensor *client.Sensor) {
 	c.Sensor = sensor
-	c.Refresh()
+	c.refresh()
 }
 
 func (c *SensorGraphComponent) InsertValue(sensor *client.Sensor) {
+	c.Sensor = sensor
 	c.graphComponent.InsertValue(sensor)
-	c.Refresh()
+	c.refresh()
 }
 
 func (c *SensorGraphComponent) SetTitle(label string) {
