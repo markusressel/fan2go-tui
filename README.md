@@ -19,6 +19,9 @@
 
 # How to use
 
+> **Note:**
+> fan2go-tui depends on the API of the [fan2go](https://github.com/markusressel/fan2go) daemon.
+
 ## Installation
 
 ### Arch Linux ![](https://img.shields.io/badge/Arch_Linux-1793D1?logo=arch-linux&logoColor=white)
