@@ -2,8 +2,8 @@ package fan
 
 import (
 	"fan2go-tui/internal/client"
-	uiutil "fan2go-tui/internal/ui/util"
 	"github.com/rivo/tview"
+	"golang.org/x/exp/maps"
 	"sort"
 	"strings"
 )
@@ -15,17 +15,19 @@ type FansPage struct {
 
 	Fans map[string]*client.Fan
 
-	layout *tview.Flex
+	layout       *tview.Flex
+	fanRowLayout *tview.Flex
 
-	fanInfoComponents  []*FanInfoComponent
-	fanGraphComponents []*FanGraphComponent
+	fanListItemComponents map[string]*FanListItemComponent
 }
 
-func NewFansPage(application *tview.Application, client client.Fan2goApiClient) FansPage {
+func NewFansPage(application *tview.Application, c client.Fan2goApiClient) FansPage {
 
 	fansPage := FansPage{
-		application: application,
-		client:      client,
+		application:           application,
+		client:                c,
+		Fans:                  map[string]*client.Fan{},
+		fanListItemComponents: map[string]*FanListItemComponent{},
 	}
 
 	fansPage.layout = fansPage.createLayout()
@@ -37,38 +39,8 @@ func (c *FansPage) createLayout() *tview.Flex {
 
 	fansPageLayout := tview.NewFlex().SetDirection(tview.FlexRow)
 
-	fanRowLayout := tview.NewFlex().SetDirection(tview.FlexRow)
-	fansPageLayout.AddItem(fanRowLayout, 0, 1, true)
-
-	fans, fanIds, err := c.fetchFans()
-	if err != nil {
-		// TODO: handle error
-		//c.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
-		return fansPageLayout
-	}
-	c.Fans = *fans
-
-	for _, fId := range fanIds {
-		fanColumnLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
-		uiutil.SetupWindow(fanColumnLayout, fId)
-		fanColumnLayout.SetTitleAlign(tview.AlignLeft)
-		fanColumnLayout.SetBorder(true)
-		fanRowLayout.AddItem(fanColumnLayout, 0, 1, true)
-
-		f := (*fans)[fId]
-		fanInfoComponent := NewFanInfoComponent(c.application, f)
-		c.fanInfoComponents = append(c.fanInfoComponents, fanInfoComponent)
-		fanInfoComponent.Refresh()
-		layout := fanInfoComponent.GetLayout()
-
-		fanColumnLayout.AddItem(layout, 0, 1, true)
-
-		fanGraphComponent := NewFanGraphComponent(c.application, f)
-		c.fanGraphComponents = append(c.fanGraphComponents, fanGraphComponent)
-		fanGraphComponent.Refresh()
-		layout = fanGraphComponent.GetLayout()
-		fanColumnLayout.AddItem(layout, 0, 3, true)
-	}
+	c.fanRowLayout = tview.NewFlex().SetDirection(tview.FlexRow)
+	fansPageLayout.AddItem(c.fanRowLayout, 0, 1, true)
 
 	return fansPageLayout
 }
@@ -105,37 +77,34 @@ func (c *FansPage) GetLayout() *tview.Flex {
 }
 
 func (c *FansPage) Refresh() {
-	fans, _, err := c.fetchFans()
-	if err != nil {
-		return
-	}
-	if fans == nil {
-		return
+	fans, fanIds, err := c.fetchFans()
+	if err != nil || fans == nil {
+		fans = &map[string]*client.Fan{}
 	}
 
-	c.Fans = *fans
-	for _, component := range c.fanInfoComponents {
-		fan, ok := (*fans)[component.Fan.Config.Id]
+	oldFIds := maps.Keys(c.fanListItemComponents)
+
+	// add new entries / update existing entries
+	for _, fId := range fanIds {
+		fan := (*fans)[fId]
+		fanListItemComponent, ok := c.fanListItemComponents[fId]
+		if ok {
+			fanListItemComponent.SetFan(fan)
+			fanListItemComponent.Refresh()
+		} else {
+			fanListItemComponent = NewFanListItemComponent(c.application, fan)
+			c.fanListItemComponents[fId] = fanListItemComponent
+			c.fanRowLayout.AddItem(fanListItemComponent.GetLayout(), 0, 1, true)
+		}
+	}
+	// remove now nonexisting entries
+	for _, oldFId := range oldFIds {
+		_, ok := (*fans)[oldFId]
 		if !ok {
-			continue
+			fanListItemComponent := c.fanListItemComponents[oldFId]
+			c.fanRowLayout.RemoveItem(fanListItemComponent.GetLayout())
+			delete(c.fanListItemComponents, oldFId)
 		}
-		component.SetFan(fan)
-		component.Refresh()
 	}
-	for _, component := range c.fanGraphComponents {
-		if component.Fan == nil {
-			continue
-		}
-		fan, ok := (*fans)[component.Fan.Config.Id]
-		if !ok || fan == nil {
-			continue
-		}
-		component.SetFan(fan)
-		component.Refresh()
-	}
-}
-
-func (c *FansPage) SetFans(fans *map[string]*client.Fan) {
 	c.Fans = *fans
-	c.Refresh()
 }
