@@ -73,7 +73,7 @@ func (c *FansPage) GetLayout() *tview.Flex {
 	return c.layout
 }
 
-func (c *FansPage) Refresh() {
+func (c *FansPage) Refresh() error {
 	fans, fanIds, err := c.fetchFans()
 	if err != nil || fans == nil {
 		fans = &map[string]*client.Fan{}
@@ -103,4 +103,6 @@ func (c *FansPage) Refresh() {
 			c.fanRowLayout.AddItem(fanListItemComponent.GetLayout(), 0, 1, true)
 		}
 	}
+
+	return err
 }

@@ -73,7 +73,7 @@ func (c *CurvesPage) GetLayout() *tview.Flex {
 	return c.layout
 }
 
-func (c *CurvesPage) Refresh() {
+func (c *CurvesPage) Refresh() error {
 	curves, curveIds, err := c.fetchCurves()
 	if err != nil || curves == nil {
 		curves = &map[string]*client.Curve{}
@@ -103,4 +103,6 @@ func (c *CurvesPage) Refresh() {
 			c.curveRowLayout.AddItem(curveListItemComponent.GetLayout(), 0, 1, true)
 		}
 	}
+
+	return err
 }
