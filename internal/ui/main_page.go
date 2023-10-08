@@ -111,11 +111,24 @@ func (mainPage *MainPage) Init() {
 }
 
 func (mainPage *MainPage) Refresh() {
+	defer mainPage.application.ForceDraw()
 	mainPage.UpdateHeader()
-	mainPage.fansPage.Refresh()
-	mainPage.curvesPage.Refresh()
-	mainPage.sensorsPage.Refresh()
-	mainPage.application.ForceDraw()
+	err := mainPage.fansPage.Refresh()
+	if err != nil {
+		mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
+		return
+	}
+	err = mainPage.curvesPage.Refresh()
+	if err != nil {
+		mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
+		return
+	}
+	err = mainPage.sensorsPage.Refresh()
+	if err != nil {
+		mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
+		return
+	}
+	mainPage.clearStatusMessage()
 }
 
 func (mainPage *MainPage) ToggleFocus() {
@@ -139,6 +152,10 @@ func (mainPage *MainPage) NextPage() {
 	currentIndex := slices.Index(Pages, mainPage.page)
 	nextIndex := (currentIndex + 1) % len(Pages)
 	mainPage.SetPage(Pages[nextIndex])
+}
+
+func (mainPage *MainPage) clearStatusMessage() {
+	mainPage.header.SetStatus(status_message.NewInfoStatusMessage(""))
 }
 
 func (mainPage *MainPage) showStatusMessage(status *status_message.StatusMessage) {

@@ -73,7 +73,7 @@ func (c *SensorsPage) GetLayout() *tview.Flex {
 	return c.layout
 }
 
-func (c *SensorsPage) Refresh() {
+func (c *SensorsPage) Refresh() error {
 	sensors, sensorIds, err := c.fetchSensors()
 	if err != nil || sensors == nil {
 		sensors = &map[string]*client.Sensor{}
@@ -103,4 +103,6 @@ func (c *SensorsPage) Refresh() {
 			c.sensorRowLayout.AddItem(sensorListItemComponent.GetLayout(), 0, 1, true)
 		}
 	}
+
+	return err
 }
