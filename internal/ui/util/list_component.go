@@ -93,29 +93,7 @@ func (c *ListComponent[T]) createLayout() {
 }
 
 func (c *ListComponent[T]) updateLayout() {
-
-	// ensure we are displaying as many items as specified by MaxVisibleItems
-	for _, entry := range c.entries {
-		_, ok := c.entryVisibilityMap[entry]
-		if !ok {
-			if c.getVisibleEntriesCount() < MaxVisibleItems {
-				c.entryVisibilityMap[entry] = true
-			} else {
-				c.entryVisibilityMap[entry] = false
-			}
-		}
-	}
-
 	c.updateVisibleEntries()
-
-	c.layout.Clear()
-	for row, entry := range c.entries {
-		currentVisibility := c.entryVisibilityMap[entry]
-		if currentVisibility {
-			c.layout.AddItem(c.toLayout(row, entry), 0, 1, false)
-		}
-	}
-
 	c.application.ForceDraw()
 }
 
@@ -211,7 +189,25 @@ func (c *ListComponent[T]) shiftFocus(amount int) {
 }
 
 func (c *ListComponent[T]) updateVisibleEntries() {
+	// ensure we are displaying as many items as specified by MaxVisibleItems
+	for _, entry := range c.entries {
+		_, ok := c.entryVisibilityMap[entry]
+		if !ok {
+			if c.getVisibleEntriesCount() < MaxVisibleItems {
+				c.entryVisibilityMap[entry] = true
+			} else {
+				c.entryVisibilityMap[entry] = false
+			}
+		}
+	}
 
+	c.layout.Clear()
+	for row, entry := range c.entries {
+		currentVisibility := c.entryVisibilityMap[entry]
+		if currentVisibility {
+			c.layout.AddItem(c.toLayout(row, entry), 0, 1, false)
+		}
+	}
 }
 
 func (c *ListComponent[T]) getVisibleEntriesCount() int {
