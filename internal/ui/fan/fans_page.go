@@ -113,7 +113,6 @@ func (c *FansPage) Refresh() error {
 			c.fanListItemComponents[fId] = fanListItemComponent
 			fanListItemComponent.SetFan(fan)
 			fanListItemsComponents = append(fanListItemsComponents, fanListItemComponent)
-			c.fanRowLayout.AddItem(fanListItemComponent.GetLayout(), 0, 1, true)
 		}
 	}
 

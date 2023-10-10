@@ -20,7 +20,7 @@ type ListComponent[T comparable] struct {
 	entries      []*T
 	entriesMutex sync.Mutex
 
-	entryVisibilityMap map[T]bool
+	entryVisibilityMap map[*T]bool
 
 	sortByColumn             *Column
 	toLayout                 func(row int, entry *T) (layout tview.Primitive)
@@ -38,7 +38,7 @@ func NewListComponent[T comparable](
 	listComponent := &ListComponent[T]{
 		application:        application,
 		entriesMutex:       sync.Mutex{},
-		entryVisibilityMap: map[T]bool{},
+		entryVisibilityMap: map[*T]bool{},
 		toLayout:           toLayout,
 		inputCapture: func(event *tcell.EventKey) *tcell.EventKey {
 			return event
@@ -96,12 +96,12 @@ func (c *ListComponent[T]) updateLayout() {
 
 	// ensure we are displaying as many items as specified by MaxVisibleItems
 	for _, entry := range c.entries {
-		_, ok := c.entryVisibilityMap[*entry]
+		_, ok := c.entryVisibilityMap[entry]
 		if !ok {
 			if c.getVisibleEntriesCount() < MaxVisibleItems {
-				c.entryVisibilityMap[*entry] = true
+				c.entryVisibilityMap[entry] = true
 			} else {
-				c.entryVisibilityMap[*entry] = false
+				c.entryVisibilityMap[entry] = false
 			}
 		}
 	}
@@ -110,7 +110,7 @@ func (c *ListComponent[T]) updateLayout() {
 
 	c.layout.Clear()
 	for row, entry := range c.entries {
-		currentVisibility := c.entryVisibilityMap[*entry]
+		currentVisibility := c.entryVisibilityMap[entry]
 		if currentVisibility {
 			c.layout.AddItem(c.toLayout(row, entry), 0, 1, false)
 		}
@@ -204,7 +204,7 @@ func (c *ListComponent[T]) shiftFocus(amount int) {
 	entryVisibilityMapValues := maps.Values(c.entryVisibilityMap)
 
 	//entryVisibilityMapValues := util.RotateSliceLeft(entryVisibilityMapValues)
-	c.entryVisibilityMap = map[T]bool{}
+	c.entryVisibilityMap = map[*T]bool{}
 	for i, key := range entryVisibilityMapKeys {
 		c.entryVisibilityMap[key] = entryVisibilityMapValues[i+amount%len(entryVisibilityMapValues)]
 	}

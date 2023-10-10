@@ -4,13 +4,10 @@ import (
 	"fan2go-tui/internal/client"
 	"github.com/rivo/tview"
 	"golang.org/x/exp/maps"
+	"math"
 	"slices"
 	"sort"
 	"strings"
-)
-
-const (
-	MaxVisibleItems = 3
 )
 
 type CurvesPage struct {
@@ -86,9 +83,7 @@ func (c *CurvesPage) Refresh() error {
 		curves = &map[string]*client.Curve{}
 	}
 
-	if len(c.entryVisibilityMap) < MaxVisibleItems {
-		c.entryVisibilityMap = curveIds[0:MaxVisibleItems]
-	}
+	c.entryVisibilityMap = curveIds[0:int(math.Min(float64(len(curveIds)), 3))]
 
 	var visibleCurveIds []string
 	// filter currently invisible curves
