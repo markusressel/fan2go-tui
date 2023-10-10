@@ -37,6 +37,7 @@ func NewListComponent[T comparable](
 ) *ListComponent[T] {
 	listComponent := &ListComponent[T]{
 		application:        application,
+		entries:            []*T{},
 		entriesMutex:       sync.Mutex{},
 		entryVisibilityMap: map[*T]bool{},
 		toLayout:           toLayout,
@@ -46,6 +47,7 @@ func NewListComponent[T comparable](
 		selectionChangedCallback: func(selectedEntry *T) {},
 	}
 	listComponent.createLayout()
+	listComponent.SetDirection(tview.FlexRow)
 	return listComponent
 }
 
@@ -92,6 +94,10 @@ func (c *ListComponent[T]) createLayout() {
 	c.layout = layout
 }
 
+func (c *ListComponent[T]) SetDirection(direction int) {
+	c.layout.SetDirection(direction)
+}
+
 func (c *ListComponent[T]) updateLayout() {
 	c.updateVisibleEntries()
 	c.application.ForceDraw()
@@ -109,6 +115,10 @@ func (c *ListComponent[T]) SetColumnSpec(columns []*Column, defaultSortColumn *C
 	c.columnSpec = columns
 	c.SortBy(defaultSortColumn, inverted)
 	c.updateLayout()
+}
+
+func (c *ListComponent[T]) GetData() []*T {
+	return c.entries
 }
 
 func (c *ListComponent[T]) SetData(entries []*T) {

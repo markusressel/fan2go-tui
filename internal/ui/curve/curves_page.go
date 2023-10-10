@@ -2,10 +2,9 @@ package curve
 
 import (
 	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/ui/util"
 	"github.com/rivo/tview"
 	"golang.org/x/exp/maps"
-	"math"
-	"slices"
 	"sort"
 	"strings"
 )
@@ -21,6 +20,8 @@ type CurvesPage struct {
 	layout         *tview.Flex
 	curveRowLayout *tview.Flex
 
+	curveList *util.ListComponent[CurveListItemComponent]
+
 	curveListItemComponents map[string]*CurveListItemComponent
 }
 
@@ -29,7 +30,6 @@ func NewCurvesPage(application *tview.Application, client client.Fan2goApiClient
 	curvesPage := CurvesPage{
 		application:             application,
 		client:                  client,
-		entryVisibilityMap:      []string{},
 		curveListItemComponents: map[string]*CurveListItemComponent{},
 	}
 
@@ -41,8 +41,14 @@ func NewCurvesPage(application *tview.Application, client client.Fan2goApiClient
 func (c *CurvesPage) createLayout() *tview.Flex {
 	curvesPageLayout := tview.NewFlex().SetDirection(tview.FlexRow)
 
-	c.curveRowLayout = tview.NewFlex().SetDirection(tview.FlexRow)
-	curvesPageLayout.AddItem(c.curveRowLayout, 0, 1, true)
+	curveListComponent := util.NewListComponent[CurveListItemComponent](
+		c.application,
+		func(row int, entry *CurveListItemComponent) (layout tview.Primitive) {
+			return entry.GetLayout()
+		},
+	)
+	c.curveList = curveListComponent
+	curvesPageLayout.AddItem(c.curveList.GetLayout(), 0, 1, true)
 
 	return curvesPageLayout
 }
@@ -83,55 +89,35 @@ func (c *CurvesPage) Refresh() error {
 		curves = &map[string]*client.Curve{}
 	}
 
-	c.entryVisibilityMap = curveIds[0:int(math.Min(float64(len(curveIds)), 3))]
+	var curveListItemsComponents []*CurveListItemComponent
 
-	var visibleCurveIds []string
-	// filter currently invisible curves
-	for _, curveId := range curveIds {
-		isCurveIdVisible := slices.ContainsFunc(visibleCurveIds, func(visibleCurveId string) bool {
-			return curveId == visibleCurveId
-		})
-		if isCurveIdVisible {
-			visibleCurveIds = append(visibleCurveIds, curveId)
-		}
-	}
-	c.entryVisibilityMap = visibleCurveIds
-
+	oldFIds := maps.Keys(c.curveListItemComponents)
 	// remove now nonexisting entries
-	oldCIds := maps.Keys(c.curveListItemComponents)
-	for _, oldCId := range oldCIds {
-		_, ok := (*curves)[oldCId]
+	for _, oldFId := range oldFIds {
+		_, ok := (*curves)[oldFId]
 		if !ok {
-			curveListItemComponent := c.curveListItemComponents[oldCId]
+			curveListItemComponent := c.curveListItemComponents[oldFId]
 			c.curveRowLayout.RemoveItem(curveListItemComponent.GetLayout())
-			delete(c.curveListItemComponents, oldCId)
+			delete(c.curveListItemComponents, oldFId)
 		}
 	}
 
 	// add new entries / update existing entries
-	for _, cId := range curveIds {
-		curve := (*curves)[cId]
-		curveListItemComponent, ok := c.curveListItemComponents[cId]
+	for _, fId := range curveIds {
+		curve := (*curves)[fId]
+		curveListItemComponent, ok := c.curveListItemComponents[fId]
 		if ok {
 			curveListItemComponent.SetCurve(curve)
+			curveListItemsComponents = append(curveListItemsComponents, curveListItemComponent)
 		} else {
 			curveListItemComponent = NewCurveListItemComponent(c.application, curve)
-			c.curveListItemComponents[cId] = curveListItemComponent
+			c.curveListItemComponents[fId] = curveListItemComponent
 			curveListItemComponent.SetCurve(curve)
-			c.curveRowLayout.AddItem(curveListItemComponent.GetLayout(), 0, 1, true)
+			curveListItemsComponents = append(curveListItemsComponents, curveListItemComponent)
 		}
 	}
 
-	// update visibility
-	for curveId, oldCurveListItemComponent := range c.curveListItemComponents {
-		curveIdVisible := slices.ContainsFunc(c.entryVisibilityMap, func(visibleCurveId string) bool {
-			return curveId == visibleCurveId
-		})
-
-		if curveIdVisible == false {
-			c.curveRowLayout.RemoveItem(oldCurveListItemComponent.GetLayout())
-		}
-	}
+	c.curveList.SetData(curveListItemsComponents)
 
 	return err
 }

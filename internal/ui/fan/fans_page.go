@@ -46,8 +46,8 @@ func (c *FansPage) createLayout() *tview.Flex {
 		},
 	)
 	c.fanList = fanListComponent
-
 	fansPageLayout.AddItem(c.fanList.GetLayout(), 0, 1, true)
+
 	return fansPageLayout
 }
 
