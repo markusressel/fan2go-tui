@@ -4,7 +4,6 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 	"golang.org/x/exp/maps"
-	"golang.org/x/exp/slices"
 	"sync"
 )
 
@@ -22,12 +21,10 @@ type ListComponent[T comparable] struct {
 
 	entryVisibilityMap map[*T]bool
 
-	sortByColumn             *Column
 	toLayout                 func(row int, entry *T) (layout tview.Primitive)
 	inputCapture             func(event *tcell.EventKey) *tcell.EventKey
 	selectionChangedCallback func(selectedEntry *T)
 
-	columnSpec   []*Column
 	sortInverted bool
 }
 
@@ -62,18 +59,17 @@ func (c *ListComponent[T]) createLayout() {
 			return event
 		}
 		key := event.Key()
-		//if c.GetSelectedEntry() == nil {
-		if key == tcell.KeyRight {
-			c.nextSortOrder()
+		if key == tcell.KeyUp {
+			return nil
+		} else if key == tcell.KeyDown {
 			return nil
 		} else if key == tcell.KeyLeft {
-			c.previousSortOrder()
+			return nil
+		} else if key == tcell.KeyRight {
 			return nil
 		} else if key == tcell.KeyEnter {
-			c.toggleSortDirection()
 			return nil
 		}
-		//}
 
 		if key == tcell.KeyUp {
 			c.ShiftFocusUp()
@@ -111,12 +107,6 @@ func (c *ListComponent[T]) SetTitle(title string) {
 	SetupWindow(c.layout, title)
 }
 
-func (c *ListComponent[T]) SetColumnSpec(columns []*Column, defaultSortColumn *Column, inverted bool) {
-	c.columnSpec = columns
-	c.SortBy(defaultSortColumn, inverted)
-	c.updateLayout()
-}
-
 func (c *ListComponent[T]) GetData() []*T {
 	return c.entries
 }
@@ -125,38 +115,14 @@ func (c *ListComponent[T]) SetData(entries []*T) {
 	c.entriesMutex.Lock()
 	c.entries = entries
 	c.entriesMutex.Unlock()
-	c.SortBy(c.sortByColumn, c.sortInverted)
 	c.updateLayout()
 }
 
-func (c *ListComponent[comparable]) SortBy(sortOption *Column, inverted bool) {
+func (c *ListComponent[comparable]) SortBy(inverted bool) {
 	c.entriesMutex.Lock()
-	c.sortByColumn = sortOption
 	c.sortInverted = inverted
 	// c.entries = c.sortTableEntries(c.entries, c.sortByColumn, c.sortInverted)
 	c.entriesMutex.Unlock()
-}
-
-func (c *ListComponent[comparable]) nextSortOrder() {
-	currentIndex := slices.Index(c.columnSpec, c.sortByColumn)
-	nextIndex := (currentIndex + 1) % len(c.columnSpec)
-	column := c.columnSpec[nextIndex]
-	c.SortBy(column, c.sortInverted)
-	c.updateLayout()
-}
-
-func (c *ListComponent[comparable]) previousSortOrder() {
-	currentIndex := slices.Index(c.columnSpec, c.sortByColumn)
-	nextIndex := (len(c.columnSpec) + currentIndex - 1) % len(c.columnSpec)
-	column := c.columnSpec[nextIndex]
-	c.SortBy(column, c.sortInverted)
-	c.updateLayout()
-}
-
-func (c *ListComponent[comparable]) toggleSortDirection() {
-	c.sortInverted = !c.sortInverted
-	c.SortBy(c.sortByColumn, c.sortInverted)
-	c.updateLayout()
 }
 
 func (c *ListComponent[abc]) HasFocus() bool {
