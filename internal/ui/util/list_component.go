@@ -181,7 +181,6 @@ func (c *ListComponent[T]) shiftFocus(amount int) {
 	entryVisibilityMapKeys := maps.Keys(c.entryVisibilityMap)
 	entryVisibilityMapValues := maps.Values(c.entryVisibilityMap)
 
-	//entryVisibilityMapValues := util.RotateSliceLeft(entryVisibilityMapValues)
 	c.entryVisibilityMap = map[*T]bool{}
 	for i, key := range entryVisibilityMapKeys {
 		c.entryVisibilityMap[key] = entryVisibilityMapValues[i+amount%len(entryVisibilityMapValues)]
