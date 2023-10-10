@@ -43,7 +43,7 @@ func (c *CurvesPage) createLayout() *tview.Flex {
 
 	curveListComponent := util.NewListComponent[CurveListItemComponent](
 		c.application,
-		func(row int, entry *CurveListItemComponent) (layout tview.Primitive) {
+		func(entry *CurveListItemComponent) (layout tview.Primitive) {
 			return entry.GetLayout()
 		},
 		func(a, b *CurveListItemComponent) bool {

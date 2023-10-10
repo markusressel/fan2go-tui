@@ -4,7 +4,8 @@ import (
 	"fan2go-tui/internal/util"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
-	"golang.org/x/exp/maps"
+	"golang.org/x/exp/slices"
+	"math"
 	"sort"
 	"sync"
 )
@@ -27,7 +28,7 @@ type ListComponent[T comparable] struct {
 
 	entryVisibilityMap map[*T]bool
 
-	toLayout                 func(row int, entry *T) (layout tview.Primitive)
+	toLayout                 func(entry *T) (layout tview.Primitive)
 	inputCapture             func(event *tcell.EventKey) *tcell.EventKey
 	selectionChangedCallback func(selectedEntry *T)
 
@@ -37,7 +38,7 @@ type ListComponent[T comparable] struct {
 
 func NewListComponent[T comparable](
 	application *tview.Application,
-	toLayout func(row int, entry *T) (layout tview.Primitive),
+	toLayout func(entry *T) (layout tview.Primitive),
 	compare func(a, b *T) bool,
 ) *ListComponent[T] {
 	listComponent := &ListComponent[T]{
@@ -69,11 +70,11 @@ func (c *ListComponent[T]) createLayout() {
 		}
 		key := event.Key()
 		if key == tcell.KeyUp {
-			c.ShiftFocusUp()
-			return nil
+			c.selectPreviousEntry()
+			return event
 		} else if key == tcell.KeyDown {
-			c.ShiftFocusDown()
-			return nil
+			c.selectNextEntry()
+			return event
 		} else if key == tcell.KeyLeft {
 			return nil
 		} else if key == tcell.KeyRight {
@@ -106,6 +107,11 @@ func (c *ListComponent[T]) SetTitle(title string) {
 }
 
 func (c *ListComponent[T]) GetData() []*T {
+	sort.SliceStable(c.entries, func(i, j int) bool {
+		a := c.entries[i]
+		b := c.entries[j]
+		return c.compare(a, b)
+	})
 	return c.entries
 }
 
@@ -143,13 +149,15 @@ func (c *ListComponent[T]) SetSelectionChangedCallback(f func(selectedEntry *T))
 	c.selectionChangedCallback = f
 }
 
-func (c *ListComponent[T]) ShiftFocusUp() {
+func (c *ListComponent[T]) scrollUp() {
 	c.scroll(-1)
+	c.selectPreviousEntry()
 	c.application.ForceDraw()
 }
 
-func (c *ListComponent[T]) ShiftFocusDown() {
+func (c *ListComponent[T]) scrollDown() {
 	c.scroll(+1)
+	c.selectNextEntry()
 	c.application.ForceDraw()
 }
 
@@ -157,12 +165,7 @@ func (c *ListComponent[T]) scroll(rows int) {
 	var entryVisibilityMapKeys []*T
 	var entryVisibilityMapValues []bool
 
-	var keys = maps.Keys(c.entryVisibilityMap)
-	sort.SliceStable(keys, func(i, j int) bool {
-		a := keys[i]
-		b := keys[j]
-		return c.compare(a, b)
-	})
+	var keys = c.GetData()
 
 	for _, key := range keys {
 		value := c.entryVisibilityMap[key]
@@ -195,10 +198,10 @@ func (c *ListComponent[T]) updateVisibleEntries() {
 	}
 
 	c.layout.Clear()
-	for row, entry := range c.entries {
+	for _, entry := range c.entries {
 		currentVisibility := c.entryVisibilityMap[entry]
 		if currentVisibility {
-			c.layout.AddItem(c.toLayout(row, entry), 0, 1, false)
+			c.layout.AddItem(c.toLayout(entry), 0, 1, false)
 		}
 	}
 }
@@ -211,4 +214,73 @@ func (c *ListComponent[T]) getVisibleEntriesCount() int {
 		}
 	}
 	return count
+}
+
+func (c *ListComponent[T]) selectPreviousEntry() {
+	newSelection := c.shiftSelection(-1)
+	c.scrollTo(newSelection)
+	c.application.ForceDraw()
+}
+
+func (c *ListComponent[T]) selectNextEntry() {
+	newSelection := c.shiftSelection(+1)
+	c.scrollTo(newSelection)
+	c.application.ForceDraw()
+}
+
+func (c *ListComponent[T]) shiftSelection(rows int) *T {
+	for idx, entry := range c.entries {
+		entryLayout := c.toLayout(entry)
+		if entryLayout.HasFocus() {
+			nextEntryIndex := (len(c.entries) + idx + rows) % len(c.entries)
+			nextEntry := c.entries[nextEntryIndex]
+			nextEntryLayout := c.toLayout(nextEntry)
+			c.application.SetFocus(nextEntryLayout)
+			c.selectionChangedCallback(entry)
+			return nextEntry
+		}
+	}
+	return nil
+}
+
+func (c *ListComponent[T]) scrollTo(selection *T) {
+	if !c.isInVisibleScrollRange(selection) {
+		distance := c.determineScrollDistanceToEntry(selection)
+		c.scroll(distance)
+	}
+}
+
+func (c *ListComponent[T]) isInVisibleScrollRange(selection *T) bool {
+	for _, entry := range c.GetData() {
+		isVisible := c.entryVisibilityMap[entry]
+		if entry == selection && isVisible {
+			return true
+		}
+	}
+	return false
+}
+
+func (c *ListComponent[T]) determineScrollDistanceToEntry(selection *T) int {
+	data := c.GetData()
+
+	index := slices.Index(data, selection)
+
+	// find the min/max indices of currently visible items
+	minIndex := len(c.entryVisibilityMap)
+	maxIndex := 0
+	for idx, entry := range data {
+		isVisible := c.entryVisibilityMap[entry]
+		if isVisible {
+			minIndex = int(math.Min(float64(minIndex), float64(idx)))
+			maxIndex = int(math.Max(float64(maxIndex), float64(idx)))
+		}
+	}
+
+	if index < minIndex {
+		return index - minIndex
+	} else if index > maxIndex {
+		return index - maxIndex
+	} else {
+		return 0
+	}
 }

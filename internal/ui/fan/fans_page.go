@@ -41,7 +41,7 @@ func (c *FansPage) createLayout() *tview.Flex {
 
 	fanListComponent := util.NewListComponent[FanListItemComponent](
 		c.application,
-		func(row int, entry *FanListItemComponent) (layout tview.Primitive) {
+		func(entry *FanListItemComponent) (layout tview.Primitive) {
 			return entry.GetLayout()
 		},
 		func(a, b *FanListItemComponent) bool {
