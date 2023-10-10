@@ -1,15 +1,21 @@
 package util
 
 import (
+	"fan2go-tui/internal/util"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 	"golang.org/x/exp/maps"
+	"sort"
 	"sync"
 )
 
 const (
 	MaxVisibleItems = 3
 )
+
+type IListComponent interface {
+	Compare()
+}
 
 type ListComponent[T comparable] struct {
 	application *tview.Application
@@ -25,12 +31,14 @@ type ListComponent[T comparable] struct {
 	inputCapture             func(event *tcell.EventKey) *tcell.EventKey
 	selectionChangedCallback func(selectedEntry *T)
 
+	compare      func(a, b *T) bool
 	sortInverted bool
 }
 
 func NewListComponent[T comparable](
 	application *tview.Application,
 	toLayout func(row int, entry *T) (layout tview.Primitive),
+	compare func(a, b *T) bool,
 ) *ListComponent[T] {
 	listComponent := &ListComponent[T]{
 		application:        application,
@@ -42,6 +50,7 @@ func NewListComponent[T comparable](
 			return event
 		},
 		selectionChangedCallback: func(selectedEntry *T) {},
+		compare:                  compare,
 	}
 	listComponent.createLayout()
 	listComponent.SetDirection(tview.FlexRow)
@@ -60,8 +69,10 @@ func (c *ListComponent[T]) createLayout() {
 		}
 		key := event.Key()
 		if key == tcell.KeyUp {
+			c.ShiftFocusUp()
 			return nil
 		} else if key == tcell.KeyDown {
+			c.ShiftFocusDown()
 			return nil
 		} else if key == tcell.KeyLeft {
 			return nil
@@ -69,19 +80,6 @@ func (c *ListComponent[T]) createLayout() {
 			return nil
 		} else if key == tcell.KeyEnter {
 			return nil
-		}
-
-		if key == tcell.KeyUp {
-			c.ShiftFocusUp()
-			//FocusPreviousItem()
-			return nil
-		} else if key == tcell.KeyDown {
-			c.ShiftFocusDown()
-			return nil
-		} else if key == tcell.KeyEnter {
-			//selectedEntry := c.GetSelectedEntry()
-			//c.selectionChangedCallback(selectedEntry)
-			//return nil
 		}
 
 		return event
@@ -146,21 +144,41 @@ func (c *ListComponent[T]) SetSelectionChangedCallback(f func(selectedEntry *T))
 }
 
 func (c *ListComponent[T]) ShiftFocusUp() {
-	c.shiftFocus(-1)
+	c.scroll(-1)
+	c.application.ForceDraw()
 }
 
 func (c *ListComponent[T]) ShiftFocusDown() {
-	c.shiftFocus(+1)
+	c.scroll(+1)
+	c.application.ForceDraw()
 }
 
-func (c *ListComponent[T]) shiftFocus(amount int) {
-	entryVisibilityMapKeys := maps.Keys(c.entryVisibilityMap)
-	entryVisibilityMapValues := maps.Values(c.entryVisibilityMap)
+func (c *ListComponent[T]) scroll(rows int) {
+	var entryVisibilityMapKeys []*T
+	var entryVisibilityMapValues []bool
+
+	var keys = maps.Keys(c.entryVisibilityMap)
+	sort.SliceStable(keys, func(i, j int) bool {
+		a := keys[i]
+		b := keys[j]
+		return c.compare(a, b)
+	})
+
+	for _, key := range keys {
+		value := c.entryVisibilityMap[key]
+		entryVisibilityMapKeys = append(entryVisibilityMapKeys, key)
+		entryVisibilityMapValues = append(entryVisibilityMapValues, value)
+	}
+
+	if rows < 0 && entryVisibilityMapValues[0] == false || rows > 0 && entryVisibilityMapValues[len(entryVisibilityMapValues)-1] == false {
+		entryVisibilityMapValues = util.RotateSliceBy(entryVisibilityMapValues, rows)
+	}
 
 	c.entryVisibilityMap = map[*T]bool{}
 	for i, key := range entryVisibilityMapKeys {
-		c.entryVisibilityMap[key] = entryVisibilityMapValues[i+amount%len(entryVisibilityMapValues)]
+		c.entryVisibilityMap[key] = entryVisibilityMapValues[i]
 	}
+	c.updateLayout()
 }
 
 func (c *ListComponent[T]) updateVisibleEntries() {

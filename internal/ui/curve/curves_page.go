@@ -46,6 +46,9 @@ func (c *CurvesPage) createLayout() *tview.Flex {
 		func(row int, entry *CurveListItemComponent) (layout tview.Primitive) {
 			return entry.GetLayout()
 		},
+		func(a, b *CurveListItemComponent) bool {
+			return strings.Compare(a.Curve.Config.ID, b.Curve.Config.ID) <= 0
+		},
 	)
 	c.curveList = curveListComponent
 	curvesPageLayout.AddItem(c.curveList.GetLayout(), 0, 1, true)

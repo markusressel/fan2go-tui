@@ -45,6 +45,9 @@ func (c *SensorsPage) createLayout() *tview.Flex {
 		func(row int, entry *SensorListItemComponent) (layout tview.Primitive) {
 			return entry.GetLayout()
 		},
+		func(a, b *SensorListItemComponent) bool {
+			return strings.Compare(a.Sensor.Config.ID, b.Sensor.Config.ID) <= 0
+		},
 	)
 	c.sensorList = sensorListComponent
 	sensorsPageLayout.AddItem(c.sensorList.GetLayout(), 0, 1, true)

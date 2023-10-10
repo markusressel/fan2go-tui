@@ -44,6 +44,9 @@ func (c *FansPage) createLayout() *tview.Flex {
 		func(row int, entry *FanListItemComponent) (layout tview.Primitive) {
 			return entry.GetLayout()
 		},
+		func(a, b *FanListItemComponent) bool {
+			return strings.Compare(a.Fan.Config.Id, b.Fan.Config.Id) <= 0
+		},
 	)
 	c.fanList = fanListComponent
 	fansPageLayout.AddItem(c.fanList.GetLayout(), 0, 1, true)
