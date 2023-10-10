@@ -4,8 +4,13 @@ import (
 	"fan2go-tui/internal/client"
 	"github.com/rivo/tview"
 	"golang.org/x/exp/maps"
+	"slices"
 	"sort"
 	"strings"
+)
+
+const (
+	MaxVisibleItems = 3
 )
 
 type CurvesPage struct {
@@ -13,7 +18,8 @@ type CurvesPage struct {
 
 	client client.Fan2goApiClient
 
-	Curves map[string]*client.Curve
+	Curves             map[string]*client.Curve
+	entryVisibilityMap []string
 
 	layout         *tview.Flex
 	curveRowLayout *tview.Flex
@@ -26,6 +32,7 @@ func NewCurvesPage(application *tview.Application, client client.Fan2goApiClient
 	curvesPage := CurvesPage{
 		application:             application,
 		client:                  client,
+		entryVisibilityMap:      []string{},
 		curveListItemComponents: map[string]*CurveListItemComponent{},
 	}
 
@@ -79,8 +86,24 @@ func (c *CurvesPage) Refresh() error {
 		curves = &map[string]*client.Curve{}
 	}
 
-	oldCIds := maps.Keys(c.curveListItemComponents)
+	if len(c.entryVisibilityMap) < MaxVisibleItems {
+		c.entryVisibilityMap = curveIds[0:MaxVisibleItems]
+	}
+
+	var visibleCurveIds []string
+	// filter currently invisible curves
+	for _, curveId := range curveIds {
+		isCurveIdVisible := slices.ContainsFunc(visibleCurveIds, func(visibleCurveId string) bool {
+			return curveId == visibleCurveId
+		})
+		if isCurveIdVisible {
+			visibleCurveIds = append(visibleCurveIds, curveId)
+		}
+	}
+	c.entryVisibilityMap = visibleCurveIds
+
 	// remove now nonexisting entries
+	oldCIds := maps.Keys(c.curveListItemComponents)
 	for _, oldCId := range oldCIds {
 		_, ok := (*curves)[oldCId]
 		if !ok {
@@ -101,6 +124,17 @@ func (c *CurvesPage) Refresh() error {
 			c.curveListItemComponents[cId] = curveListItemComponent
 			curveListItemComponent.SetCurve(curve)
 			c.curveRowLayout.AddItem(curveListItemComponent.GetLayout(), 0, 1, true)
+		}
+	}
+
+	// update visibility
+	for curveId, oldCurveListItemComponent := range c.curveListItemComponents {
+		curveIdVisible := slices.ContainsFunc(c.entryVisibilityMap, func(visibleCurveId string) bool {
+			return curveId == visibleCurveId
+		})
+
+		if curveIdVisible == false {
+			c.curveRowLayout.RemoveItem(oldCurveListItemComponent.GetLayout())
 		}
 	}
 
