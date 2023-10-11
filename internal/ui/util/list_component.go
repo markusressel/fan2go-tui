@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fan2go-tui/internal/logging"
 	"fan2go-tui/internal/util"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -43,7 +44,7 @@ func NewListComponent[T comparable](
 ) *ListComponent[T] {
 	listComponent := &ListComponent[T]{
 		application:        application,
-		entries:            []*T{},
+		entries:            nil,
 		entriesMutex:       sync.Mutex{},
 		entryVisibilityMap: map[*T]bool{},
 		toLayout:           toLayout,
@@ -117,9 +118,13 @@ func (c *ListComponent[T]) GetData() []*T {
 
 func (c *ListComponent[T]) SetData(entries []*T) {
 	c.entriesMutex.Lock()
+	selectFirst := c.entries == nil
 	c.entries = entries
 	c.entriesMutex.Unlock()
 	c.updateLayout()
+	if selectFirst {
+		c.SelectFirst()
+	}
 }
 
 func (c *ListComponent[comparable]) SortBy(inverted bool) {
@@ -250,6 +255,11 @@ func (c *ListComponent[T]) scrollTo(selection *T) {
 	}
 }
 
+func (c *ListComponent[T]) scrollToSelection() {
+	newSelection := c.shiftSelection(0)
+	c.scrollTo(newSelection)
+}
+
 func (c *ListComponent[T]) isInVisibleScrollRange(selection *T) bool {
 	for _, entry := range c.GetData() {
 		isVisible := c.entryVisibilityMap[entry]
@@ -283,4 +293,18 @@ func (c *ListComponent[T]) determineScrollDistanceToEntry(selection *T) int {
 	} else {
 		return 0
 	}
+}
+
+func (c *ListComponent[T]) SelectFirst() {
+	for _, entry := range c.GetData() {
+		entryLayout := c.toLayout(entry)
+		c.application.SetFocus(entryLayout)
+		focused := c.application.GetFocus()
+		if focused != entryLayout {
+			logging.Error("sdsadsa")
+		}
+		c.selectionChangedCallback(entry)
+		return
+	}
+	c.scrollToSelection()
 }
