@@ -163,7 +163,3 @@ func (mainPage *MainPage) showStatusMessage(status *status_message.StatusMessage
 func (mainPage *MainPage) UpdateHeader() {
 	mainPage.header.Refresh()
 }
-
-func (mainPage *MainPage) Focus() {
-	mainPage.application.SetFocus(mainPage.layout)
-}

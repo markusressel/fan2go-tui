@@ -14,8 +14,7 @@ type FansPage struct {
 
 	client client.Fan2goApiClient
 
-	layout       *tview.Flex
-	fanRowLayout *tview.Flex
+	layout *tview.Flex
 
 	fanList *util.ListComponent[FanListItemComponent]
 
@@ -36,12 +35,12 @@ func NewFansPage(application *tview.Application, c client.Fan2goApiClient) FansP
 }
 
 func (c *FansPage) createLayout() *tview.Flex {
-
-	fansPageLayout := tview.NewFlex().SetDirection(tview.FlexRow)
+	fansPageLayout := tview.NewFlex()
+	fansPageLayout.SetDirection(tview.FlexRow)
 
 	fanListComponent := util.NewListComponent[FanListItemComponent](
 		c.application,
-		func(entry *FanListItemComponent) (layout tview.Primitive) {
+		func(entry *FanListItemComponent) (layout *tview.Flex) {
 			return entry.GetLayout()
 		},
 		func(a, b *FanListItemComponent) bool {
@@ -50,6 +49,11 @@ func (c *FansPage) createLayout() *tview.Flex {
 	)
 	c.fanList = fanListComponent
 	fansPageLayout.AddItem(c.fanList.GetLayout(), 0, 1, true)
+
+	fansPageLayout.Focus(func(p tview.Primitive) {
+		layout := c.fanList.GetLayout()
+		c.application.SetFocus(layout)
+	})
 
 	return fansPageLayout
 }
@@ -98,8 +102,6 @@ func (c *FansPage) Refresh() error {
 	for _, oldFId := range oldFIds {
 		_, ok := (*fans)[oldFId]
 		if !ok {
-			fanListItemComponent := c.fanListItemComponents[oldFId]
-			c.fanRowLayout.RemoveItem(fanListItemComponent.GetLayout())
 			delete(c.fanListItemComponents, oldFId)
 		}
 	}
@@ -120,6 +122,7 @@ func (c *FansPage) Refresh() error {
 	}
 
 	c.fanList.SetData(fanListItemsComponents)
+	c.application.SetFocus(c.fanList.GetLayout())
 
 	return err
 }

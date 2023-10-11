@@ -42,7 +42,7 @@ func (c *SensorsPage) createLayout() *tview.Flex {
 
 	sensorListComponent := util.NewListComponent[SensorListItemComponent](
 		c.application,
-		func(entry *SensorListItemComponent) (layout tview.Primitive) {
+		func(entry *SensorListItemComponent) (layout *tview.Flex) {
 			return entry.GetLayout()
 		},
 		func(a, b *SensorListItemComponent) bool {

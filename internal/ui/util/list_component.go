@@ -29,7 +29,7 @@ type ListComponent[T comparable] struct {
 
 	entryVisibilityMap map[*T]bool
 
-	toLayout                 func(entry *T) (layout tview.Primitive)
+	toLayout                 func(entry *T) (layout *tview.Flex)
 	inputCapture             func(event *tcell.EventKey) *tcell.EventKey
 	selectionChangedCallback func(selectedEntry *T)
 
@@ -39,7 +39,7 @@ type ListComponent[T comparable] struct {
 
 func NewListComponent[T comparable](
 	application *tview.Application,
-	toLayout func(entry *T) (layout tview.Primitive),
+	toLayout func(entry *T) (layout *tview.Flex),
 	compare func(a, b *T) bool,
 ) *ListComponent[T] {
 	listComponent := &ListComponent[T]{
@@ -61,8 +61,15 @@ func NewListComponent[T comparable](
 
 func (c *ListComponent[T]) createLayout() {
 	layout := tview.NewFlex()
+	layout.SetBorder(true)
 
-	SetupWindow(layout, "")
+	SetupWindow(layout, "abc")
+
+	layout.Focus(func(p tview.Primitive) {
+		data := c.GetData()
+		layout := c.toLayout(data[0])
+		c.application.SetFocus(layout)
+	})
 
 	layout.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		event = c.inputCapture(event)
@@ -122,6 +129,7 @@ func (c *ListComponent[T]) SetData(entries []*T) {
 	c.entries = entries
 	c.entriesMutex.Unlock()
 	c.updateLayout()
+	c.application.ForceDraw()
 	if selectFirst {
 		c.SelectFirst()
 	}
