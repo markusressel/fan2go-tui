@@ -1,17 +1,17 @@
 ui:
-  # Defines the default update interval on startup for fetching data from the fan2go daemon
+  # (Optional) Defines the default update interval on startup for fetching data from the fan2go daemon
   updateInterval: 1s
 
 api:
-  # The hostname of the fan2go daemon api server
+  # (Optional) The hostname of the fan2go daemon api server
   host: localhost
-  # The port of the fan2go daemon api server
+  # (Optional) The port of the fan2go daemon api server
   port: 9001
 
 profiling:
-  # Whether to enable the profiling webserver
+  # (Optional) Whether to enable the profiling webserver
   enabled: false
-  # The host to listen for connections
+  # (Optional) The host to listen for connections
   host: localhost
-  # The port to listen for connections
+  # (Optional) The port to listen for connections
   port: 6060
