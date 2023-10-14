@@ -1,5 +1,5 @@
 ui:
-  # Defines the update interval for fetching data from the fan2go daemon
+  # Defines the default update interval on startup for fetching data from the fan2go daemon
   updateInterval: 1s
 
 api:
