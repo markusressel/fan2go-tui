@@ -186,7 +186,7 @@ func (c *ListComponent[T]) scroll(rows int) {
 		entryVisibilityMapValues = append(entryVisibilityMapValues, value)
 	}
 
-	if rows < 0 && entryVisibilityMapValues[0] == false || rows > 0 && entryVisibilityMapValues[len(entryVisibilityMapValues)-1] == false {
+	if len(entryVisibilityMapValues) > 0 && rows < 0 && entryVisibilityMapValues[0] == false || rows > 0 && entryVisibilityMapValues[len(entryVisibilityMapValues)-1] == false {
 		entryVisibilityMapValues = util.RotateSliceBy(entryVisibilityMapValues, rows)
 	}
 
