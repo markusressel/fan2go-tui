@@ -93,27 +93,25 @@ func (c *SensorsPage) Refresh() error {
 
 	var sensorListItemsComponents []*SensorListItemComponent
 
-	oldFIds := maps.Keys(c.sensorListItemComponents)
+	oldSIds := maps.Keys(c.sensorListItemComponents)
 	// remove now nonexisting entries
-	for _, oldFId := range oldFIds {
-		_, ok := (*sensors)[oldFId]
+	for _, oldSId := range oldSIds {
+		_, ok := (*sensors)[oldSId]
 		if !ok {
-			sensorListItemComponent := c.sensorListItemComponents[oldFId]
-			c.sensorRowLayout.RemoveItem(sensorListItemComponent.GetLayout())
-			delete(c.sensorListItemComponents, oldFId)
+			delete(c.sensorListItemComponents, oldSId)
 		}
 	}
 
 	// add new entries / update existing entries
-	for _, fId := range sensorIds {
-		sensor := (*sensors)[fId]
-		sensorListItemComponent, ok := c.sensorListItemComponents[fId]
+	for _, sId := range sensorIds {
+		sensor := (*sensors)[sId]
+		sensorListItemComponent, ok := c.sensorListItemComponents[sId]
 		if ok {
 			sensorListItemComponent.SetSensor(sensor)
 			sensorListItemsComponents = append(sensorListItemsComponents, sensorListItemComponent)
 		} else {
 			sensorListItemComponent = NewSensorListItemComponent(c.application, sensor)
-			c.sensorListItemComponents[fId] = sensorListItemComponent
+			c.sensorListItemComponents[sId] = sensorListItemComponent
 			sensorListItemComponent.SetSensor(sensor)
 			sensorListItemsComponents = append(sensorListItemsComponents, sensorListItemComponent)
 		}

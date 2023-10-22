@@ -122,7 +122,6 @@ func (c *FansPage) Refresh() error {
 	}
 
 	c.fanList.SetData(fanListItemsComponents)
-	c.application.SetFocus(c.fanList.GetLayout())
 
 	return err
 }
