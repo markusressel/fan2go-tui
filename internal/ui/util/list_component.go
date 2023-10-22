@@ -66,6 +66,7 @@ func (c *ListComponent[T]) createLayout() {
 	//SetupWindow(layout, "abc")
 
 	layout.SetFocusFunc(func() {
+		// ensure the first item is automatically selected, if there is any
 		data := c.GetData()
 		if data != nil {
 			layout.Blur()
