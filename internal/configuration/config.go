@@ -55,10 +55,10 @@ func setDefaultValues() {
 	viper.SetDefault("Ui.UpdateInterval", 100*time.Millisecond)
 
 	viper.SetDefault("Api", ApiConfig{
-		Host: "localhost",
+		Host: "127.0.0.1",
 		Port: 9001,
 	})
-	viper.SetDefault("Api.Host", "localhost")
+	viper.SetDefault("Api.Host", "127.0.0.1")
 	viper.SetDefault("Api.Port", 9001)
 
 	viper.SetDefault("Profiling", ProfilingConfig{
@@ -66,7 +66,7 @@ func setDefaultValues() {
 		Host:    "localhost",
 		Port:    6060,
 	})
-	viper.SetDefault("Profiling.Host", "localhost")
+	viper.SetDefault("Profiling.Host", "127.0.0.1")
 	viper.SetDefault("Profiling.Port", 6060)
 }
 

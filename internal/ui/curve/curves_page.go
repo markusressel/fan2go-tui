@@ -2,6 +2,7 @@ package curve
 
 import (
 	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/ui/util"
 	"github.com/rivo/tview"
 	"golang.org/x/exp/maps"
 	"sort"
@@ -13,10 +14,13 @@ type CurvesPage struct {
 
 	client client.Fan2goApiClient
 
-	Curves map[string]*client.Curve
+	Curves             map[string]*client.Curve
+	entryVisibilityMap []string
 
 	layout         *tview.Flex
 	curveRowLayout *tview.Flex
+
+	curveList *util.ListComponent[CurveListItemComponent]
 
 	curveListItemComponents map[string]*CurveListItemComponent
 }
@@ -37,8 +41,17 @@ func NewCurvesPage(application *tview.Application, client client.Fan2goApiClient
 func (c *CurvesPage) createLayout() *tview.Flex {
 	curvesPageLayout := tview.NewFlex().SetDirection(tview.FlexRow)
 
-	c.curveRowLayout = tview.NewFlex().SetDirection(tview.FlexRow)
-	curvesPageLayout.AddItem(c.curveRowLayout, 0, 1, true)
+	curveListComponent := util.NewListComponent[CurveListItemComponent](
+		c.application,
+		func(entry *CurveListItemComponent) (layout *tview.Flex) {
+			return entry.GetLayout()
+		},
+		func(a, b *CurveListItemComponent) bool {
+			return strings.Compare(a.Curve.Config.ID, b.Curve.Config.ID) <= 0
+		},
+	)
+	c.curveList = curveListComponent
+	curvesPageLayout.AddItem(c.curveList.GetLayout(), 0, 1, true)
 
 	return curvesPageLayout
 }
@@ -79,13 +92,13 @@ func (c *CurvesPage) Refresh() error {
 		curves = &map[string]*client.Curve{}
 	}
 
+	var curveListItemsComponents []*CurveListItemComponent
+
 	oldCIds := maps.Keys(c.curveListItemComponents)
 	// remove now nonexisting entries
 	for _, oldCId := range oldCIds {
 		_, ok := (*curves)[oldCId]
 		if !ok {
-			curveListItemComponent := c.curveListItemComponents[oldCId]
-			c.curveRowLayout.RemoveItem(curveListItemComponent.GetLayout())
 			delete(c.curveListItemComponents, oldCId)
 		}
 	}
@@ -96,13 +109,16 @@ func (c *CurvesPage) Refresh() error {
 		curveListItemComponent, ok := c.curveListItemComponents[cId]
 		if ok {
 			curveListItemComponent.SetCurve(curve)
+			curveListItemsComponents = append(curveListItemsComponents, curveListItemComponent)
 		} else {
 			curveListItemComponent = NewCurveListItemComponent(c.application, curve)
 			c.curveListItemComponents[cId] = curveListItemComponent
 			curveListItemComponent.SetCurve(curve)
-			c.curveRowLayout.AddItem(curveListItemComponent.GetLayout(), 0, 1, true)
+			curveListItemsComponents = append(curveListItemsComponents, curveListItemComponent)
 		}
 	}
+
+	c.curveList.SetData(curveListItemsComponents)
 
 	return err
 }

@@ -4,7 +4,7 @@ ui:
 
 api:
   # (optional) The hostname of the fan2go daemon api server
-  host: localhost
+  host: 127.0.0.1
   # (optional) The port of the fan2go daemon api server
   port: 9001
 
@@ -12,6 +12,6 @@ profiling:
   # (optional) Whether to enable the profiling webserver
   enabled: false
   # (optional) The host to listen for connections
-  host: localhost
+  host: 127.0.0.1
   # (optional) The port to listen for connections
   port: 6060

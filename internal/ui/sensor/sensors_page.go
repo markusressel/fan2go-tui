@@ -2,6 +2,7 @@ package sensor
 
 import (
 	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/ui/util"
 	"github.com/rivo/tview"
 	"golang.org/x/exp/maps"
 	"sort"
@@ -17,6 +18,8 @@ type SensorsPage struct {
 
 	layout          *tview.Flex
 	sensorRowLayout *tview.Flex
+
+	sensorList *util.ListComponent[SensorListItemComponent]
 
 	sensorListItemComponents map[string]*SensorListItemComponent
 }
@@ -37,8 +40,17 @@ func NewSensorsPage(application *tview.Application, client client.Fan2goApiClien
 func (c *SensorsPage) createLayout() *tview.Flex {
 	sensorsPageLayout := tview.NewFlex().SetDirection(tview.FlexRow)
 
-	c.sensorRowLayout = tview.NewFlex().SetDirection(tview.FlexRow)
-	sensorsPageLayout.AddItem(c.sensorRowLayout, 0, 1, true)
+	sensorListComponent := util.NewListComponent[SensorListItemComponent](
+		c.application,
+		func(entry *SensorListItemComponent) (layout *tview.Flex) {
+			return entry.GetLayout()
+		},
+		func(a, b *SensorListItemComponent) bool {
+			return strings.Compare(a.Sensor.Config.ID, b.Sensor.Config.ID) <= 0
+		},
+	)
+	c.sensorList = sensorListComponent
+	sensorsPageLayout.AddItem(c.sensorList.GetLayout(), 0, 1, true)
 
 	return sensorsPageLayout
 }
@@ -79,13 +91,13 @@ func (c *SensorsPage) Refresh() error {
 		sensors = &map[string]*client.Sensor{}
 	}
 
+	var sensorListItemsComponents []*SensorListItemComponent
+
 	oldSIds := maps.Keys(c.sensorListItemComponents)
 	// remove now nonexisting entries
 	for _, oldSId := range oldSIds {
 		_, ok := (*sensors)[oldSId]
 		if !ok {
-			sensorListItemComponent := c.sensorListItemComponents[oldSId]
-			c.sensorRowLayout.RemoveItem(sensorListItemComponent.GetLayout())
 			delete(c.sensorListItemComponents, oldSId)
 		}
 	}
@@ -96,13 +108,16 @@ func (c *SensorsPage) Refresh() error {
 		sensorListItemComponent, ok := c.sensorListItemComponents[sId]
 		if ok {
 			sensorListItemComponent.SetSensor(sensor)
+			sensorListItemsComponents = append(sensorListItemsComponents, sensorListItemComponent)
 		} else {
 			sensorListItemComponent = NewSensorListItemComponent(c.application, sensor)
 			c.sensorListItemComponents[sId] = sensorListItemComponent
 			sensorListItemComponent.SetSensor(sensor)
-			c.sensorRowLayout.AddItem(sensorListItemComponent.GetLayout(), 0, 1, true)
+			sensorListItemsComponents = append(sensorListItemsComponents, sensorListItemComponent)
 		}
 	}
+
+	c.sensorList.SetData(sensorListItemsComponents)
 
 	return err
 }

@@ -56,7 +56,7 @@ func NewMainPage(application *tview.Application, client client.Fan2goApiClient) 
 		key := event.Key()
 		rune := event.Rune()
 		if key == tcell.KeyTab || key == tcell.KeyBacktab {
-			mainPage.ToggleFocus()
+			// TODO: Switch between tabs
 		} else if key == tcell.KeyCtrlR {
 
 		} else if rune == int32(49) {
@@ -113,7 +113,8 @@ func (mainPage *MainPage) Init() {
 func (mainPage *MainPage) Refresh() {
 	defer mainPage.application.ForceDraw()
 	mainPage.UpdateHeader()
-	err := mainPage.fansPage.Refresh()
+
+	err := mainPage.sensorsPage.Refresh()
 	if err != nil {
 		mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
 		return
@@ -123,16 +124,13 @@ func (mainPage *MainPage) Refresh() {
 		mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
 		return
 	}
-	err = mainPage.sensorsPage.Refresh()
+	err = mainPage.fansPage.Refresh()
 	if err != nil {
 		mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
 		return
 	}
+
 	mainPage.clearStatusMessage()
-}
-
-func (mainPage *MainPage) ToggleFocus() {
-
 }
 
 func (mainPage *MainPage) SetPage(page Page) {

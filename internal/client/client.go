@@ -2,6 +2,7 @@ package client
 
 import (
 	"encoding/json"
+	"errors"
 	"fan2go-tui/internal/logging"
 	"fmt"
 	"io"
@@ -255,7 +256,7 @@ func doGet[T any](client *http.Client, url string, data T) (*T, error) {
 		logging.Warning("Error is req: %v", err)
 	}
 
-	// Do sends an HTTP request and
+	// Send it
 	resp, err := client.Do(req)
 	if err != nil {
 		logging.Warning("error in send req: %v", err)
@@ -269,6 +270,13 @@ func doGet[T any](client *http.Client, url string, data T) (*T, error) {
 			logging.Warning("error in close resp: %v", err)
 		}
 	}(resp.Body)
+
+	// Check the status code
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, errors.New(fmt.Sprintf("Cannot reach fan2go daemon, did you enable its API?"))
+	} else if resp.StatusCode != http.StatusOK {
+		return nil, errors.New(fmt.Sprintf("Unexpected API status code: %s", resp.Status))
+	}
 
 	// Use json.Decode for reading streams of JSON data
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
