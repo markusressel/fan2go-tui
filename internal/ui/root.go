@@ -65,10 +65,10 @@ func CreateUi(fullscreen bool) *tview.Application {
 			UpdateTicker.Reset(configuration.CurrentConfig.Ui.UpdateInterval)
 			mainPage.UpdateHeader()
 			return nil
-		} else if event.Key() == tcell.KeyPgUp {
+		} else if event.Key() == tcell.KeyPgUp || event.Key() == tcell.KeyLeft {
 			mainPage.PreviousPage()
 			return nil
-		} else if event.Key() == tcell.KeyPgDn {
+		} else if event.Key() == tcell.KeyPgDn || event.Key() == tcell.KeyRight {
 			mainPage.NextPage()
 			return nil
 		}
