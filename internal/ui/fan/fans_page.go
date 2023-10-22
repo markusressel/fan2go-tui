@@ -50,11 +50,6 @@ func (c *FansPage) createLayout() *tview.Flex {
 	c.fanList = fanListComponent
 	fansPageLayout.AddItem(c.fanList.GetLayout(), 0, 1, true)
 
-	fansPageLayout.Focus(func(p tview.Primitive) {
-		layout := c.fanList.GetLayout()
-		c.application.SetFocus(layout)
-	})
-
 	return fansPageLayout
 }
 

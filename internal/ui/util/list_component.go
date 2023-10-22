@@ -61,14 +61,17 @@ func NewListComponent[T comparable](
 
 func (c *ListComponent[T]) createLayout() {
 	layout := tview.NewFlex()
-	layout.SetBorder(true)
 
-	SetupWindow(layout, "abc")
+	//layout.SetBorder(false)
+	//SetupWindow(layout, "abc")
 
-	layout.Focus(func(p tview.Primitive) {
+	layout.SetFocusFunc(func() {
 		data := c.GetData()
-		layout := c.toLayout(data[0])
-		c.application.SetFocus(layout)
+		if data != nil {
+			layout.Blur()
+			itemLayout := c.toLayout(data[0])
+			c.application.SetFocus(itemLayout)
+		}
 	})
 
 	layout.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
