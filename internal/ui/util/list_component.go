@@ -350,6 +350,12 @@ func (c *ListComponent[T]) SelectFirst() {
 }
 
 func (c *ListComponent[T]) updateScrollBar() {
+	if len(c.entries) <= MaxVisibleItems {
+		c.hideScrollbar()
+	} else {
+		c.showScrollbar()
+	}
+
 	c.scrollbarComponent.SetMin(0)
 	c.scrollbarComponent.SetMax(int(math.Max(0.0, float64(len(c.entries)))))
 	visibleIndexMin, visibleIndexMax := c.GetVisibleRange()
@@ -363,4 +369,14 @@ func (c *ListComponent[T]) updateScrollBar() {
 
 func (c *ListComponent[T]) GetSelectedIndex() int {
 	return c.selectedIndex
+}
+
+func (c *ListComponent[T]) hideScrollbar() {
+	c.layout.RemoveItem(c.scrollbarComponent.GetLayout())
+}
+
+func (c *ListComponent[T]) showScrollbar() {
+	if c.layout.GetItemCount() <= 1 {
+		c.layout.AddItem(c.scrollbarComponent.GetLayout(), 1, 0, false)
+	}
 }
