@@ -72,7 +72,7 @@ func (c *ListComponent[T]) createLayout() {
 	c.scrollbarComponent = NewScrollbarComponent(c.application, ScrollBarVertical, 0, 1, 0, 1)
 	layout.AddItem(c.scrollbarComponent.GetLayout(), 1, 0, false)
 
-	layout.SetFocusFunc(func() {
+	c.entriesLayout.SetFocusFunc(func() {
 		// ensure the first item is automatically selected, if there is any
 		data := c.GetData()
 		if data != nil {
@@ -83,7 +83,7 @@ func (c *ListComponent[T]) createLayout() {
 		}
 	})
 
-	layout.Focus(func(item tview.Primitive) {
+	c.entriesLayout.Focus(func(item tview.Primitive) {
 		for idx, entry := range c.entries {
 			if item == c.toLayout(entry) {
 				c.selectedIndex = idx
@@ -91,7 +91,7 @@ func (c *ListComponent[T]) createLayout() {
 		}
 	})
 
-	layout.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+	c.entriesLayout.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		event = c.inputCapture(event)
 		if event == nil {
 			return event
