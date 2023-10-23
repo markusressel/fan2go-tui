@@ -74,9 +74,12 @@ func (c *CurveInfoComponent) refresh() {
 	} else if config.Linear != nil {
 		configText += fmt.Sprintf("Type: Linear\n")
 		configText += fmt.Sprintf("  Sensor: %s\n", config.Linear.Sensor)
-		configText += fmt.Sprintf("  Min: %d\n", config.Linear.Min)
-		configText += fmt.Sprintf("  Max: %d\n", config.Linear.Max)
-		configText += fmt.Sprintf("  Steps: %v\n", config.Linear.Steps)
+		if config.Linear.Steps != nil {
+			configText += fmt.Sprintf("  Steps: %v\n", config.Linear.Steps)
+		} else {
+			configText += fmt.Sprintf("  Min: %d\n", config.Linear.Min)
+			configText += fmt.Sprintf("  Max: %d\n", config.Linear.Max)
+		}
 	} else if config.Function != nil {
 		configText += fmt.Sprintf("Type: Function\n")
 		configText += fmt.Sprintf("  Type: %s\n", config.Function.Type)

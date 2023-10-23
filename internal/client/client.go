@@ -79,7 +79,7 @@ type LinearCurveConfig struct {
 	Sensor string          `json:"sensor"`
 	Min    int             `json:"min"`
 	Max    int             `json:"max"`
-	Steps  map[int]float64 `json:"steps"`
+	Steps  map[int]float64 `json:"steps,omitempty"`
 }
 
 type PidCurveConfig struct {
