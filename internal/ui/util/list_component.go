@@ -1,7 +1,6 @@
 package util
 
 import (
-	"fan2go-tui/internal/logging"
 	"fan2go-tui/internal/util"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -22,12 +21,14 @@ type IListComponent interface {
 type ListComponent[T comparable] struct {
 	application *tview.Application
 
-	layout *tview.Flex
+	layout        *tview.Flex
+	entriesLayout *tview.Flex
 
 	entries      []*T
 	entriesMutex sync.Mutex
 
 	entryVisibilityMap map[*T]bool
+	selectedIndex      int
 
 	toLayout                 func(entry *T) (layout *tview.Flex)
 	inputCapture             func(event *tcell.EventKey) *tcell.EventKey
@@ -35,6 +36,8 @@ type ListComponent[T comparable] struct {
 
 	compare      func(a, b *T) bool
 	sortInverted bool
+
+	scrollbarComponent *ScrollbarComponent
 }
 
 func NewListComponent[T comparable](
@@ -53,17 +56,21 @@ func NewListComponent[T comparable](
 		},
 		selectionChangedCallback: func(selectedEntry *T) {},
 		compare:                  compare,
+		selectedIndex:            -1,
 	}
 	listComponent.createLayout()
-	listComponent.SetDirection(tview.FlexRow)
+	listComponent.SetDirection(tview.FlexColumn)
 	return listComponent
 }
 
 func (c *ListComponent[T]) createLayout() {
 	layout := tview.NewFlex()
 
-	//layout.SetBorder(false)
-	//SetupWindow(layout, "abc")
+	c.entriesLayout = tview.NewFlex().SetDirection(tview.FlexRow)
+	layout.AddItem(c.entriesLayout, 0, 1, true)
+
+	c.scrollbarComponent = NewScrollbarComponent(c.application, ScrollBarVertical, 0, 1, 0, 1)
+	layout.AddItem(c.scrollbarComponent.GetLayout(), 1, 0, false)
 
 	layout.SetFocusFunc(func() {
 		// ensure the first item is automatically selected, if there is any
@@ -71,7 +78,16 @@ func (c *ListComponent[T]) createLayout() {
 		if data != nil {
 			layout.Blur()
 			itemLayout := c.toLayout(data[0])
+			c.selectedIndex = 0
 			c.application.SetFocus(itemLayout)
+		}
+	})
+
+	layout.Focus(func(item tview.Primitive) {
+		for idx, entry := range c.entries {
+			if item == c.toLayout(entry) {
+				c.selectedIndex = idx
+			}
 		}
 	})
 
@@ -107,6 +123,7 @@ func (c *ListComponent[T]) SetDirection(direction int) {
 
 func (c *ListComponent[T]) updateLayout() {
 	c.updateVisibleEntries()
+	c.updateScrollBar()
 	c.application.ForceDraw()
 }
 
@@ -201,6 +218,19 @@ func (c *ListComponent[T]) scroll(rows int) {
 	c.updateLayout()
 }
 
+func (c *ListComponent[T]) GetVisibleRange() (int, int) {
+	minIndex := len(c.entryVisibilityMap)
+	maxIndex := 0
+	for idx, entry := range c.entries {
+		isVisible := c.entryVisibilityMap[entry]
+		if isVisible {
+			minIndex = int(math.Min(float64(minIndex), float64(idx)))
+			maxIndex = int(math.Max(float64(maxIndex), float64(idx)))
+		}
+	}
+	return minIndex, maxIndex
+}
+
 func (c *ListComponent[T]) updateVisibleEntries() {
 	// ensure we are displaying as many items as specified by MaxVisibleItems
 	for _, entry := range c.entries {
@@ -214,11 +244,11 @@ func (c *ListComponent[T]) updateVisibleEntries() {
 		}
 	}
 
-	c.layout.Clear()
+	c.entriesLayout.Clear()
 	for _, entry := range c.entries {
 		currentVisibility := c.entryVisibilityMap[entry]
 		if currentVisibility {
-			c.layout.AddItem(c.toLayout(entry), 0, 1, false)
+			c.entriesLayout.AddItem(c.toLayout(entry), 0, 1, false)
 		}
 	}
 }
@@ -252,6 +282,7 @@ func (c *ListComponent[T]) shiftSelection(rows int) *T {
 			nextEntryIndex := (len(c.entries) + idx + rows) % len(c.entries)
 			nextEntry := c.entries[nextEntryIndex]
 			nextEntryLayout := c.toLayout(nextEntry)
+			c.selectedIndex = nextEntryIndex
 			c.application.SetFocus(nextEntryLayout)
 			c.selectionChangedCallback(entry)
 			return nextEntry
@@ -308,15 +339,28 @@ func (c *ListComponent[T]) determineScrollDistanceToEntry(selection *T) int {
 }
 
 func (c *ListComponent[T]) SelectFirst() {
-	for _, entry := range c.GetData() {
+	for idx, entry := range c.GetData() {
 		entryLayout := c.toLayout(entry)
 		c.application.SetFocus(entryLayout)
-		focused := c.application.GetFocus()
-		if focused != entryLayout {
-			logging.Error("sdsadsa")
-		}
+		c.selectedIndex = idx
 		c.selectionChangedCallback(entry)
 		return
 	}
 	c.scrollToSelection()
+}
+
+func (c *ListComponent[T]) updateScrollBar() {
+	c.scrollbarComponent.SetMin(0)
+	c.scrollbarComponent.SetMax(int(math.Max(0.0, float64(len(c.entries)))))
+	visibleIndexMin, visibleIndexMax := c.GetVisibleRange()
+
+	//newPosition := c.GetSelectedIndex()
+	c.scrollbarComponent.SetPosition(visibleIndexMin)
+
+	width := (visibleIndexMax - visibleIndexMin) + 1
+	c.scrollbarComponent.SetWidth(width)
+}
+
+func (c *ListComponent[T]) GetSelectedIndex() int {
+	return c.selectedIndex
 }

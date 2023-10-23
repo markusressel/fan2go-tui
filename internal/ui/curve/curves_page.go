@@ -39,7 +39,7 @@ func NewCurvesPage(application *tview.Application, client client.Fan2goApiClient
 }
 
 func (c *CurvesPage) createLayout() *tview.Flex {
-	curvesPageLayout := tview.NewFlex().SetDirection(tview.FlexRow)
+	curvesPageLayout := tview.NewFlex()
 
 	curveListComponent := util.NewListComponent[CurveListItemComponent](
 		c.application,
