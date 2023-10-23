@@ -34,6 +34,8 @@ type ListComponent[T comparable] struct {
 	inputCapture             func(event *tcell.EventKey) *tcell.EventKey
 	selectionChangedCallback func(selectedEntry *T)
 
+	sortListEntries func(entries []*T, inverted bool) []*T
+
 	compare      func(a, b *T) bool
 	sortInverted bool
 
@@ -44,6 +46,7 @@ func NewListComponent[T comparable](
 	application *tview.Application,
 	toLayout func(entry *T) (layout *tview.Flex),
 	compare func(a, b *T) bool,
+	sortListEntries func(entries []*T, inverted bool) []*T,
 ) *ListComponent[T] {
 	listComponent := &ListComponent[T]{
 		application:        application,
@@ -51,6 +54,7 @@ func NewListComponent[T comparable](
 		entriesMutex:       sync.Mutex{},
 		entryVisibilityMap: map[*T]bool{},
 		toLayout:           toLayout,
+		sortListEntries:    sortListEntries,
 		inputCapture: func(event *tcell.EventKey) *tcell.EventKey {
 			return event
 		},
@@ -159,7 +163,7 @@ func (c *ListComponent[T]) SetData(entries []*T) {
 func (c *ListComponent[comparable]) SortBy(inverted bool) {
 	c.entriesMutex.Lock()
 	c.sortInverted = inverted
-	// c.entries = c.sortTableEntries(c.entries, c.sortByColumn, c.sortInverted)
+	c.entries = c.sortListEntries(c.entries, c.sortInverted)
 	c.entriesMutex.Unlock()
 }
 

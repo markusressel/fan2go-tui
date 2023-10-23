@@ -5,6 +5,7 @@ import (
 	"fan2go-tui/internal/ui/util"
 	"github.com/rivo/tview"
 	"golang.org/x/exp/maps"
+	"golang.org/x/exp/slices"
 	"sort"
 	"strings"
 )
@@ -44,6 +45,26 @@ func (c *FansPage) createLayout() *tview.Flex {
 		},
 		func(a, b *FanListItemComponent) bool {
 			return strings.Compare(a.Fan.Config.Id, b.Fan.Config.Id) <= 0
+		},
+		func(entries []*FanListItemComponent, inverted bool) []*FanListItemComponent {
+			sort.SliceStable(entries, func(i, j int) bool {
+				a := entries[i].Fan.Config.Id
+				b := entries[j].Fan.Config.Id
+
+				result := strings.Compare(strings.ToLower(a), strings.ToLower(b))
+
+				if result <= 0 {
+					return true
+				} else {
+					return false
+				}
+			})
+
+			if inverted {
+				slices.Reverse(entries)
+			}
+
+			return entries
 		},
 	)
 	c.fanList = fanListComponent

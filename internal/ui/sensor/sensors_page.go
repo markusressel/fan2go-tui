@@ -5,6 +5,7 @@ import (
 	"fan2go-tui/internal/ui/util"
 	"github.com/rivo/tview"
 	"golang.org/x/exp/maps"
+	"golang.org/x/exp/slices"
 	"sort"
 	"strings"
 )
@@ -47,6 +48,26 @@ func (c *SensorsPage) createLayout() *tview.Flex {
 		},
 		func(a, b *SensorListItemComponent) bool {
 			return strings.Compare(a.Sensor.Config.ID, b.Sensor.Config.ID) <= 0
+		},
+		func(entries []*SensorListItemComponent, inverted bool) []*SensorListItemComponent {
+			sort.SliceStable(entries, func(i, j int) bool {
+				a := entries[i].Sensor.Config.ID
+				b := entries[j].Sensor.Config.ID
+
+				result := strings.Compare(strings.ToLower(a), strings.ToLower(b))
+
+				if result <= 0 {
+					return true
+				} else {
+					return false
+				}
+			})
+
+			if inverted {
+				slices.Reverse(entries)
+			}
+
+			return entries
 		},
 	)
 	c.sensorList = sensorListComponent

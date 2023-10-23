@@ -5,6 +5,7 @@ import (
 	"fan2go-tui/internal/ui/util"
 	"github.com/rivo/tview"
 	"golang.org/x/exp/maps"
+	"golang.org/x/exp/slices"
 	"sort"
 	"strings"
 )
@@ -48,6 +49,26 @@ func (c *CurvesPage) createLayout() *tview.Flex {
 		},
 		func(a, b *CurveListItemComponent) bool {
 			return strings.Compare(a.Curve.Config.ID, b.Curve.Config.ID) <= 0
+		},
+		func(entries []*CurveListItemComponent, inverted bool) []*CurveListItemComponent {
+			sort.SliceStable(entries, func(i, j int) bool {
+				a := entries[i].Curve.Config.ID
+				b := entries[j].Curve.Config.ID
+
+				result := strings.Compare(strings.ToLower(a), strings.ToLower(b))
+
+				if result <= 0 {
+					return true
+				} else {
+					return false
+				}
+			})
+
+			if inverted {
+				slices.Reverse(entries)
+			}
+
+			return entries
 		},
 	)
 	c.curveList = curveListComponent
