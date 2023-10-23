@@ -44,8 +44,10 @@ var (
 		},
 		List: ListsColors{
 			Scrollbar: ScrollbarColors{
-				Bar:        tcell.ColorBlue,
-				Background: tcell.ColorBlack,
+				Bar:               tcell.ColorBlue,
+				IndicatorActive:   tcell.ColorBlue,
+				IndicatorInactive: tcell.ColorGray,
+				Background:        tcell.ColorBlack,
 			},
 		},
 	}

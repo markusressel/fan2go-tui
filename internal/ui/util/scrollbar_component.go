@@ -12,6 +12,12 @@ type ScrollBarOrientation int
 const (
 	ScrollBarVertical ScrollBarOrientation = iota
 	ScrollBarHorizontal
+
+	ScrollIndicatorMiddle = "■"
+	ScrollIndicatorTop    = "▲"
+	ScrollIndicatorBottom = "▼"
+	ScrollIndicatorLeft   = "◀"
+	ScrollIndicatorRight  = "▶"
 )
 
 type ScrollbarComponent struct {
@@ -183,45 +189,55 @@ func (c *ScrollbarComponent) calculateBarWidth() int {
 func (c *ScrollbarComponent) updateTopEndText() {
 	c.layout.ResizeItem(c.topArrow, 1, 0)
 	text := ""
-	//isAtLimit := c.scrollPosition <= c.min
-	isAtLimit := false
+	textColor := theme.Colors.List.Scrollbar.IndicatorInactive
+	isAtLimit := c.scrollPosition <= c.min
 	switch c.orientation {
 	case ScrollBarVertical:
 		if isAtLimit {
-			text = "="
+			text = ScrollIndicatorMiddle
+			textColor = theme.Colors.List.Scrollbar.IndicatorInactive
 		} else {
-			text = "^"
+			text = ScrollIndicatorTop
+			textColor = theme.Colors.List.Scrollbar.IndicatorActive
 		}
 	case ScrollBarHorizontal:
 		if isAtLimit {
-			text = "="
+			text = ScrollIndicatorMiddle
+			textColor = theme.Colors.List.Scrollbar.IndicatorInactive
 		} else {
-			text = "<"
+			text = ScrollIndicatorLeft
+			textColor = theme.Colors.List.Scrollbar.IndicatorActive
 		}
 	}
 	c.topArrow.SetText(text)
+	c.topArrow.SetTextColor(textColor)
 }
 
 func (c *ScrollbarComponent) updateBottomEndText() {
 	c.layout.ResizeItem(c.bottomArrow, 1, 0)
 	text := ""
-	//isAtLimit := c.scrollPosition+c.barWidth >= c.max
-	isAtLimit := false
+	textColor := theme.Colors.List.Scrollbar.IndicatorInactive
+	isAtLimit := c.scrollPosition+c.barWidth >= c.max
 	switch c.orientation {
 	case ScrollBarVertical:
 		if isAtLimit {
-			text = "="
+			text = ScrollIndicatorMiddle
+			textColor = theme.Colors.List.Scrollbar.IndicatorInactive
 		} else {
-			text = "v"
+			text = ScrollIndicatorBottom
+			textColor = theme.Colors.List.Scrollbar.IndicatorActive
 		}
 	case ScrollBarHorizontal:
 		if isAtLimit {
-			text = "="
+			text = ScrollIndicatorMiddle
+			textColor = theme.Colors.List.Scrollbar.IndicatorInactive
 		} else {
-			text = ">"
+			text = ScrollIndicatorRight
+			textColor = theme.Colors.List.Scrollbar.IndicatorActive
 		}
 	}
 	c.bottomArrow.SetText(text)
+	c.bottomArrow.SetTextColor(textColor)
 }
 
 func (c *ScrollbarComponent) updateScrollbar() {

@@ -57,8 +57,10 @@ type ListsColors struct {
 }
 
 type ScrollbarColors struct {
-	Bar        tcell.Color
-	Background tcell.Color
+	Bar               tcell.Color
+	IndicatorInactive tcell.Color
+	IndicatorActive   tcell.Color
+	Background        tcell.Color
 }
 
 func CreateTitleText(text string) string {
