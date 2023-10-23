@@ -36,7 +36,8 @@ type Color struct {
 	Header HeaderColors
 	Dialog DialogColors
 	Layout LayoutColors
-	Graphs GraphsColors
+	Graph  GraphsColors
+	List   ListsColors
 }
 
 type GraphsColors struct {
@@ -49,6 +50,15 @@ type GraphsColors struct {
 type LayoutColors struct {
 	Border tcell.Color
 	Title  tcell.Color
+}
+
+type ListsColors struct {
+	Scrollbar ScrollbarColors
+}
+
+type ScrollbarColors struct {
+	Bar        tcell.Color
+	Background tcell.Color
 }
 
 func CreateTitleText(text string) string {

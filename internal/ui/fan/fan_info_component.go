@@ -37,11 +37,11 @@ func (c *FanInfoComponent) createLayout() *tview.Flex {
 	layout.AddItem(configTextView, 0, 1, false)
 	c.configTextView = configTextView
 
-	rpmValueTextView := tview.NewTextView().SetTextColor(theme.Colors.Graphs.Rpm)
+	rpmValueTextView := tview.NewTextView().SetTextColor(theme.Colors.Graph.Rpm)
 	layout.AddItem(rpmValueTextView, 1, 0, false)
 	c.rpmValueTextView = rpmValueTextView
 
-	pwmValueTextView := tview.NewTextView().SetTextColor(theme.Colors.Graphs.Pwm)
+	pwmValueTextView := tview.NewTextView().SetTextColor(theme.Colors.Graph.Pwm)
 	layout.AddItem(pwmValueTextView, 1, 0, false)
 	c.pwmValueTextView = pwmValueTextView
 

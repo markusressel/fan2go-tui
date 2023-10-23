@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fan2go-tui/internal/ui/theme"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 	"math"
@@ -61,13 +62,13 @@ func (c *ScrollbarComponent) createLayout() {
 	c.topArrow = tview.NewTextView()
 	layout.AddItem(c.topArrow, 1, 0, false)
 	c.upperBox = tview.NewBox()
-	c.upperBox.SetBackgroundColor(tcell.ColorGray)
+	c.upperBox.SetBackgroundColor(theme.Colors.List.Scrollbar.Background)
 	layout.AddItem(c.upperBox, 1, 0, false)
 	c.scrollBarBox = tview.NewBox()
-	c.scrollBarBox.SetBackgroundColor(tcell.ColorWhite)
+	c.scrollBarBox.SetBackgroundColor(theme.Colors.List.Scrollbar.Bar)
 	layout.AddItem(c.scrollBarBox, 1, 0, false)
 	c.lowerBox = tview.NewBox()
-	c.lowerBox.SetBackgroundColor(tcell.ColorGray)
+	c.lowerBox.SetBackgroundColor(theme.Colors.List.Scrollbar.Background)
 	layout.AddItem(c.lowerBox, 1, 0, false)
 	c.bottomArrow = tview.NewTextView()
 	layout.AddItem(c.bottomArrow, 1, 0, false)
