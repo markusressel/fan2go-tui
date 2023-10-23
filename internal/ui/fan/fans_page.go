@@ -36,7 +36,6 @@ func NewFansPage(application *tview.Application, c client.Fan2goApiClient) FansP
 
 func (c *FansPage) createLayout() *tview.Flex {
 	fansPageLayout := tview.NewFlex()
-	fansPageLayout.SetDirection(tview.FlexRow)
 
 	fanListComponent := util.NewListComponent[FanListItemComponent](
 		c.application,

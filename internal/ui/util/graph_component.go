@@ -43,8 +43,8 @@ func (c *GraphComponent[T]) createLayout() *tview.Flex {
 	bmScatterPlot := tvxwidgets.NewPlot()
 	c.bmScatterPlot = bmScatterPlot
 	bmScatterPlot.SetLineColor([]tcell.Color{
-		theme.Colors.Graphs.Rpm,
-		theme.Colors.Graphs.Pwm,
+		theme.Colors.Graph.Rpm,
+		theme.Colors.Graph.Pwm,
 	})
 	bmScatterPlot.SetPlotType(tvxwidgets.PlotTypeLineChart)
 	bmScatterPlot.SetMarker(tvxwidgets.PlotMarkerBraille)

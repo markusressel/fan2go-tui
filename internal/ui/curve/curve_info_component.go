@@ -36,7 +36,7 @@ func (c *CurveInfoComponent) createLayout() *tview.Flex {
 	layout.AddItem(configTextView, 0, 1, false)
 	c.configTextView = configTextView
 
-	curveValueTextView := tview.NewTextView().SetTextColor(theme.Colors.Graphs.Curve)
+	curveValueTextView := tview.NewTextView().SetTextColor(theme.Colors.Graph.Curve)
 	layout.AddItem(curveValueTextView, 1, 0, false)
 	c.valueTextView = curveValueTextView
 

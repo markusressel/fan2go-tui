@@ -36,7 +36,7 @@ func (c *SensorInfoComponent) createLayout() *tview.Flex {
 	layout.AddItem(configTextView, 0, 1, false)
 	c.configTextView = configTextView
 
-	curveValueTextView := tview.NewTextView().SetTextColor(theme.Colors.Graphs.Sensor)
+	curveValueTextView := tview.NewTextView().SetTextColor(theme.Colors.Graph.Sensor)
 	layout.AddItem(curveValueTextView, 1, 0, false)
 	c.valueTextView = curveValueTextView
 
