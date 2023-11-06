@@ -10,7 +10,7 @@ require (
 	github.com/oklog/run v1.1.0
 	github.com/pterm/pterm v0.12.70
 	github.com/rivo/tview v0.0.0-20230928053139-9bc1d28d88a9
-	github.com/spf13/cobra v1.7.0
+	github.com/spf13/cobra v1.8.0
 	github.com/spf13/viper v1.17.0
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9
 )
