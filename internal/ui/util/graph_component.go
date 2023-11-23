@@ -6,6 +6,7 @@ import (
 	"github.com/navidys/tvxwidgets"
 	"github.com/rivo/tview"
 	"golang.org/x/exp/slices"
+	"math"
 )
 
 type GraphComponent[T any] struct {
@@ -47,7 +48,7 @@ func (c *GraphComponent[T]) createLayout() *tview.Flex {
 		theme.Colors.Graph.Pwm,
 	})
 	bmScatterPlot.SetPlotType(tvxwidgets.PlotTypeLineChart)
-	bmScatterPlot.SetMarker(tvxwidgets.PlotMarkerBraille)
+	bmScatterPlot.SetMarker(tvxwidgets.PlotMarkerDot)
 	layout.AddItem(bmScatterPlot, 0, 1, false)
 	_, _, width, _ := bmScatterPlot.GetRect()
 	c.valueBufferSize = width * 4
@@ -61,6 +62,28 @@ func (c *GraphComponent[T]) Refresh() {
 
 	_, _, width, _ := c.bmScatterPlot.GetRect()
 	c.valueBufferSize = width - 5
+
+	if c.fetchValue != nil {
+		missingDataPoints := c.valueBufferSize - len(c.scatterPlotData[0])
+		for i := 0; i < missingDataPoints; i++ {
+			c.scatterPlotData[0] = slices.Insert(c.scatterPlotData[0], 0, math.NaN())
+		}
+
+		// limit data to visible data points
+		overflow := len(c.scatterPlotData[0]) - c.valueBufferSize
+		c.scatterPlotData[0] = c.scatterPlotData[0][overflow:]
+	}
+
+	if c.fetchValue2 != nil {
+		missingDataPoints := c.valueBufferSize - len(c.scatterPlotData[1])
+		for i := 0; i < missingDataPoints; i++ {
+			c.scatterPlotData[1] = slices.Insert(c.scatterPlotData[1], 0, math.NaN())
+		}
+
+		// limit data to visible data points
+		overflow := len(c.scatterPlotData[1]) - c.valueBufferSize
+		c.scatterPlotData[1] = c.scatterPlotData[1][overflow:]
+	}
 }
 
 func (c *GraphComponent[T]) GetLayout() *tview.Flex {
@@ -76,21 +99,10 @@ func (c *GraphComponent[T]) InsertValue(data *T) {
 	if c.fetchValue != nil {
 		value := c.fetchValue(data)
 		c.scatterPlotData[0] = slices.Insert(c.scatterPlotData[0], len(c.scatterPlotData[0]), value)
-		// limit data to visible data points
-		if (len(c.scatterPlotData[0])) > c.valueBufferSize {
-			overflow := len(c.scatterPlotData[0]) - c.valueBufferSize
-			c.scatterPlotData[0] = c.scatterPlotData[0][overflow:]
-		}
 	}
-
 	if c.fetchValue2 != nil {
 		value2 := c.fetchValue2(data)
 		c.scatterPlotData[1] = slices.Insert(c.scatterPlotData[1], len(c.scatterPlotData[1]), value2)
-		// limit data to visible data points
-		if (len(c.scatterPlotData[1])) > c.valueBufferSize {
-			overflow := len(c.scatterPlotData[1]) - c.valueBufferSize
-			c.scatterPlotData[1] = c.scatterPlotData[1][overflow:]
-		}
 	}
 
 	c.Refresh()
