@@ -188,8 +188,8 @@ github.com/mitchellh/go-homedir v1.1.0 h1:lukF9ziXFxDFPkA1vsr5zpc1XuPDn/wFntq5mG
 github.com/mitchellh/go-homedir v1.1.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=
 github.com/mitchellh/mapstructure v1.5.0 h1:jeMsZIYE/09sWLaz43PL7Gy6RuMjD2eJVyuac5Z2hdY=
 github.com/mitchellh/mapstructure v1.5.0/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
-github.com/navidys/tvxwidgets v0.4.0 h1:ns5jm61scuIXs3UDOKO/CFI5NuQce9DNzjc7ZS6wNJE=
-github.com/navidys/tvxwidgets v0.4.0/go.mod h1:VJRhOCt9q4cuqN1UebaWRAc0MG4pmpHMBWL3tRSoqdI=
+github.com/navidys/tvxwidgets v0.4.1 h1:abITHN2R0AN1G5XYBDCeTBfR+E1FRsDKN5j1FKI8ags=
+github.com/navidys/tvxwidgets v0.4.1/go.mod h1:VJRhOCt9q4cuqN1UebaWRAc0MG4pmpHMBWL3tRSoqdI=
 github.com/oklog/run v1.1.0 h1:GEenZ1cK0+q0+wsJew9qUg/DyD8k3JzYsZAi5gYi2mA=
 github.com/oklog/run v1.1.0/go.mod h1:sVPdnTZT1zYwAJeCMu2Th4T21pA3FPOQRfWjQlk7DVU=
 github.com/pelletier/go-toml/v2 v2.1.0 h1:FnwAJ4oYMvbT/34k9zzHuZNrhlz48GB3/s6at6/MHO4=
