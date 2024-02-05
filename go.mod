@@ -8,7 +8,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/navidys/tvxwidgets v0.5.0
 	github.com/oklog/run v1.1.0
-	github.com/pterm/pterm v0.12.77
+	github.com/pterm/pterm v0.12.78
 	github.com/rivo/tview v0.0.0-20231206124440-5f078138442e
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/viper v1.18.2
