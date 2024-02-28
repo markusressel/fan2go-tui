@@ -4,6 +4,7 @@ import (
 	"fan2go-tui/internal/util"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
+	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
 	"math"
 	"sort"
@@ -241,6 +242,10 @@ func (c *ListComponent[T]) GetVisibleRange() (int, int) {
 
 func (c *ListComponent[T]) updateVisibleEntries() {
 	// ensure we are displaying as many items as specified by MaxVisibleItems
+
+	// cleanup the visibility map (remove entries that are not in the dataset anymore)
+	c.cleanupVisibilityMap()
+
 	for _, entry := range c.entries {
 		_, ok := c.entryVisibilityMap[entry]
 		if !ok {
@@ -257,6 +262,16 @@ func (c *ListComponent[T]) updateVisibleEntries() {
 		currentVisibility := c.entryVisibilityMap[entry]
 		if currentVisibility {
 			c.entriesLayout.AddItem(c.toLayout(entry), 0, 1, false)
+		}
+	}
+}
+
+func (c *ListComponent[T]) cleanupVisibilityMap() {
+	keys := maps.Keys(c.entryVisibilityMap)
+	for _, key := range keys {
+		ok := slices.Contains(c.entries, key)
+		if !ok {
+			delete(c.entryVisibilityMap, key)
 		}
 	}
 }
