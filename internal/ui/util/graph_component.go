@@ -17,7 +17,7 @@ type GraphComponent[T any] struct {
 	fetchValue2 func(*T) float64
 
 	layout          *tview.Flex
-	bmScatterPlot   *tvxwidgets.Plot
+	plotLayout      *tvxwidgets.Plot
 	scatterPlotData [][]float64
 	valueBufferSize int
 }
@@ -41,26 +41,26 @@ func (c *GraphComponent[T]) createLayout() *tview.Flex {
 
 	SetupWindow(layout, "")
 
-	bmScatterPlot := tvxwidgets.NewPlot()
-	c.bmScatterPlot = bmScatterPlot
-	bmScatterPlot.SetLineColor([]tcell.Color{
+	plotLayout := tvxwidgets.NewPlot()
+	c.plotLayout = plotLayout
+	plotLayout.SetLineColor([]tcell.Color{
 		theme.Colors.Graph.Rpm,
 		theme.Colors.Graph.Pwm,
 	})
-	bmScatterPlot.SetPlotType(tvxwidgets.PlotTypeLineChart)
-	bmScatterPlot.SetMarker(tvxwidgets.PlotMarkerDot)
-	layout.AddItem(bmScatterPlot, 0, 1, false)
-	_, _, width, _ := bmScatterPlot.GetRect()
+	plotLayout.SetPlotType(tvxwidgets.PlotTypeLineChart)
+	plotLayout.SetMarker(tvxwidgets.PlotMarkerBraille)
+	layout.AddItem(plotLayout, 0, 1, false)
+	_, _, width, _ := plotLayout.GetRect()
 	c.valueBufferSize = width * 4
 
 	return layout
 }
 
 func (c *GraphComponent[T]) Refresh() {
-	c.bmScatterPlot.SetDrawAxes(true)
-	c.bmScatterPlot.SetData(c.scatterPlotData)
+	c.plotLayout.SetDrawAxes(true)
+	c.plotLayout.SetData(c.scatterPlotData)
 
-	_, _, width, _ := c.bmScatterPlot.GetRect()
+	_, _, width, _ := c.plotLayout.GetRect()
 	c.valueBufferSize = width - 5
 
 	if c.fetchValue != nil {
