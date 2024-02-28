@@ -141,10 +141,15 @@ func (c *GraphComponent[T]) InsertValue(data *T) {
 		data2 := c.scatterPlotData[1]
 		targetIndex := len(data2)
 		if c.reversed {
-			targetIndex = 0
+			reversedCopy := slices.Clone(data2)
+			slices.Reverse(reversedCopy)
+			reversedCopy = slices.Insert(reversedCopy, targetIndex, value2)
+			slices.Reverse(reversedCopy)
+			data2 = reversedCopy
+		} else {
+			data2 = slices.Insert(data2, targetIndex, value2)
 		}
-		slices.Insert(data2, targetIndex, value2)
-		c.scatterPlotData[1] = slices.Insert(data2, targetIndex, value2)
+		c.scatterPlotData[1] = data2
 	}
 
 	c.Refresh()
