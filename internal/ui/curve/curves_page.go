@@ -143,3 +143,7 @@ func (c *CurvesPage) Refresh() error {
 
 	return err
 }
+
+func (c *CurvesPage) ScrollToItem() {
+	c.curveList.SelectEntry(c.curveList.GetSelectedItem())
+}

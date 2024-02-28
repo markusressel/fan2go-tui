@@ -142,3 +142,7 @@ func (c *SensorsPage) Refresh() error {
 
 	return err
 }
+
+func (c *SensorsPage) ScrollToItem() {
+	c.sensorList.SelectEntry(c.sensorList.GetSelectedItem())
+}

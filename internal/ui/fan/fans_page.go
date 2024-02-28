@@ -140,3 +140,7 @@ func (c *FansPage) Refresh() error {
 
 	return err
 }
+
+func (c *FansPage) ScrollToItem() {
+	c.fanList.SelectEntry(c.fanList.GetSelectedItem())
+}

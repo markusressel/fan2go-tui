@@ -81,8 +81,12 @@ func (c *ListComponent[T]) createLayout() {
 		data := c.GetData()
 		if data != nil {
 			layout.Blur()
+			if c.selectedIndex == -1 {
+				c.selectedIndex = 0
+			}
 			itemLayout := c.toLayout(data[0])
-			c.selectedIndex = 0
+
+			c.SelectEntry(c.GetSelectedItem())
 			c.application.SetFocus(itemLayout)
 		}
 	})
@@ -267,6 +271,16 @@ func (c *ListComponent[T]) getVisibleEntriesCount() int {
 	return count
 }
 
+func (c *ListComponent[T]) SelectEntry(entry *T) {
+	indexToSelect := slices.Index(c.entries, entry)
+	entryToSelect := c.entries[indexToSelect]
+	entryLayout := c.toLayout(entryToSelect)
+	c.selectedIndex = indexToSelect
+	c.application.SetFocus(entryLayout)
+	c.selectionChangedCallback(entry)
+	c.scrollTo(entryToSelect)
+}
+
 func (c *ListComponent[T]) selectPreviousEntry() {
 	newSelection := c.shiftSelection(-1)
 	c.scrollTo(newSelection)
@@ -373,6 +387,10 @@ func (c *ListComponent[T]) updateScrollBar() {
 
 func (c *ListComponent[T]) GetSelectedIndex() int {
 	return c.selectedIndex
+}
+
+func (c *ListComponent[T]) GetSelectedItem() *T {
+	return c.entries[c.selectedIndex]
 }
 
 func (c *ListComponent[T]) hideScrollbar() {
