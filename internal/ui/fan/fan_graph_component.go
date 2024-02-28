@@ -24,6 +24,7 @@ func NewFanGraphComponent(application *tview.Application, fan *client.Fan) *FanG
 	}, func(c *client.Fan) float64 {
 		return float64(c.Pwm)
 	},
+		true,
 	)
 
 	c := &FanGraphComponent{

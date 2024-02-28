@@ -21,7 +21,9 @@ func NewCurveGraphComponent(application *tview.Application, curve *client.Curve)
 
 	graphComponent := util.NewGraphComponent[client.Curve](application, curve, func(c *client.Curve) float64 {
 		return c.Value
-	}, nil,
+	},
+		nil,
+		true,
 	)
 
 	c := &CurveGraphComponent{
@@ -51,7 +53,6 @@ func (c *CurveGraphComponent) refresh() {
 	}
 	component := c.graphComponent
 	component.InsertValue(curve)
-	component.Refresh()
 }
 
 func (c *CurveGraphComponent) GetLayout() *tview.Flex {

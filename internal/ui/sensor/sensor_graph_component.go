@@ -22,6 +22,7 @@ func NewSensorGraphComponent(application *tview.Application, sensor *client.Sens
 	graphComponent := util.NewGraphComponent[client.Sensor](application, sensor, func(c *client.Sensor) float64 {
 		return c.MovingAvg / 1000
 	}, nil,
+		true,
 	)
 
 	c := &SensorGraphComponent{
