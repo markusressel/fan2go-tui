@@ -4,6 +4,7 @@ import (
 	"fan2go-tui/internal/util"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
+	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
 	"math"
 	"sort"
@@ -81,8 +82,12 @@ func (c *ListComponent[T]) createLayout() {
 		data := c.GetData()
 		if data != nil {
 			layout.Blur()
+			if c.selectedIndex == -1 {
+				c.selectedIndex = 0
+			}
 			itemLayout := c.toLayout(data[0])
-			c.selectedIndex = 0
+
+			c.SelectEntry(c.GetSelectedItem())
 			c.application.SetFocus(itemLayout)
 		}
 	})
@@ -237,6 +242,10 @@ func (c *ListComponent[T]) GetVisibleRange() (int, int) {
 
 func (c *ListComponent[T]) updateVisibleEntries() {
 	// ensure we are displaying as many items as specified by MaxVisibleItems
+
+	// cleanup the visibility map (remove entries that are not in the dataset anymore)
+	c.cleanupVisibilityMap()
+
 	for _, entry := range c.entries {
 		_, ok := c.entryVisibilityMap[entry]
 		if !ok {
@@ -257,6 +266,16 @@ func (c *ListComponent[T]) updateVisibleEntries() {
 	}
 }
 
+func (c *ListComponent[T]) cleanupVisibilityMap() {
+	keys := maps.Keys(c.entryVisibilityMap)
+	for _, key := range keys {
+		ok := slices.Contains(c.entries, key)
+		if !ok {
+			delete(c.entryVisibilityMap, key)
+		}
+	}
+}
+
 func (c *ListComponent[T]) getVisibleEntriesCount() int {
 	count := 0
 	for _, isVisible := range c.entryVisibilityMap {
@@ -265,6 +284,16 @@ func (c *ListComponent[T]) getVisibleEntriesCount() int {
 		}
 	}
 	return count
+}
+
+func (c *ListComponent[T]) SelectEntry(entry *T) {
+	indexToSelect := slices.Index(c.entries, entry)
+	entryToSelect := c.entries[indexToSelect]
+	entryLayout := c.toLayout(entryToSelect)
+	c.selectedIndex = indexToSelect
+	c.application.SetFocus(entryLayout)
+	c.selectionChangedCallback(entry)
+	c.scrollTo(entryToSelect)
 }
 
 func (c *ListComponent[T]) selectPreviousEntry() {
@@ -373,6 +402,10 @@ func (c *ListComponent[T]) updateScrollBar() {
 
 func (c *ListComponent[T]) GetSelectedIndex() int {
 	return c.selectedIndex
+}
+
+func (c *ListComponent[T]) GetSelectedItem() *T {
+	return c.entries[c.selectedIndex]
 }
 
 func (c *ListComponent[T]) hideScrollbar() {

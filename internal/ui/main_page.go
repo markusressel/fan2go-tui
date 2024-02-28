@@ -136,8 +136,18 @@ func (mainPage *MainPage) Refresh() {
 func (mainPage *MainPage) SetPage(page Page) {
 	mainPage.page = page
 	mainPage.header.SetPage(page)
+
 	mainPage.mainPagePagerLayout.SwitchToPage(string(page))
 	mainPage.Refresh()
+
+	switch mainPage.page {
+	case FansPage:
+		mainPage.fansPage.ScrollToItem()
+	case CurvesPage:
+		mainPage.curvesPage.ScrollToItem()
+	case SensorsPage:
+		mainPage.sensorsPage.ScrollToItem()
+	}
 }
 
 func (mainPage *MainPage) PreviousPage() {
