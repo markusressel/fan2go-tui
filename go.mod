@@ -4,7 +4,7 @@ go 1.22
 
 require (
 	github.com/asecurityteam/rolling v2.0.4+incompatible
-	github.com/gdamore/tcell/v2 v2.7.1
+	github.com/gdamore/tcell/v2 v2.7.4
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/navidys/tvxwidgets v0.5.0
 	github.com/oklog/run v1.1.0
