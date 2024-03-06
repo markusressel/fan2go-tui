@@ -6,7 +6,7 @@ require (
 	github.com/asecurityteam/rolling v2.0.4+incompatible
 	github.com/gdamore/tcell/v2 v2.7.4
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/navidys/tvxwidgets v0.5.0
+	github.com/navidys/tvxwidgets v0.6.0
 	github.com/oklog/run v1.1.0
 	github.com/pterm/pterm v0.12.79
 	github.com/rivo/tview v0.0.0-20240225120200-5605142ca62e
