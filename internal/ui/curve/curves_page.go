@@ -44,12 +44,13 @@ func (c *CurvesPage) createLayout() *tview.Flex {
 
 	curveListComponent := util.NewListComponent[CurveListItemComponent](
 		c.application,
+		util.NewListComponentConfig().WithMaxVisibleItems(3),
 		func(entry *CurveListItemComponent) (layout *tview.Flex) {
 			return entry.GetLayout()
 		},
-		func(a, b *CurveListItemComponent) bool {
-			return strings.Compare(a.Curve.Config.ID, b.Curve.Config.ID) <= 0
-		},
+		//func(a, b *CurveListItemComponent) bool {
+		//	return strings.Compare(a.Curve.Config.ID, b.Curve.Config.ID) <= 0
+		//},
 		func(entries []*CurveListItemComponent, inverted bool) []*CurveListItemComponent {
 			sort.SliceStable(entries, func(i, j int) bool {
 				a := entries[i].Curve.Config.ID

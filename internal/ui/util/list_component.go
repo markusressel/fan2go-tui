@@ -7,17 +7,8 @@ import (
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
 	"math"
-	"sort"
 	"sync"
 )
-
-const (
-	MaxVisibleItems = 3
-)
-
-type IListComponent interface {
-	Compare()
-}
 
 type ListComponent[T comparable] struct {
 	application *tview.Application
@@ -28,40 +19,49 @@ type ListComponent[T comparable] struct {
 	entries      []*T
 	entriesMutex sync.Mutex
 
+	config             *ListComponentConfig
 	entryVisibilityMap map[*T]bool
 	selectedIndex      int
 
-	toLayout                 func(entry *T) (layout *tview.Flex)
+	getLayout                func(entry *T) (layout *tview.Flex)
 	inputCapture             func(event *tcell.EventKey) *tcell.EventKey
 	selectionChangedCallback func(selectedEntry *T)
 
 	sortListEntries func(entries []*T, inverted bool) []*T
 
-	compare      func(a, b *T) bool
+	//compare      func(a, b *T) bool
 	sortInverted bool
 
 	scrollbarComponent *ScrollbarComponent
 }
 
+// NewListComponent creates a new ListComponent.
+// The application is used to redraw the component.
+// The config is used to configure the component.
+// The getLayout function is used to create the layout for each entry.
+// The compare function is used to sort the entries.
+// The sortListEntries function is used to sort the entries.
 func NewListComponent[T comparable](
 	application *tview.Application,
-	toLayout func(entry *T) (layout *tview.Flex),
-	compare func(a, b *T) bool,
+	config *ListComponentConfig,
+	getLayout func(entry *T) (layout *tview.Flex),
+//compare func(a, b *T) bool,
 	sortListEntries func(entries []*T, inverted bool) []*T,
 ) *ListComponent[T] {
 	listComponent := &ListComponent[T]{
 		application:        application,
-		entries:            nil,
+		config:             config,
+		entries:            []*T{},
 		entriesMutex:       sync.Mutex{},
 		entryVisibilityMap: map[*T]bool{},
-		toLayout:           toLayout,
+		getLayout:          getLayout,
 		sortListEntries:    sortListEntries,
 		inputCapture: func(event *tcell.EventKey) *tcell.EventKey {
 			return event
 		},
 		selectionChangedCallback: func(selectedEntry *T) {},
-		compare:                  compare,
-		selectedIndex:            -1,
+		//compare:                  compare,
+		selectedIndex: -1,
 	}
 	listComponent.createLayout()
 	listComponent.SetDirection(tview.FlexColumn)
@@ -74,18 +74,18 @@ func (c *ListComponent[T]) createLayout() {
 	c.entriesLayout = tview.NewFlex().SetDirection(tview.FlexRow)
 	layout.AddItem(c.entriesLayout, 0, 1, true)
 
-	c.scrollbarComponent = NewScrollbarComponent(c.application, ScrollBarVertical, 0, 1, 0, 1)
+	c.scrollbarComponent = NewScrollbarComponent(c.application, ScrollBarVertical, 0, 1, 0, c.config.MaxVisibleItems)
 	layout.AddItem(c.scrollbarComponent.GetLayout(), 1, 0, false)
 
 	c.entriesLayout.SetFocusFunc(func() {
 		// ensure the first item is automatically selected, if there is any
 		data := c.GetData()
-		if data != nil {
+		if data != nil && len(data) > 0 {
 			layout.Blur()
 			if c.selectedIndex == -1 {
 				c.selectedIndex = 0
 			}
-			itemLayout := c.toLayout(data[0])
+			itemLayout := c.getLayout(data[0])
 
 			c.SelectEntry(c.GetSelectedItem())
 			c.application.SetFocus(itemLayout)
@@ -94,7 +94,7 @@ func (c *ListComponent[T]) createLayout() {
 
 	c.entriesLayout.Focus(func(item tview.Primitive) {
 		for idx, entry := range c.entries {
-			if item == c.toLayout(entry) {
+			if item == c.getLayout(entry) {
 				c.selectedIndex = idx
 			}
 		}
@@ -145,12 +145,13 @@ func (c *ListComponent[T]) SetTitle(title string) {
 }
 
 func (c *ListComponent[T]) GetData() []*T {
-	sort.SliceStable(c.entries, func(i, j int) bool {
-		a := c.entries[i]
-		b := c.entries[j]
-		return c.compare(a, b)
-	})
-	return c.entries
+	return c.sortListEntries(c.entries, c.sortInverted)
+	//sort.SliceStable(c.entries, func(i, j int) bool {
+	//	a := c.entries[i]
+	//	b := c.entries[j]
+	//	return c.compare(a, b)
+	//})
+	//return c.entries
 }
 
 func (c *ListComponent[T]) SetData(entries []*T) {
@@ -249,7 +250,7 @@ func (c *ListComponent[T]) updateVisibleEntries() {
 	for _, entry := range c.entries {
 		_, ok := c.entryVisibilityMap[entry]
 		if !ok {
-			if c.getVisibleEntriesCount() < MaxVisibleItems {
+			if c.getVisibleEntriesCount() < c.config.MaxVisibleItems {
 				c.entryVisibilityMap[entry] = true
 			} else {
 				c.entryVisibilityMap[entry] = false
@@ -261,7 +262,7 @@ func (c *ListComponent[T]) updateVisibleEntries() {
 	for _, entry := range c.entries {
 		currentVisibility := c.entryVisibilityMap[entry]
 		if currentVisibility {
-			c.entriesLayout.AddItem(c.toLayout(entry), 0, 1, false)
+			c.entriesLayout.AddItem(c.getLayout(entry), 0, 1, false)
 		}
 	}
 }
@@ -288,8 +289,11 @@ func (c *ListComponent[T]) getVisibleEntriesCount() int {
 
 func (c *ListComponent[T]) SelectEntry(entry *T) {
 	indexToSelect := slices.Index(c.entries, entry)
+	if indexToSelect == -1 {
+		return
+	}
 	entryToSelect := c.entries[indexToSelect]
-	entryLayout := c.toLayout(entryToSelect)
+	entryLayout := c.getLayout(entryToSelect)
 	c.selectedIndex = indexToSelect
 	c.application.SetFocus(entryLayout)
 	c.selectionChangedCallback(entry)
@@ -310,11 +314,11 @@ func (c *ListComponent[T]) selectNextEntry() {
 
 func (c *ListComponent[T]) shiftSelection(rows int) *T {
 	for idx, entry := range c.entries {
-		entryLayout := c.toLayout(entry)
+		entryLayout := c.getLayout(entry)
 		if entryLayout.HasFocus() {
 			nextEntryIndex := (len(c.entries) + idx + rows) % len(c.entries)
 			nextEntry := c.entries[nextEntryIndex]
-			nextEntryLayout := c.toLayout(nextEntry)
+			nextEntryLayout := c.getLayout(nextEntry)
 			c.selectedIndex = nextEntryIndex
 			c.application.SetFocus(nextEntryLayout)
 			c.selectionChangedCallback(entry)
@@ -373,7 +377,7 @@ func (c *ListComponent[T]) determineScrollDistanceToEntry(selection *T) int {
 
 func (c *ListComponent[T]) SelectFirst() {
 	for idx, entry := range c.GetData() {
-		entryLayout := c.toLayout(entry)
+		entryLayout := c.getLayout(entry)
 		c.application.SetFocus(entryLayout)
 		c.selectedIndex = idx
 		c.selectionChangedCallback(entry)
@@ -383,7 +387,7 @@ func (c *ListComponent[T]) SelectFirst() {
 }
 
 func (c *ListComponent[T]) updateScrollBar() {
-	if len(c.entries) <= MaxVisibleItems {
+	if len(c.entries) <= c.config.MaxVisibleItems {
 		c.hideScrollbar()
 	} else {
 		c.showScrollbar()
@@ -405,6 +409,9 @@ func (c *ListComponent[T]) GetSelectedIndex() int {
 }
 
 func (c *ListComponent[T]) GetSelectedItem() *T {
+	if c.selectedIndex == -1 {
+		return nil
+	}
 	return c.entries[c.selectedIndex]
 }
 

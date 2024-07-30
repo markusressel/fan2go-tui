@@ -43,12 +43,13 @@ func (c *SensorsPage) createLayout() *tview.Flex {
 
 	sensorListComponent := util.NewListComponent[SensorListItemComponent](
 		c.application,
+		util.NewListComponentConfig().WithMaxVisibleItems(3),
 		func(entry *SensorListItemComponent) (layout *tview.Flex) {
 			return entry.GetLayout()
 		},
-		func(a, b *SensorListItemComponent) bool {
-			return strings.Compare(a.Sensor.Config.ID, b.Sensor.Config.ID) <= 0
-		},
+		//func(a, b *SensorListItemComponent) bool {
+		//	return strings.Compare(a.Sensor.Config.ID, b.Sensor.Config.ID) <= 0
+		//},
 		func(entries []*SensorListItemComponent, inverted bool) []*SensorListItemComponent {
 			sort.SliceStable(entries, func(i, j int) bool {
 				a := entries[i].Sensor.Config.ID

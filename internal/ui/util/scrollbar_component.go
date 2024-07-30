@@ -39,6 +39,13 @@ type ScrollbarComponent struct {
 	max            int
 }
 
+// NewScrollbarComponent creates a new ScrollbarComponent.
+// The application is used to redraw the component.
+// The orientation is used to set the orientation of the scrollbar.
+// The min is the minimum value of the scrollbar.
+// The max is the maximum value of the scrollbar.
+// The scrollPosition is the current position of the scrollbar.
+// The barWidth is the width of the scrollbar.
 func NewScrollbarComponent(
 	application *tview.Application,
 	orientation ScrollBarOrientation,
@@ -182,7 +189,7 @@ func (c *ScrollbarComponent) ScrollToTop() {
 
 func (c *ScrollbarComponent) calculateBarWidth() int {
 	// calculate the bar width
-	barWidth := int(math.Max(1, float64(MaxVisibleItems/(c.max-c.min))))
+	barWidth := int(math.Max(1, float64(c.max/(c.max-c.min))))
 	return barWidth
 }
 

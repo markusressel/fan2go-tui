@@ -40,18 +40,25 @@ func (c *FansPage) createLayout() *tview.Flex {
 
 	fanListComponent := util.NewListComponent[FanListItemComponent](
 		c.application,
+		util.NewListComponentConfig().
+			WithMaxVisibleItems(3),
+		//Also(func(config *util.ListComponentConfig) {
+		//	config.MaxVisibleItems = 3
+		//}),
 		func(entry *FanListItemComponent) (layout *tview.Flex) {
 			return entry.GetLayout()
 		},
-		func(a, b *FanListItemComponent) bool {
-			return strings.Compare(a.Fan.Config.Id, b.Fan.Config.Id) <= 0
-		},
+		//func(a, b *FanListItemComponent) bool {
+		//	x := a.Fan.Config.Id
+		//	y := b.Fan.Config.Id
+		//	return strings.Compare(strings.ToLower(x), strings.ToLower(y)) <= 0
+		//},
 		func(entries []*FanListItemComponent, inverted bool) []*FanListItemComponent {
 			sort.SliceStable(entries, func(i, j int) bool {
-				a := entries[i].Fan.Config.Id
-				b := entries[j].Fan.Config.Id
+				x := entries[i].Fan.Config.Id
+				y := entries[j].Fan.Config.Id
 
-				result := strings.Compare(strings.ToLower(a), strings.ToLower(b))
+				result := strings.Compare(strings.ToLower(x), strings.ToLower(y))
 
 				if result <= 0 {
 					return true
