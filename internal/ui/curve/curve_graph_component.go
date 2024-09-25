@@ -21,7 +21,11 @@ type CurveGraphComponent struct {
 func NewCurveGraphComponent(application *tview.Application, curve *client.Curve) *CurveGraphComponent {
 	graphConfig := util.NewGraphComponentConfig().
 		WithReversedOrder().
-		WithPlotColors(theme.Colors.Graph.Curve)
+		WithPlotColors(
+			theme.Colors.Graph.Curve,
+			theme.Colors.Graph.CurveMin,
+			theme.Colors.Graph.CurveMax,
+		)
 	graphComponent := util.NewGraphComponent[client.Curve](
 		application,
 		graphConfig,
