@@ -41,9 +41,10 @@ func NewSensorsPage(application *tview.Application, client client.Fan2goApiClien
 func (c *SensorsPage) createLayout() *tview.Flex {
 	sensorsPageLayout := tview.NewFlex()
 
+	listConfig := util.NewListComponentConfig().WithMaxVisibleItems(3)
 	sensorListComponent := util.NewListComponent[SensorListItemComponent](
 		c.application,
-		util.NewListComponentConfig().WithMaxVisibleItems(3),
+		listConfig,
 		func(entry *SensorListItemComponent) (layout *tview.Flex) {
 			return entry.GetLayout()
 		},

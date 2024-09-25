@@ -38,13 +38,10 @@ func NewFansPage(application *tview.Application, c client.Fan2goApiClient) FansP
 func (c *FansPage) createLayout() *tview.Flex {
 	fansPageLayout := tview.NewFlex()
 
+	listConfig := util.NewListComponentConfig().WithMaxVisibleItems(3)
 	fanListComponent := util.NewListComponent[FanListItemComponent](
 		c.application,
-		util.NewListComponentConfig().
-			WithMaxVisibleItems(3),
-		//Also(func(config *util.ListComponentConfig) {
-		//	config.MaxVisibleItems = 3
-		//}),
+		listConfig,
 		func(entry *FanListItemComponent) (layout *tview.Flex) {
 			return entry.GetLayout()
 		},
