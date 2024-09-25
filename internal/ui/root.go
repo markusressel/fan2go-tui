@@ -51,19 +51,10 @@ func CreateUi(fullscreen bool) *tview.Application {
 			pagesLayout.ShowPage(string(HelpDialog))
 			return nil
 		} else if event.Rune() == '+' {
-			configuration.CurrentConfig.Ui.UpdateInterval += 100 * time.Millisecond
-			UpdateTicker.Reset(configuration.CurrentConfig.Ui.UpdateInterval)
-			mainPage.UpdateHeader()
+			slowDownUpdateInterval(mainPage)
 			return nil
 		} else if event.Rune() == '-' {
-			stepSize := 100 * time.Millisecond
-			if configuration.CurrentConfig.Ui.UpdateInterval <= stepSize {
-				configuration.CurrentConfig.Ui.UpdateInterval = stepSize
-			} else {
-				configuration.CurrentConfig.Ui.UpdateInterval -= stepSize
-			}
-			UpdateTicker.Reset(configuration.CurrentConfig.Ui.UpdateInterval)
-			mainPage.UpdateHeader()
+			speedUpUpdateInterval(mainPage)
 			return nil
 		} else if event.Key() == tcell.KeyPgUp || event.Key() == tcell.KeyLeft {
 			mainPage.PreviousPage()
@@ -94,4 +85,21 @@ func CreateUi(fullscreen bool) *tview.Application {
 	}()
 
 	return application.SetRoot(pagesLayout, fullscreen)
+}
+
+func speedUpUpdateInterval(mainPage *MainPage) {
+	stepSize := 100 * time.Millisecond
+	if configuration.CurrentConfig.Ui.UpdateInterval <= stepSize {
+		configuration.CurrentConfig.Ui.UpdateInterval = stepSize
+	} else {
+		configuration.CurrentConfig.Ui.UpdateInterval -= stepSize
+	}
+	UpdateTicker.Reset(configuration.CurrentConfig.Ui.UpdateInterval)
+	mainPage.UpdateHeader()
+}
+
+func slowDownUpdateInterval(mainPage *MainPage) {
+	configuration.CurrentConfig.Ui.UpdateInterval += 100 * time.Millisecond
+	UpdateTicker.Reset(configuration.CurrentConfig.Ui.UpdateInterval)
+	mainPage.UpdateHeader()
 }
