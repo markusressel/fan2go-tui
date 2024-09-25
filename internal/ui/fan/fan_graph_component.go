@@ -23,11 +23,13 @@ func NewFanGraphComponent(application *tview.Application, fan *client.Fan) *FanG
 		application,
 		util.NewGraphComponentConfig().WithReversedOrder(),
 		fan,
-		func(c *client.Fan) float64 {
-			return float64(c.Rpm)
-		},
-		func(c *client.Fan) float64 {
-			return float64(c.Pwm)
+		[]func(*client.Fan) float64{
+			func(c *client.Fan) float64 {
+				return float64(c.Rpm)
+			},
+			func(c *client.Fan) float64 {
+				return float64(c.Pwm)
+			},
 		},
 	)
 

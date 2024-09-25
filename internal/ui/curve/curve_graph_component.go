@@ -23,10 +23,11 @@ func NewCurveGraphComponent(application *tview.Application, curve *client.Curve)
 		application,
 		util.NewGraphComponentConfig().WithReversedOrder(),
 		curve,
-		func(c *client.Curve) float64 {
-			return c.Value
+		[]func(*client.Curve) float64{
+			func(c *client.Curve) float64 {
+				return c.Value
+			},
 		},
-		nil,
 	)
 
 	c := &CurveGraphComponent{

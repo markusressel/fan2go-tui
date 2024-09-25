@@ -14,9 +14,8 @@ type GraphComponent[T any] struct {
 
 	config *GraphComponentConfig
 
-	Data        *T
-	fetchValue  func(*T) float64
-	fetchValue2 func(*T) float64
+	Data                *T
+	fetchValueFunctions []func(*T) float64
 
 	layout          *tview.Flex
 	plotLayout      *tvxwidgets.Plot
@@ -28,16 +27,14 @@ func NewGraphComponent[T any](
 	application *tview.Application,
 	config *GraphComponentConfig,
 	data *T,
-	fetchValue func(*T) float64,
-	fetchValue2 func(*T) float64,
+	fetchValueFunctions []func(*T) float64,
 ) *GraphComponent[T] {
 	c := &GraphComponent[T]{
-		application:     application,
-		config:          config,
-		Data:            data,
-		fetchValue:      fetchValue,
-		fetchValue2:     fetchValue2,
-		scatterPlotData: make([][]float64, 2),
+		application:         application,
+		config:              config,
+		Data:                data,
+		fetchValueFunctions: fetchValueFunctions,
+		scatterPlotData:     make([][]float64, 2),
 	}
 
 	c.layout = c.createLayout()
@@ -72,41 +69,22 @@ func (c *GraphComponent[T]) Refresh() {
 	_, _, width, _ := c.plotLayout.GetRect()
 	c.valueBufferSize = width - 5
 
-	if c.fetchValue != nil {
-		missingDataPoints := c.valueBufferSize - len(c.scatterPlotData[0])
+	for idx := range c.fetchValueFunctions {
+		missingDataPoints := c.valueBufferSize - len(c.scatterPlotData[idx])
 		for i := 0; i < missingDataPoints; i++ {
 			targetIndex := 0
 			if c.config.Reversed {
-				targetIndex = len(c.scatterPlotData[0])
+				targetIndex = len(c.scatterPlotData[idx])
 			}
-			c.scatterPlotData[0] = slices.Insert(c.scatterPlotData[0], targetIndex, math.NaN())
+			c.scatterPlotData[idx] = slices.Insert(c.scatterPlotData[idx], targetIndex, math.NaN())
 		}
 
 		// limit data to visible data points
-		overflow := len(c.scatterPlotData[0]) - c.valueBufferSize
+		overflow := len(c.scatterPlotData[idx]) - c.valueBufferSize
 		if c.config.Reversed {
-			c.scatterPlotData[0] = c.scatterPlotData[0][:len(c.scatterPlotData[0])-overflow]
+			c.scatterPlotData[idx] = c.scatterPlotData[idx][:len(c.scatterPlotData[idx])-overflow]
 		} else {
-			c.scatterPlotData[0] = c.scatterPlotData[0][overflow:]
-		}
-	}
-
-	if c.fetchValue2 != nil {
-		missingDataPoints := c.valueBufferSize - len(c.scatterPlotData[1])
-		for i := 0; i < missingDataPoints; i++ {
-			targetIndex := 0
-			if c.config.Reversed {
-				targetIndex = len(c.scatterPlotData[1])
-			}
-			c.scatterPlotData[1] = slices.Insert(c.scatterPlotData[1], targetIndex, math.NaN())
-		}
-
-		// limit data to visible data points
-		overflow := len(c.scatterPlotData[1]) - c.valueBufferSize
-		if c.config.Reversed {
-			c.scatterPlotData[1] = c.scatterPlotData[1][:len(c.scatterPlotData[1])-overflow]
-		} else {
-			c.scatterPlotData[1] = c.scatterPlotData[1][overflow:]
+			c.scatterPlotData[idx] = c.scatterPlotData[idx][overflow:]
 		}
 	}
 }
@@ -121,35 +99,20 @@ func (c *GraphComponent[T]) SetTitle(title string) {
 }
 
 func (c *GraphComponent[T]) InsertValue(data *T) {
-	if c.fetchValue != nil {
-		value := c.fetchValue(data)
-		data1 := c.scatterPlotData[0]
-		targetIndex := len(data1)
+	for idx, fetchValue := range c.fetchValueFunctions {
+		value := fetchValue(data)
+		data := c.scatterPlotData[idx]
+		targetIndex := len(data)
 		if c.config.Reversed {
-			reversedCopy := slices.Clone(data1)
+			reversedCopy := slices.Clone(data)
 			slices.Reverse(reversedCopy)
 			reversedCopy = slices.Insert(reversedCopy, targetIndex, value)
 			slices.Reverse(reversedCopy)
-			data1 = reversedCopy
+			data = reversedCopy
 		} else {
-			data1 = slices.Insert(data1, targetIndex, value)
+			data = slices.Insert(data, targetIndex, value)
 		}
-		c.scatterPlotData[0] = data1
-	}
-	if c.fetchValue2 != nil {
-		value2 := c.fetchValue2(data)
-		data2 := c.scatterPlotData[1]
-		targetIndex := len(data2)
-		if c.config.Reversed {
-			reversedCopy := slices.Clone(data2)
-			slices.Reverse(reversedCopy)
-			reversedCopy = slices.Insert(reversedCopy, targetIndex, value2)
-			slices.Reverse(reversedCopy)
-			data2 = reversedCopy
-		} else {
-			data2 = slices.Insert(data2, targetIndex, value2)
-		}
-		c.scatterPlotData[1] = data2
+		c.scatterPlotData[idx] = data
 	}
 
 	c.Refresh()

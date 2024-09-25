@@ -23,10 +23,11 @@ func NewSensorGraphComponent(application *tview.Application, sensor *client.Sens
 		application,
 		util.NewGraphComponentConfig().WithReversedOrder(),
 		sensor,
-		func(c *client.Sensor) float64 {
-			return c.MovingAvg / 1000
+		[]func(*client.Sensor) float64{
+			func(c *client.Sensor) float64 {
+				return c.MovingAvg / 1000
+			},
 		},
-		nil,
 	)
 
 	c := &SensorGraphComponent{
