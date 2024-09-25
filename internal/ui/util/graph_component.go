@@ -74,37 +74,40 @@ func (c *GraphComponent[T]) Refresh() {
 	c.plotLayout.SetDrawAxes(true)
 	c.plotLayout.SetData(c.scatterPlotData)
 
-	_, _, width, _ := c.plotLayout.GetRect()
-	c.valueBufferSize = width - 5
+	c.updateValueBufferSize()
 
 	for idx := range c.fetchValueFunctions {
-		missingDataPoints := c.valueBufferSize - len(c.scatterPlotData[idx])
+		c.refreshPlot(idx)
+	}
+}
 
-		lastDataPoint := math.NaN()
-		hasDataPoints := len(c.scatterPlotData[idx]) > 0
-		if hasDataPoints {
-			if c.config.Reversed {
-				lastDataPoint = c.scatterPlotData[idx][0]
-			} else {
-				lastDataPoint = c.scatterPlotData[idx][len(c.scatterPlotData[idx])-1]
-			}
-		}
+func (c *GraphComponent[T]) refreshPlot(idx int) {
+	missingDataPoints := c.valueBufferSize - len(c.scatterPlotData[idx])
 
-		for i := 0; i < missingDataPoints; i++ {
-			targetIndex := 0
-			if c.config.Reversed {
-				targetIndex = len(c.scatterPlotData[idx])
-			}
-			c.scatterPlotData[idx] = slices.Insert(c.scatterPlotData[idx], targetIndex, lastDataPoint)
-		}
-
-		// limit data to visible data points
-		overflow := len(c.scatterPlotData[idx]) - c.valueBufferSize
+	lastDataPoint := math.NaN()
+	hasDataPoints := len(c.scatterPlotData[idx]) > 0
+	if hasDataPoints {
 		if c.config.Reversed {
-			c.scatterPlotData[idx] = c.scatterPlotData[idx][:len(c.scatterPlotData[idx])-overflow]
+			lastDataPoint = c.scatterPlotData[idx][0]
 		} else {
-			c.scatterPlotData[idx] = c.scatterPlotData[idx][overflow:]
+			lastDataPoint = c.scatterPlotData[idx][len(c.scatterPlotData[idx])-1]
 		}
+	}
+
+	for i := 0; i < missingDataPoints; i++ {
+		targetIndex := 0
+		if c.config.Reversed {
+			targetIndex = len(c.scatterPlotData[idx])
+		}
+		c.scatterPlotData[idx] = slices.Insert(c.scatterPlotData[idx], targetIndex, lastDataPoint)
+	}
+
+	// limit data to visible data points
+	overflow := len(c.scatterPlotData[idx]) - c.valueBufferSize
+	if c.config.Reversed {
+		c.scatterPlotData[idx] = c.scatterPlotData[idx][:len(c.scatterPlotData[idx])-overflow]
+	} else {
+		c.scatterPlotData[idx] = c.scatterPlotData[idx][overflow:]
 	}
 }
 
@@ -135,4 +138,9 @@ func (c *GraphComponent[T]) InsertValue(data *T) {
 	}
 
 	c.Refresh()
+}
+
+func (c *GraphComponent[T]) updateValueBufferSize() {
+	_, _, width, _ := c.plotLayout.GetRect()
+	c.valueBufferSize = width - 5
 }
