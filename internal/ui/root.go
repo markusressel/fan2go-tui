@@ -17,6 +17,8 @@ const (
 
 var (
 	UpdateTicker *time.Ticker
+
+	UpdateIntervalStepSize = 100 * time.Millisecond
 )
 
 func CreateUi(fullscreen bool) *tview.Application {
@@ -88,18 +90,17 @@ func CreateUi(fullscreen bool) *tview.Application {
 }
 
 func speedUpUpdateInterval(mainPage *MainPage) {
-	stepSize := 100 * time.Millisecond
-	if configuration.CurrentConfig.Ui.UpdateInterval <= stepSize {
-		configuration.CurrentConfig.Ui.UpdateInterval = stepSize
+	if configuration.CurrentConfig.Ui.UpdateInterval <= UpdateIntervalStepSize {
+		configuration.CurrentConfig.Ui.UpdateInterval = UpdateIntervalStepSize
 	} else {
-		configuration.CurrentConfig.Ui.UpdateInterval -= stepSize
+		configuration.CurrentConfig.Ui.UpdateInterval -= UpdateIntervalStepSize
 	}
 	UpdateTicker.Reset(configuration.CurrentConfig.Ui.UpdateInterval)
 	mainPage.UpdateHeader()
 }
 
 func slowDownUpdateInterval(mainPage *MainPage) {
-	configuration.CurrentConfig.Ui.UpdateInterval += 100 * time.Millisecond
+	configuration.CurrentConfig.Ui.UpdateInterval += UpdateIntervalStepSize
 	UpdateTicker.Reset(configuration.CurrentConfig.Ui.UpdateInterval)
 	mainPage.UpdateHeader()
 }

@@ -19,6 +19,10 @@ type UiConfig struct {
 	UpdateInterval time.Duration `json:"updateInterval"`
 }
 
+var (
+	defaultUpdateInterval = 500 * time.Millisecond
+)
+
 var CurrentConfig Configuration
 
 // InitConfig reads in config file and ENV variables if set.
@@ -50,9 +54,9 @@ func InitConfig(cfgFile string) {
 
 func setDefaultValues() {
 	viper.SetDefault("Ui", UiConfig{
-		UpdateInterval: 100 * time.Millisecond,
+		UpdateInterval: defaultUpdateInterval,
 	})
-	viper.SetDefault("Ui.UpdateInterval", 100*time.Millisecond)
+	viper.SetDefault("Ui.UpdateInterval", defaultUpdateInterval)
 
 	viper.SetDefault("Api", ApiConfig{
 		Host: "127.0.0.1",
