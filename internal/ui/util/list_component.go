@@ -426,11 +426,12 @@ func (c *ListComponent[T]) showScrollbar() {
 func (c *ListComponent[T]) GetMaxVisibleItems() int {
 	configValue := c.config.MaxVisibleItems
 	if c.layout != nil {
-		//if configValue <= 0 {
-		// compute the max visible items based on the available height
-		_, _, _, height := c.entriesLayout.GetRect()
-		dynamicMaxVisibleItems := util.Coerce(float64(height/15), 1, float64(1000))
-		return int(dynamicMaxVisibleItems)
+		if configValue <= 0 {
+			// compute the max visible items based on the available height
+			_, _, _, height := c.entriesLayout.GetRect()
+			dynamicMaxVisibleItems := util.Coerce(float64(height/c.config.MinHeightPerEntry), 1, float64(1000))
+			return int(dynamicMaxVisibleItems)
+		}
 	}
 	return configValue
 }
