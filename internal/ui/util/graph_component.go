@@ -33,7 +33,7 @@ func NewGraphComponent[T any](
 		config:              config,
 		Data:                data,
 		fetchValueFunctions: fetchValueFunctions,
-		scatterPlotData:     make([][]float64, 2),
+		scatterPlotData:     make([][]float64, len(fetchValueFunctions)),
 	}
 
 	c.layout = c.createLayout()
