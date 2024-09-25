@@ -2,7 +2,9 @@ package util
 
 import (
 	"fan2go-tui/internal/ui/theme"
+	"github.com/gdamore/tcell/v2"
 	"github.com/navidys/tvxwidgets"
+	"github.com/qdm12/reprint"
 	"github.com/rivo/tview"
 	"golang.org/x/exp/slices"
 	"math"
@@ -50,7 +52,13 @@ func (c *GraphComponent[T]) createLayout() *tview.Flex {
 	c.plotLayout = plotLayout
 
 	if len(c.config.PlotColors) > 0 {
-		plotLayout.SetLineColor(c.config.PlotColors)
+		// Ensure that the number of plot colors matches the number of fetch value functions
+		plotColors := reprint.This(c.config.PlotColors).([]tcell.Color)
+		for i := len(plotColors); i < len(c.fetchValueFunctions); i++ {
+			plotColors = append(plotColors, theme.Colors.Graph.Default)
+		}
+
+		plotLayout.SetLineColor(plotColors)
 	}
 	plotLayout.SetPlotType(c.config.PlotType)
 	plotLayout.SetMarker(c.config.MarkerType)

@@ -30,6 +30,12 @@ func NewCurveGraphComponent(application *tview.Application, curve *client.Curve)
 			func(c *client.Curve) float64 {
 				return c.Value
 			},
+			func(c *client.Curve) float64 {
+				return 0
+			},
+			func(c *client.Curve) float64 {
+				return 255
+			},
 		},
 	)
 

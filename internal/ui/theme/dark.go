@@ -37,10 +37,11 @@ var (
 			Title:  tcell.ColorBlue,
 		},
 		Graph: GraphsColors{
-			Rpm:    tcell.ColorBlue,
-			Pwm:    PrimaryVariantColor,
-			Curve:  tcell.ColorBlue,
-			Sensor: tcell.ColorBlue,
+			Default: tcell.ColorBlue,
+			Rpm:     tcell.ColorBlue,
+			Pwm:     PrimaryVariantColor,
+			Curve:   tcell.ColorBlue,
+			Sensor:  tcell.ColorBlue,
 		},
 		List: ListsColors{
 			Scrollbar: ScrollbarColors{

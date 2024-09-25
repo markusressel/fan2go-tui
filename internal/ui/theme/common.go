@@ -41,10 +41,11 @@ type Color struct {
 }
 
 type GraphsColors struct {
-	Rpm    tcell.Color
-	Pwm    tcell.Color
-	Curve  tcell.Color
-	Sensor tcell.Color
+	Default tcell.Color
+	Rpm     tcell.Color
+	Pwm     tcell.Color
+	Curve   tcell.Color
+	Sensor  tcell.Color
 }
 
 type LayoutColors struct {
