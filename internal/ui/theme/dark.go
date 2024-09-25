@@ -46,7 +46,9 @@ var (
 			CurveMin: tcell.ColorGray,
 			CurveMax: tcell.ColorGray,
 
-			Sensor: tcell.ColorBlue,
+			Sensor:    tcell.ColorBlue,
+			SensorMin: tcell.ColorGray,
+			SensorMax: tcell.ColorRed,
 		},
 		List: ListsColors{
 			Scrollbar: ScrollbarColors{

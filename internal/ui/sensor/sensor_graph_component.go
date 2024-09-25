@@ -21,7 +21,11 @@ type SensorGraphComponent struct {
 func NewSensorGraphComponent(application *tview.Application, sensor *client.Sensor) *SensorGraphComponent {
 	graphConfig := util.NewGraphComponentConfig().
 		WithReversedOrder().
-		WithPlotColors(theme.Colors.Graph.Sensor)
+		WithPlotColors(
+			theme.Colors.Graph.Sensor,
+			theme.Colors.Graph.SensorMin,
+			theme.Colors.Graph.SensorMax,
+		)
 	graphComponent := util.NewGraphComponent[client.Sensor](
 		application,
 		graphConfig,
@@ -29,6 +33,12 @@ func NewSensorGraphComponent(application *tview.Application, sensor *client.Sens
 		[]func(*client.Sensor) float64{
 			func(c *client.Sensor) float64 {
 				return c.MovingAvg / 1000
+			},
+			func(c *client.Sensor) float64 {
+				return 0
+			},
+			func(c *client.Sensor) float64 {
+				return 100
 			},
 		},
 	)

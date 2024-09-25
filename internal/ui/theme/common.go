@@ -53,7 +53,9 @@ type GraphsColors struct {
 	CurveMax tcell.Color
 
 	// Sensor
-	Sensor tcell.Color
+	Sensor    tcell.Color
+	SensorMin tcell.Color
+	SensorMax tcell.Color
 }
 
 type LayoutColors struct {
