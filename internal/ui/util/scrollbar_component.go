@@ -90,9 +90,6 @@ func (c *ScrollbarComponent) createLayout() {
 }
 
 func (c *ScrollbarComponent) updateLayout() {
-	// update the top arrow
-	c.layout.ResizeItem(c.topArrow, 1, 0)
-
 	c.updateTopEndText()
 	c.updateScrollbar()
 	c.updateBottomEndText()
