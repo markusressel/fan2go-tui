@@ -383,7 +383,6 @@ func (c *ListComponent[T]) SelectFirst() {
 }
 
 func (c *ListComponent[T]) updateScrollBar() {
-	c.scrollbarComponent.SetMax(c.GetMaxVisibleItems())
 	if len(c.entries) <= c.GetMaxVisibleItems() {
 		c.hideScrollbar()
 	} else {
