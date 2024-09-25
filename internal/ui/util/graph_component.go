@@ -2,7 +2,6 @@ package util
 
 import (
 	"fan2go-tui/internal/ui/theme"
-	"github.com/gdamore/tcell/v2"
 	"github.com/navidys/tvxwidgets"
 	"github.com/rivo/tview"
 	"golang.org/x/exp/slices"
@@ -49,12 +48,13 @@ func (c *GraphComponent[T]) createLayout() *tview.Flex {
 
 	plotLayout := tvxwidgets.NewPlot()
 	c.plotLayout = plotLayout
-	plotLayout.SetLineColor([]tcell.Color{
-		theme.Colors.Graph.Rpm,
-		theme.Colors.Graph.Pwm,
-	})
-	plotLayout.SetPlotType(tvxwidgets.PlotTypeLineChart)
-	plotLayout.SetMarker(tvxwidgets.PlotMarkerBraille)
+
+	if len(c.config.PlotColors) > 0 {
+		plotLayout.SetLineColor(c.config.PlotColors)
+	}
+	plotLayout.SetPlotType(c.config.PlotType)
+	plotLayout.SetMarker(c.config.MarkerType)
+
 	layout.AddItem(plotLayout, 0, 1, false)
 	_, _, width, _ := plotLayout.GetRect()
 	c.valueBufferSize = width * 4

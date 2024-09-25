@@ -2,6 +2,7 @@ package fan
 
 import (
 	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/ui/theme"
 	"fan2go-tui/internal/ui/util"
 	"github.com/navidys/tvxwidgets"
 	"github.com/rivo/tview"
@@ -18,10 +19,12 @@ type FanGraphComponent struct {
 }
 
 func NewFanGraphComponent(application *tview.Application, fan *client.Fan) *FanGraphComponent {
-
+	graphConfig := util.NewGraphComponentConfig().
+		WithReversedOrder().
+		WithPlotColors(theme.Colors.Graph.Rpm, theme.Colors.Graph.Pwm)
 	graphComponent := util.NewGraphComponent[client.Fan](
 		application,
-		util.NewGraphComponentConfig().WithReversedOrder(),
+		graphConfig,
 		fan,
 		[]func(*client.Fan) float64{
 			func(c *client.Fan) float64 {
