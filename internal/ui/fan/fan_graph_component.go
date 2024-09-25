@@ -19,12 +19,16 @@ type FanGraphComponent struct {
 
 func NewFanGraphComponent(application *tview.Application, fan *client.Fan) *FanGraphComponent {
 
-	graphComponent := util.NewGraphComponent[client.Fan](application, fan, func(c *client.Fan) float64 {
-		return float64(c.Rpm)
-	}, func(c *client.Fan) float64 {
-		return float64(c.Pwm)
-	},
-		true,
+	graphComponent := util.NewGraphComponent[client.Fan](
+		application,
+		util.NewGraphComponentConfig().WithReversedOrder(),
+		fan,
+		func(c *client.Fan) float64 {
+			return float64(c.Rpm)
+		},
+		func(c *client.Fan) float64 {
+			return float64(c.Pwm)
+		},
 	)
 
 	c := &FanGraphComponent{

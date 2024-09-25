@@ -19,11 +19,14 @@ type CurveGraphComponent struct {
 
 func NewCurveGraphComponent(application *tview.Application, curve *client.Curve) *CurveGraphComponent {
 
-	graphComponent := util.NewGraphComponent[client.Curve](application, curve, func(c *client.Curve) float64 {
-		return c.Value
-	},
+	graphComponent := util.NewGraphComponent[client.Curve](
+		application,
+		util.NewGraphComponentConfig().WithReversedOrder(),
+		curve,
+		func(c *client.Curve) float64 {
+			return c.Value
+		},
 		nil,
-		true,
 	)
 
 	c := &CurveGraphComponent{

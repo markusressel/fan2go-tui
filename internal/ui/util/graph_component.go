@@ -12,6 +12,8 @@ import (
 type GraphComponent[T any] struct {
 	application *tview.Application
 
+	config *GraphComponentConfig
+
 	Data        *T
 	fetchValue  func(*T) float64
 	fetchValue2 func(*T) float64
@@ -20,24 +22,22 @@ type GraphComponent[T any] struct {
 	plotLayout      *tvxwidgets.Plot
 	scatterPlotData [][]float64
 	valueBufferSize int
-
-	reversed bool
 }
 
 func NewGraphComponent[T any](
 	application *tview.Application,
+	config *GraphComponentConfig,
 	data *T,
 	fetchValue func(*T) float64,
 	fetchValue2 func(*T) float64,
-	reversed bool,
 ) *GraphComponent[T] {
 	c := &GraphComponent[T]{
 		application:     application,
+		config:          config,
 		Data:            data,
 		fetchValue:      fetchValue,
 		fetchValue2:     fetchValue2,
 		scatterPlotData: make([][]float64, 2),
-		reversed:        reversed,
 	}
 
 	c.layout = c.createLayout()
@@ -76,7 +76,7 @@ func (c *GraphComponent[T]) Refresh() {
 		missingDataPoints := c.valueBufferSize - len(c.scatterPlotData[0])
 		for i := 0; i < missingDataPoints; i++ {
 			targetIndex := 0
-			if c.reversed {
+			if c.config.Reversed {
 				targetIndex = len(c.scatterPlotData[0])
 			}
 			c.scatterPlotData[0] = slices.Insert(c.scatterPlotData[0], targetIndex, math.NaN())
@@ -84,7 +84,7 @@ func (c *GraphComponent[T]) Refresh() {
 
 		// limit data to visible data points
 		overflow := len(c.scatterPlotData[0]) - c.valueBufferSize
-		if c.reversed {
+		if c.config.Reversed {
 			c.scatterPlotData[0] = c.scatterPlotData[0][:len(c.scatterPlotData[0])-overflow]
 		} else {
 			c.scatterPlotData[0] = c.scatterPlotData[0][overflow:]
@@ -95,7 +95,7 @@ func (c *GraphComponent[T]) Refresh() {
 		missingDataPoints := c.valueBufferSize - len(c.scatterPlotData[1])
 		for i := 0; i < missingDataPoints; i++ {
 			targetIndex := 0
-			if c.reversed {
+			if c.config.Reversed {
 				targetIndex = len(c.scatterPlotData[1])
 			}
 			c.scatterPlotData[1] = slices.Insert(c.scatterPlotData[1], targetIndex, math.NaN())
@@ -103,7 +103,7 @@ func (c *GraphComponent[T]) Refresh() {
 
 		// limit data to visible data points
 		overflow := len(c.scatterPlotData[1]) - c.valueBufferSize
-		if c.reversed {
+		if c.config.Reversed {
 			c.scatterPlotData[1] = c.scatterPlotData[1][:len(c.scatterPlotData[1])-overflow]
 		} else {
 			c.scatterPlotData[1] = c.scatterPlotData[1][overflow:]
@@ -125,7 +125,7 @@ func (c *GraphComponent[T]) InsertValue(data *T) {
 		value := c.fetchValue(data)
 		data1 := c.scatterPlotData[0]
 		targetIndex := len(data1)
-		if c.reversed {
+		if c.config.Reversed {
 			reversedCopy := slices.Clone(data1)
 			slices.Reverse(reversedCopy)
 			reversedCopy = slices.Insert(reversedCopy, targetIndex, value)
@@ -140,7 +140,7 @@ func (c *GraphComponent[T]) InsertValue(data *T) {
 		value2 := c.fetchValue2(data)
 		data2 := c.scatterPlotData[1]
 		targetIndex := len(data2)
-		if c.reversed {
+		if c.config.Reversed {
 			reversedCopy := slices.Clone(data2)
 			slices.Reverse(reversedCopy)
 			reversedCopy = slices.Insert(reversedCopy, targetIndex, value2)

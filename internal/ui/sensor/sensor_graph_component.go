@@ -19,10 +19,14 @@ type SensorGraphComponent struct {
 
 func NewSensorGraphComponent(application *tview.Application, sensor *client.Sensor) *SensorGraphComponent {
 
-	graphComponent := util.NewGraphComponent[client.Sensor](application, sensor, func(c *client.Sensor) float64 {
-		return c.MovingAvg / 1000
-	}, nil,
-		true,
+	graphComponent := util.NewGraphComponent[client.Sensor](
+		application,
+		util.NewGraphComponentConfig().WithReversedOrder(),
+		sensor,
+		func(c *client.Sensor) float64 {
+			return c.MovingAvg / 1000
+		},
+		nil,
 	)
 
 	c := &SensorGraphComponent{
