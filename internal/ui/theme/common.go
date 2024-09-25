@@ -41,10 +41,21 @@ type Color struct {
 }
 
 type GraphsColors struct {
-	Rpm    tcell.Color
-	Pwm    tcell.Color
-	Curve  tcell.Color
-	Sensor tcell.Color
+	Default tcell.Color
+
+	// Fan
+	Rpm tcell.Color
+	Pwm tcell.Color
+
+	// Curve
+	Curve    tcell.Color
+	CurveMin tcell.Color
+	CurveMax tcell.Color
+
+	// Sensor
+	Sensor    tcell.Color
+	SensorMin tcell.Color
+	SensorMax tcell.Color
 }
 
 type LayoutColors struct {

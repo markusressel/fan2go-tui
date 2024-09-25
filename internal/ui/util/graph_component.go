@@ -4,6 +4,7 @@ import (
 	"fan2go-tui/internal/ui/theme"
 	"github.com/gdamore/tcell/v2"
 	"github.com/navidys/tvxwidgets"
+	"github.com/qdm12/reprint"
 	"github.com/rivo/tview"
 	"golang.org/x/exp/slices"
 	"math"
@@ -12,32 +13,29 @@ import (
 type GraphComponent[T any] struct {
 	application *tview.Application
 
-	Data        *T
-	fetchValue  func(*T) float64
-	fetchValue2 func(*T) float64
+	config *GraphComponentConfig
+
+	Data                *T
+	fetchValueFunctions []func(*T) float64
 
 	layout          *tview.Flex
 	plotLayout      *tvxwidgets.Plot
 	scatterPlotData [][]float64
 	valueBufferSize int
-
-	reversed bool
 }
 
 func NewGraphComponent[T any](
 	application *tview.Application,
+	config *GraphComponentConfig,
 	data *T,
-	fetchValue func(*T) float64,
-	fetchValue2 func(*T) float64,
-	reversed bool,
+	fetchValueFunctions []func(*T) float64,
 ) *GraphComponent[T] {
 	c := &GraphComponent[T]{
-		application:     application,
-		Data:            data,
-		fetchValue:      fetchValue,
-		fetchValue2:     fetchValue2,
-		scatterPlotData: make([][]float64, 2),
-		reversed:        reversed,
+		application:         application,
+		config:              config,
+		Data:                data,
+		fetchValueFunctions: fetchValueFunctions,
+		scatterPlotData:     make([][]float64, len(fetchValueFunctions)),
 	}
 
 	c.layout = c.createLayout()
@@ -52,12 +50,19 @@ func (c *GraphComponent[T]) createLayout() *tview.Flex {
 
 	plotLayout := tvxwidgets.NewPlot()
 	c.plotLayout = plotLayout
-	plotLayout.SetLineColor([]tcell.Color{
-		theme.Colors.Graph.Rpm,
-		theme.Colors.Graph.Pwm,
-	})
-	plotLayout.SetPlotType(tvxwidgets.PlotTypeLineChart)
-	plotLayout.SetMarker(tvxwidgets.PlotMarkerBraille)
+
+	if len(c.config.PlotColors) > 0 {
+		// Ensure that the number of plot colors matches the number of fetch value functions
+		plotColors := reprint.This(c.config.PlotColors).([]tcell.Color)
+		for i := len(plotColors); i < len(c.fetchValueFunctions); i++ {
+			plotColors = append(plotColors, theme.Colors.Graph.Default)
+		}
+
+		plotLayout.SetLineColor(plotColors)
+	}
+	plotLayout.SetPlotType(c.config.PlotType)
+	plotLayout.SetMarker(c.config.MarkerType)
+
 	layout.AddItem(plotLayout, 0, 1, false)
 	_, _, width, _ := plotLayout.GetRect()
 	c.valueBufferSize = width * 4
@@ -69,45 +74,40 @@ func (c *GraphComponent[T]) Refresh() {
 	c.plotLayout.SetDrawAxes(true)
 	c.plotLayout.SetData(c.scatterPlotData)
 
-	_, _, width, _ := c.plotLayout.GetRect()
-	c.valueBufferSize = width - 5
+	c.updateValueBufferSize()
 
-	if c.fetchValue != nil {
-		missingDataPoints := c.valueBufferSize - len(c.scatterPlotData[0])
-		for i := 0; i < missingDataPoints; i++ {
-			targetIndex := 0
-			if c.reversed {
-				targetIndex = len(c.scatterPlotData[0])
-			}
-			c.scatterPlotData[0] = slices.Insert(c.scatterPlotData[0], targetIndex, math.NaN())
-		}
+	for idx := range c.fetchValueFunctions {
+		c.refreshPlot(idx)
+	}
+}
 
-		// limit data to visible data points
-		overflow := len(c.scatterPlotData[0]) - c.valueBufferSize
-		if c.reversed {
-			c.scatterPlotData[0] = c.scatterPlotData[0][:len(c.scatterPlotData[0])-overflow]
+func (c *GraphComponent[T]) refreshPlot(idx int) {
+	missingDataPoints := c.valueBufferSize - len(c.scatterPlotData[idx])
+
+	lastDataPoint := math.NaN()
+	hasDataPoints := len(c.scatterPlotData[idx]) > 0
+	if hasDataPoints {
+		if c.config.Reversed {
+			lastDataPoint = c.scatterPlotData[idx][0]
 		} else {
-			c.scatterPlotData[0] = c.scatterPlotData[0][overflow:]
+			lastDataPoint = c.scatterPlotData[idx][len(c.scatterPlotData[idx])-1]
 		}
 	}
 
-	if c.fetchValue2 != nil {
-		missingDataPoints := c.valueBufferSize - len(c.scatterPlotData[1])
-		for i := 0; i < missingDataPoints; i++ {
-			targetIndex := 0
-			if c.reversed {
-				targetIndex = len(c.scatterPlotData[1])
-			}
-			c.scatterPlotData[1] = slices.Insert(c.scatterPlotData[1], targetIndex, math.NaN())
+	for i := 0; i < missingDataPoints; i++ {
+		targetIndex := 0
+		if c.config.Reversed {
+			targetIndex = len(c.scatterPlotData[idx])
 		}
+		c.scatterPlotData[idx] = slices.Insert(c.scatterPlotData[idx], targetIndex, lastDataPoint)
+	}
 
-		// limit data to visible data points
-		overflow := len(c.scatterPlotData[1]) - c.valueBufferSize
-		if c.reversed {
-			c.scatterPlotData[1] = c.scatterPlotData[1][:len(c.scatterPlotData[1])-overflow]
-		} else {
-			c.scatterPlotData[1] = c.scatterPlotData[1][overflow:]
-		}
+	// limit data to visible data points
+	overflow := len(c.scatterPlotData[idx]) - c.valueBufferSize
+	if c.config.Reversed {
+		c.scatterPlotData[idx] = c.scatterPlotData[idx][:len(c.scatterPlotData[idx])-overflow]
+	} else {
+		c.scatterPlotData[idx] = c.scatterPlotData[idx][overflow:]
 	}
 }
 
@@ -121,36 +121,26 @@ func (c *GraphComponent[T]) SetTitle(title string) {
 }
 
 func (c *GraphComponent[T]) InsertValue(data *T) {
-	if c.fetchValue != nil {
-		value := c.fetchValue(data)
-		data1 := c.scatterPlotData[0]
-		targetIndex := len(data1)
-		if c.reversed {
-			reversedCopy := slices.Clone(data1)
+	for idx, fetchValue := range c.fetchValueFunctions {
+		value := fetchValue(data)
+		data := c.scatterPlotData[idx]
+		targetIndex := len(data)
+		if c.config.Reversed {
+			reversedCopy := slices.Clone(data)
 			slices.Reverse(reversedCopy)
 			reversedCopy = slices.Insert(reversedCopy, targetIndex, value)
 			slices.Reverse(reversedCopy)
-			data1 = reversedCopy
+			data = reversedCopy
 		} else {
-			data1 = slices.Insert(data1, targetIndex, value)
+			data = slices.Insert(data, targetIndex, value)
 		}
-		c.scatterPlotData[0] = data1
-	}
-	if c.fetchValue2 != nil {
-		value2 := c.fetchValue2(data)
-		data2 := c.scatterPlotData[1]
-		targetIndex := len(data2)
-		if c.reversed {
-			reversedCopy := slices.Clone(data2)
-			slices.Reverse(reversedCopy)
-			reversedCopy = slices.Insert(reversedCopy, targetIndex, value2)
-			slices.Reverse(reversedCopy)
-			data2 = reversedCopy
-		} else {
-			data2 = slices.Insert(data2, targetIndex, value2)
-		}
-		c.scatterPlotData[1] = data2
+		c.scatterPlotData[idx] = data
 	}
 
 	c.Refresh()
+}
+
+func (c *GraphComponent[T]) updateValueBufferSize() {
+	_, _, width, _ := c.plotLayout.GetRect()
+	c.valueBufferSize = width - 5
 }

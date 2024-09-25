@@ -45,7 +45,7 @@ func NewListComponent[T comparable](
 	application *tview.Application,
 	config *ListComponentConfig,
 	getLayout func(entry *T) (layout *tview.Flex),
-//compare func(a, b *T) bool,
+	//compare func(a, b *T) bool,
 	sortListEntries func(entries []*T, inverted bool) []*T,
 ) *ListComponent[T] {
 	listComponent := &ListComponent[T]{
@@ -74,7 +74,7 @@ func (c *ListComponent[T]) createLayout() {
 	c.entriesLayout = tview.NewFlex().SetDirection(tview.FlexRow)
 	layout.AddItem(c.entriesLayout, 0, 1, true)
 
-	c.scrollbarComponent = NewScrollbarComponent(c.application, ScrollBarVertical, 0, 1, 0, c.config.MaxVisibleItems)
+	c.scrollbarComponent = NewScrollbarComponent(c.application, ScrollBarVertical, 0, 1, 0, c.GetMaxVisibleItems())
 	layout.AddItem(c.scrollbarComponent.GetLayout(), 1, 0, false)
 
 	c.entriesLayout.SetFocusFunc(func() {
@@ -243,22 +243,18 @@ func (c *ListComponent[T]) GetVisibleRange() (int, int) {
 
 func (c *ListComponent[T]) updateVisibleEntries() {
 	// ensure we are displaying as many items as specified by MaxVisibleItems
+	maxVisibleItems := c.GetMaxVisibleItems()
 
 	// cleanup the visibility map (remove entries that are not in the dataset anymore)
 	c.cleanupVisibilityMap()
-
+	// insert entries into the visibility map, if necessary
 	for _, entry := range c.entries {
-		_, ok := c.entryVisibilityMap[entry]
-		if !ok {
-			if c.getVisibleEntriesCount() < c.config.MaxVisibleItems {
-				c.entryVisibilityMap[entry] = true
-			} else {
-				c.entryVisibilityMap[entry] = false
-			}
-		}
+		c.insertEntryIntoVisibilityMap(entry, maxVisibleItems)
 	}
 
+	// cleanup the entries layout
 	c.entriesLayout.Clear()
+	// create a layout for each visible entry
 	for _, entry := range c.entries {
 		currentVisibility := c.entryVisibilityMap[entry]
 		if currentVisibility {
@@ -387,14 +383,16 @@ func (c *ListComponent[T]) SelectFirst() {
 }
 
 func (c *ListComponent[T]) updateScrollBar() {
-	if len(c.entries) <= c.config.MaxVisibleItems {
+	if len(c.entries) <= c.GetMaxVisibleItems() {
 		c.hideScrollbar()
 	} else {
 		c.showScrollbar()
 	}
 
-	c.scrollbarComponent.SetMin(0)
-	c.scrollbarComponent.SetMax(int(math.Max(0.0, float64(len(c.entries)))))
+	minScrollIndex := 0
+	c.scrollbarComponent.SetMin(minScrollIndex)
+	maxScrollIndex := int(math.Max(0.0, float64(len(c.entries))))
+	c.scrollbarComponent.SetMax(maxScrollIndex)
 	visibleIndexMin, visibleIndexMax := c.GetVisibleRange()
 
 	//newPosition := c.GetSelectedIndex()
@@ -422,5 +420,45 @@ func (c *ListComponent[T]) hideScrollbar() {
 func (c *ListComponent[T]) showScrollbar() {
 	if c.layout.GetItemCount() <= 1 {
 		c.layout.AddItem(c.scrollbarComponent.GetLayout(), 1, 0, false)
+	}
+}
+
+func (c *ListComponent[T]) GetMaxVisibleItems() int {
+	configValue := c.config.MaxVisibleItems
+	if c.layout != nil {
+		if configValue <= 0 {
+			// compute the max visible items based on the available height
+			_, _, _, height := c.entriesLayout.GetRect()
+			dynamicMaxVisibleItems := util.Coerce(float64(height/c.config.MinHeightPerEntry), 1, float64(1000))
+			return int(dynamicMaxVisibleItems)
+		}
+	}
+	return configValue
+}
+
+func (c *ListComponent[T]) insertEntryIntoVisibilityMap(entry *T, maxVisibleItems int) {
+	_, ok := c.entryVisibilityMap[entry]
+	currentlyVisibleEntriesCount := c.getVisibleEntriesCount()
+
+	//  the item is new
+	if !ok {
+		if currentlyVisibleEntriesCount < maxVisibleItems {
+			// we are currently displaying less items than allowed, so we can display it immediately
+			c.entryVisibilityMap[entry] = true
+		} else {
+			// we are currently displaying as many items as allowed, so we hide the new item
+			c.entryVisibilityMap[entry] = false
+		}
+	}
+
+	// we already know about this item
+	if ok {
+		if currentlyVisibleEntriesCount < maxVisibleItems {
+			// we are currently displaying less items than allowed, so we add this item to the visible items
+			c.entryVisibilityMap[entry] = true
+		} else if currentlyVisibleEntriesCount > maxVisibleItems {
+			// we are currently displaying more items than allowed, so we hide this item
+			c.entryVisibilityMap[entry] = false
+		}
 	}
 }

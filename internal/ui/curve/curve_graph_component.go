@@ -2,6 +2,7 @@ package curve
 
 import (
 	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/ui/theme"
 	"fan2go-tui/internal/ui/util"
 	"github.com/navidys/tvxwidgets"
 	"github.com/rivo/tview"
@@ -18,12 +19,28 @@ type CurveGraphComponent struct {
 }
 
 func NewCurveGraphComponent(application *tview.Application, curve *client.Curve) *CurveGraphComponent {
-
-	graphComponent := util.NewGraphComponent[client.Curve](application, curve, func(c *client.Curve) float64 {
-		return c.Value
-	},
-		nil,
-		true,
+	graphConfig := util.NewGraphComponentConfig().
+		WithReversedOrder().
+		WithPlotColors(
+			theme.Colors.Graph.Curve,
+			theme.Colors.Graph.CurveMin,
+			theme.Colors.Graph.CurveMax,
+		)
+	graphComponent := util.NewGraphComponent[client.Curve](
+		application,
+		graphConfig,
+		curve,
+		[]func(*client.Curve) float64{
+			func(c *client.Curve) float64 {
+				return c.Value
+			},
+			func(c *client.Curve) float64 {
+				return 0
+			},
+			func(c *client.Curve) float64 {
+				return 255
+			},
+		},
 	)
 
 	c := &CurveGraphComponent{

@@ -2,6 +2,7 @@ package sensor
 
 import (
 	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/ui/theme"
 	"fan2go-tui/internal/ui/util"
 	"github.com/navidys/tvxwidgets"
 	"github.com/rivo/tview"
@@ -18,11 +19,28 @@ type SensorGraphComponent struct {
 }
 
 func NewSensorGraphComponent(application *tview.Application, sensor *client.Sensor) *SensorGraphComponent {
-
-	graphComponent := util.NewGraphComponent[client.Sensor](application, sensor, func(c *client.Sensor) float64 {
-		return c.MovingAvg / 1000
-	}, nil,
-		true,
+	graphConfig := util.NewGraphComponentConfig().
+		WithReversedOrder().
+		WithPlotColors(
+			theme.Colors.Graph.Sensor,
+			theme.Colors.Graph.SensorMin,
+			theme.Colors.Graph.SensorMax,
+		)
+	graphComponent := util.NewGraphComponent[client.Sensor](
+		application,
+		graphConfig,
+		sensor,
+		[]func(*client.Sensor) float64{
+			func(c *client.Sensor) float64 {
+				return c.MovingAvg / 1000
+			},
+			func(c *client.Sensor) float64 {
+				return 0
+			},
+			func(c *client.Sensor) float64 {
+				return 100
+			},
+		},
 	)
 
 	c := &SensorGraphComponent{
