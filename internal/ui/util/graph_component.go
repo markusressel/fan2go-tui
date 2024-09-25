@@ -79,12 +79,23 @@ func (c *GraphComponent[T]) Refresh() {
 
 	for idx := range c.fetchValueFunctions {
 		missingDataPoints := c.valueBufferSize - len(c.scatterPlotData[idx])
+
+		lastDataPoint := math.NaN()
+		hasDataPoints := len(c.scatterPlotData[idx]) > 0
+		if hasDataPoints {
+			if c.config.Reversed {
+				lastDataPoint = c.scatterPlotData[idx][0]
+			} else {
+				lastDataPoint = c.scatterPlotData[idx][len(c.scatterPlotData[idx])-1]
+			}
+		}
+
 		for i := 0; i < missingDataPoints; i++ {
 			targetIndex := 0
 			if c.config.Reversed {
 				targetIndex = len(c.scatterPlotData[idx])
 			}
-			c.scatterPlotData[idx] = slices.Insert(c.scatterPlotData[idx], targetIndex, math.NaN())
+			c.scatterPlotData[idx] = slices.Insert(c.scatterPlotData[idx], targetIndex, lastDataPoint)
 		}
 
 		// limit data to visible data points
