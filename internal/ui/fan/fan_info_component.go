@@ -69,7 +69,7 @@ func (c *FanInfoComponent) refresh() {
 	config := c.Fan.Config
 
 	configText := ""
-	// configText += fmt.Sprintf("Id: %s\n", config.Id)
+	// configText += fmt.Sprintf("ID: %s\n", config.ID)
 	configText += fmt.Sprintf("Curve: %s\n", config.Curve)
 	configText += fmt.Sprintf("Pwm:\n")
 	minPwmText := "N/A"

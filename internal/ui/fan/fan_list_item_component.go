@@ -32,7 +32,7 @@ func (c *FanListItemComponent) createLayout() *tview.Flex {
 	rootLayout := tview.NewFlex().SetDirection(tview.FlexRow)
 
 	fanColumnLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
-	uiutil.SetupWindow(fanColumnLayout, c.Fan.Config.Id)
+	uiutil.SetupWindow(fanColumnLayout, c.Fan.Config.ID)
 	fanColumnLayout.SetTitleAlign(tview.AlignLeft)
 	fanColumnLayout.SetBorder(true)
 	rootLayout.AddItem(fanColumnLayout, 0, 1, true)

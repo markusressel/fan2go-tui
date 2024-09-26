@@ -17,7 +17,7 @@ type Fan struct {
 }
 
 type FanConfig struct {
-	Id          string             `json:"id"`
+	ID          string             `json:"id"`
 	NeverStop   bool               `json:"neverStop"`
 	MinPwm      *int               `json:"minPwm,omitempty"`
 	StartPwm    *int               `json:"startPwm,omitempty"`

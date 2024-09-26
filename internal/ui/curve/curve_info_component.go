@@ -61,7 +61,7 @@ func (c *CurveInfoComponent) refresh() {
 	config := c.Curve.Config
 
 	configText := ""
-	// configText += fmt.Sprintf("Id: %s\n", config.Id)
+	// configText += fmt.Sprintf("ID: %s\n", config.ID)
 	configText += fmt.Sprintf("Curve: %s\n", config.ID)
 	// value = strconv.FormatFloat(config.MinPwm, 'f', -1, 64)
 

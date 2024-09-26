@@ -46,14 +46,14 @@ func (c *FansPage) createLayout() *tview.Flex {
 			return entry.GetLayout()
 		},
 		//func(a, b *FanListItemComponent) bool {
-		//	x := a.Fan.Config.Id
-		//	y := b.Fan.Config.Id
+		//	x := a.Fan.Config.ID
+		//	y := b.Fan.Config.ID
 		//	return strings.Compare(strings.ToLower(x), strings.ToLower(y)) <= 0
 		//},
 		func(entries []*FanListItemComponent, inverted bool) []*FanListItemComponent {
 			sort.SliceStable(entries, func(i, j int) bool {
-				x := entries[i].Fan.Config.Id
-				y := entries[j].Fan.Config.Id
+				x := entries[i].Fan.Config.ID
+				y := entries[j].Fan.Config.ID
 
 				result := strings.Compare(strings.ToLower(x), strings.ToLower(y))
 
@@ -85,7 +85,7 @@ func (c *FansPage) fetchFans() (*map[string]*client.Fan, []string, error) {
 
 	var fanIds []string
 	for _, f := range *result {
-		fanIds = append(fanIds, f.Config.Id)
+		fanIds = append(fanIds, f.Config.ID)
 	}
 
 	sort.SliceStable(fanIds, func(i, j int) bool {

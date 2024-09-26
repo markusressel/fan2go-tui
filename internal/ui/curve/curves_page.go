@@ -118,7 +118,7 @@ func (c *CurvesPage) Refresh() error {
 	var curveListItemsComponents []*CurveListItemComponent
 
 	oldCIds := maps.Keys(c.curveListItemComponents)
-	// remove now nonexisting entries
+	// remove now non-existing entries
 	for _, oldCId := range oldCIds {
 		_, ok := (*curves)[oldCId]
 		if !ok {
@@ -135,8 +135,8 @@ func (c *CurvesPage) Refresh() error {
 			curveListItemsComponents = append(curveListItemsComponents, curveListItemComponent)
 		} else {
 			curveListItemComponent = NewCurveListItemComponent(c.application, curve)
-			c.curveListItemComponents[cId] = curveListItemComponent
 			curveListItemComponent.SetCurve(curve)
+			c.curveListItemComponents[cId] = curveListItemComponent
 			curveListItemsComponents = append(curveListItemsComponents, curveListItemComponent)
 		}
 	}

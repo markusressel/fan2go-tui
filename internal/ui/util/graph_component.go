@@ -2,6 +2,7 @@ package util
 
 import (
 	"fan2go-tui/internal/ui/theme"
+	"fan2go-tui/internal/util"
 	"github.com/gdamore/tcell/v2"
 	"github.com/navidys/tvxwidgets"
 	"github.com/qdm12/reprint"
@@ -123,24 +124,34 @@ func (c *GraphComponent[T]) SetTitle(title string) {
 func (c *GraphComponent[T]) InsertValue(data *T) {
 	for idx, fetchValue := range c.fetchValueFunctions {
 		value := fetchValue(data)
-		data := c.scatterPlotData[idx]
-		targetIndex := len(data)
+		plotDataPoints := c.scatterPlotData[idx]
+		targetIndex := len(plotDataPoints)
+
 		if c.config.Reversed {
-			reversedCopy := slices.Clone(data)
+			reversedCopy := slices.Clone(plotDataPoints)
 			slices.Reverse(reversedCopy)
 			reversedCopy = slices.Insert(reversedCopy, targetIndex, value)
 			slices.Reverse(reversedCopy)
-			data = reversedCopy
+			plotDataPoints = reversedCopy
 		} else {
-			data = slices.Insert(data, targetIndex, value)
+			plotDataPoints = slices.Insert(plotDataPoints, targetIndex, value)
 		}
-		c.scatterPlotData[idx] = data
+		c.scatterPlotData[idx] = plotDataPoints
 	}
 
 	c.Refresh()
 }
 
 func (c *GraphComponent[T]) updateValueBufferSize() {
+	if !c.isVisible() {
+		c.valueBufferSize = 500
+		return
+	}
+
 	_, _, width, _ := c.plotLayout.GetRect()
 	c.valueBufferSize = width - 5
+}
+
+func (c *GraphComponent[T]) isVisible() bool {
+	return util.IsTxViewVisible(c.layout.Box)
 }

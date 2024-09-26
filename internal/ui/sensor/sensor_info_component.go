@@ -61,7 +61,7 @@ func (c *SensorInfoComponent) refresh() {
 	config := c.Sensor.Config
 
 	configText := ""
-	// configText += fmt.Sprintf("Id: %s\n", config.Id)
+	// configText += fmt.Sprintf("ID: %s\n", config.ID)
 	configText += fmt.Sprintf("Sensor: %s\n", config.ID)
 	// value = strconv.FormatFloat(config.MinPwm, 'f', -1, 64)
 
