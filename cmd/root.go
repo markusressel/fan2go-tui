@@ -14,7 +14,7 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "fan2go-tui",
-	Short: "Easily recover snapshotted versions of files on your ZFS dataset.",
+	Short: "Terminal UI for fan2go.",
 	Long:  ``,
 	Args:  cobra.MaximumNArgs(1),
 	// this is the default command to run when no subcommand is specified
