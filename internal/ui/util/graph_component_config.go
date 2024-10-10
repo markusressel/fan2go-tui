@@ -18,6 +18,9 @@ type GraphComponentConfig struct {
 	// Reversed determines if the graph should be drawn from left tp right instead of right to left
 	// Default: false
 	Reversed bool
+
+	// XMax is the maximum value for the x-axis
+	XMax int
 }
 
 // NewGraphComponentConfig creates a new GraphComponentConfig with default values
@@ -45,5 +48,11 @@ func (c *GraphComponentConfig) WithPlotColors(colors ...tcell.Color) *GraphCompo
 // WithPlotColorList sets the list of colors to use for the plot lines
 func (c *GraphComponentConfig) WithPlotColorList(colors []tcell.Color) *GraphComponentConfig {
 	c.PlotColors = colors
+	return c
+}
+
+// WithXMax sets the maximum value for the x-axis
+func (c *GraphComponentConfig) WithXMax(xMax int) *GraphComponentConfig {
+	c.XMax = xMax
 	return c
 }

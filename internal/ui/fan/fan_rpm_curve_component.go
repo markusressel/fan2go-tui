@@ -6,6 +6,8 @@ import (
 	"fan2go-tui/internal/ui/util"
 	"github.com/navidys/tvxwidgets"
 	"github.com/rivo/tview"
+	"golang.org/x/exp/maps"
+	"slices"
 )
 
 type FanRpmCurveComponent struct {
@@ -21,11 +23,8 @@ type FanRpmCurveComponent struct {
 func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *FanRpmCurveComponent {
 	graphConfig := util.NewGraphComponentConfig().
 		WithReversedOrder().
-		WithPlotColors(theme.Colors.Graph.Rpm, theme.Colors.Graph.Pwm)
-
-	fanCurveData := fan.FanCurveData
-
-	currentRpmValue := 0.0
+		WithPlotColors(theme.Colors.Graph.Rpm, theme.Colors.Graph.Pwm).
+		WithXMax(256)
 
 	graphComponent := util.NewGraphComponent[client.Fan](
 		application,
@@ -33,15 +32,10 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 		fan,
 		[]func(*client.Fan) float64{
 			func(c *client.Fan) float64 {
-				return currentRpmValue
+				return 0
 			},
 		},
 	)
-
-	for _, curveData := range *fanCurveData {
-		currentRpmValue = float64(curveData)
-		graphComponent.InsertValue(fan)
-	}
 
 	c := &FanRpmCurveComponent{
 		application:    application,
@@ -57,9 +51,7 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 
 func (c *FanRpmCurveComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
-
 	layout.SetBorder(false)
-
 	return layout
 }
 
@@ -68,8 +60,33 @@ func (c *FanRpmCurveComponent) refresh() {
 	if fan == nil {
 		return
 	}
-	component := c.graphComponent
-	component.InsertValue(fan)
+
+	fanRpmGraphData, err := computeFanRpmGraphData(c.Fan)
+	if err != nil {
+		return
+	}
+	c.graphComponent.SetRawData(fanRpmGraphData)
+}
+
+func computeFanRpmGraphData(fan *client.Fan) ([][]float64, error) {
+	fanCurveData := *fan.FanCurveData
+
+	graphData := make([][]float64, 1)
+
+	rpmValues := []float64{}
+
+	pwmKeys := maps.Keys(fanCurveData)
+	slices.Sort(pwmKeys)
+
+	for _, pwmKey := range pwmKeys {
+		//pwmValue := float64(pwm)
+		currentRpmValue := fanCurveData[pwmKey]
+		rpmValues = append(rpmValues, currentRpmValue)
+	}
+
+	graphData[0] = rpmValues
+
+	return graphData, nil
 }
 
 func (c *FanRpmCurveComponent) GetLayout() *tview.Flex {

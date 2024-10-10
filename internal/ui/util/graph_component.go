@@ -66,7 +66,7 @@ func (c *GraphComponent[T]) createLayout() *tview.Flex {
 
 	layout.AddItem(plotLayout, 0, 1, false)
 	_, _, width, _ := plotLayout.GetRect()
-	c.valueBufferSize = width * 4
+	c.setValueBufferSize(width * 4)
 
 	return layout
 }
@@ -121,6 +121,12 @@ func (c *GraphComponent[T]) SetTitle(title string) {
 	c.layout.SetTitle(titleText)
 }
 
+// SetRawData sets the raw data for the graph component.
+func (c *GraphComponent[T]) SetRawData(data [][]float64) {
+	c.scatterPlotData = data
+	c.Refresh()
+}
+
 func (c *GraphComponent[T]) InsertValue(data *T) {
 	for idx, fetchValue := range c.fetchValueFunctions {
 		value := fetchValue(data)
@@ -144,14 +150,23 @@ func (c *GraphComponent[T]) InsertValue(data *T) {
 
 func (c *GraphComponent[T]) updateValueBufferSize() {
 	if !c.isVisible() {
-		c.valueBufferSize = 500
+		c.setValueBufferSize(500)
 		return
 	}
 
 	_, _, width, _ := c.plotLayout.GetRect()
-	c.valueBufferSize = width - 5
+	c.setValueBufferSize(width - 5)
 }
 
 func (c *GraphComponent[T]) isVisible() bool {
 	return util.IsTxViewVisible(c.layout.Box)
+}
+
+func (c *GraphComponent[T]) setValueBufferSize(i int) {
+	if c.config.XMax > 0 {
+		if i > c.config.XMax {
+			i = c.config.XMax
+		}
+	}
+	c.valueBufferSize = i
 }
