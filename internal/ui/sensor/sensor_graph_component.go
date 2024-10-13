@@ -25,7 +25,10 @@ func NewSensorGraphComponent(application *tview.Application, sensor *client.Sens
 			theme.Colors.Graph.Sensor,
 			theme.Colors.Graph.SensorMin,
 			theme.Colors.Graph.SensorMax,
-		)
+		).
+		WithYAxisAutoScaleMin(false).
+		WithYAxisAutoScaleMax(false)
+
 	graphComponent := util.NewGraphComponent[client.Sensor](
 		application,
 		graphConfig,
@@ -34,14 +37,10 @@ func NewSensorGraphComponent(application *tview.Application, sensor *client.Sens
 			func(c *client.Sensor) float64 {
 				return c.MovingAvg / 1000
 			},
-			func(c *client.Sensor) float64 {
-				return 0
-			},
-			func(c *client.Sensor) float64 {
-				return 100
-			},
 		},
 	)
+
+	graphComponent.SetYRange(0, 100)
 
 	c := &SensorGraphComponent{
 		application:    application,

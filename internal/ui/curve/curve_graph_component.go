@@ -25,7 +25,10 @@ func NewCurveGraphComponent(application *tview.Application, curve *client.Curve)
 			theme.Colors.Graph.Curve,
 			theme.Colors.Graph.CurveMin,
 			theme.Colors.Graph.CurveMax,
-		)
+		).
+		WithYAxisAutoScaleMin(false).
+		WithYAxisAutoScaleMax(false)
+
 	graphComponent := util.NewGraphComponent[client.Curve](
 		application,
 		graphConfig,
@@ -42,6 +45,8 @@ func NewCurveGraphComponent(application *tview.Application, curve *client.Curve)
 			},
 		},
 	)
+
+	graphComponent.SetYRange(0, 255)
 
 	c := &CurveGraphComponent{
 		application:    application,

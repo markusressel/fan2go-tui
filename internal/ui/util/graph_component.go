@@ -19,6 +19,9 @@ type GraphComponent[T any] struct {
 	Data                *T
 	fetchValueFunctions []func(*T) float64
 
+	yMinValue *float64
+	yMaxValue *float64
+
 	layout          *tview.Flex
 	plotLayout      *tvxwidgets.Plot
 	scatterPlotData [][]float64
@@ -64,6 +67,12 @@ func (c *GraphComponent[T]) createLayout() *tview.Flex {
 	plotLayout.SetPlotType(c.config.PlotType)
 	plotLayout.SetMarker(c.config.MarkerType)
 
+	plotLayout.SetDrawXAxisLabel(c.config.DrawXAxisLabel)
+	plotLayout.SetDrawYAxisLabel(c.config.DrawYAxisLabel)
+	plotLayout.SetYAxisAutoScaleMin(c.config.YAxisAutoScaleMin)
+	plotLayout.SetYAxisAutoScaleMax(c.config.YAxisAutoScaleMax)
+	plotLayout.SetXAxisLabelFunc(c.config.XAxisLabelFunc)
+
 	layout.AddItem(plotLayout, 0, 1, false)
 	_, _, width, _ := plotLayout.GetRect()
 	c.setValueBufferSize(width * 4)
@@ -71,11 +80,33 @@ func (c *GraphComponent[T]) createLayout() *tview.Flex {
 	return layout
 }
 
+func (c *GraphComponent[T]) SetYMinValue(min float64) {
+	c.yMinValue = &min
+	c.plotLayout.SetMinVal(min)
+}
+
+func (c *GraphComponent[T]) SetYMaxValue(max float64) {
+	c.yMaxValue = &max
+	c.plotLayout.SetMaxVal(max)
+}
+
+func (c *GraphComponent[T]) SetYRange(min, max float64) {
+	c.yMinValue = &min
+	c.yMaxValue = &max
+	c.plotLayout.SetYRange(min, max)
+}
+
 func (c *GraphComponent[T]) Refresh() {
 	c.plotLayout.SetDrawAxes(true)
+	if c.yMinValue != nil {
+		c.plotLayout.SetMinVal(*c.yMinValue)
+	}
+	if c.yMaxValue != nil {
+		c.plotLayout.SetMaxVal(*c.yMaxValue)
+	}
 	c.plotLayout.SetData(c.scatterPlotData)
 
-	c.updateValueBufferSize()
+	c.UpdateValueBufferSize()
 
 	for idx := range c.fetchValueFunctions {
 		c.refreshPlot(idx)
@@ -148,13 +179,13 @@ func (c *GraphComponent[T]) InsertValue(data *T) {
 	c.Refresh()
 }
 
-func (c *GraphComponent[T]) updateValueBufferSize() {
+func (c *GraphComponent[T]) UpdateValueBufferSize() {
 	if !c.isVisible() {
 		c.setValueBufferSize(500)
 		return
 	}
 
-	_, _, width, _ := c.plotLayout.GetRect()
+	_, _, width, _ := c.plotLayout.GetInnerRect()
 	c.setValueBufferSize(width - 5)
 }
 
@@ -168,5 +199,12 @@ func (c *GraphComponent[T]) setValueBufferSize(i int) {
 			i = c.config.XMax
 		}
 	}
+	if i < 1 {
+		i = 1
+	}
 	c.valueBufferSize = i
+}
+
+func (c *GraphComponent[T]) GetValueBufferSize() int {
+	return c.valueBufferSize
 }

@@ -3,6 +3,7 @@ package util
 import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/navidys/tvxwidgets"
+	"strconv"
 )
 
 type GraphComponentConfig struct {
@@ -11,6 +12,17 @@ type GraphComponentConfig struct {
 
 	// MarkerType defines the character style to use for plot markers (points)
 	MarkerType tvxwidgets.Marker
+
+	// DrawXAxisLabel determines if the x-axis label should be drawn
+	DrawXAxisLabel bool
+
+	// DrawXAxisLabel determines if the y-axis label should be drawn
+	DrawYAxisLabel bool
+
+	YAxisAutoScaleMin bool
+	YAxisAutoScaleMax bool
+
+	XAxisLabelFunc func(int) string
 
 	// PlotColors is a list of colors to use for the plot lines
 	PlotColors []tcell.Color
@@ -26,10 +38,15 @@ type GraphComponentConfig struct {
 // NewGraphComponentConfig creates a new GraphComponentConfig with default values
 func NewGraphComponentConfig() *GraphComponentConfig {
 	return &GraphComponentConfig{
-		PlotType:   tvxwidgets.PlotTypeLineChart,
-		MarkerType: tvxwidgets.PlotMarkerBraille,
-		PlotColors: make([]tcell.Color, 0),
-		Reversed:   false,
+		PlotType:          tvxwidgets.PlotTypeLineChart,
+		MarkerType:        tvxwidgets.PlotMarkerBraille,
+		DrawXAxisLabel:    true,
+		DrawYAxisLabel:    true,
+		YAxisAutoScaleMin: false,
+		YAxisAutoScaleMax: true,
+		XAxisLabelFunc:    strconv.Itoa,
+		PlotColors:        make([]tcell.Color, 0),
+		Reversed:          false,
 	}
 }
 
@@ -54,5 +71,30 @@ func (c *GraphComponentConfig) WithPlotColorList(colors []tcell.Color) *GraphCom
 // WithXMax sets the maximum value for the x-axis
 func (c *GraphComponentConfig) WithXMax(xMax int) *GraphComponentConfig {
 	c.XMax = xMax
+	return c
+}
+
+func (c *GraphComponentConfig) WithDrawXAxisLabel(draw bool) *GraphComponentConfig {
+	c.DrawXAxisLabel = draw
+	return c
+}
+
+func (c *GraphComponentConfig) WithDrawYAxisLabel(draw bool) *GraphComponentConfig {
+	c.DrawYAxisLabel = draw
+	return c
+}
+
+func (c *GraphComponentConfig) WithYAxisAutoScaleMin(autoScale bool) *GraphComponentConfig {
+	c.YAxisAutoScaleMin = autoScale
+	return c
+}
+
+func (c *GraphComponentConfig) WithYAxisAutoScaleMax(autoScale bool) *GraphComponentConfig {
+	c.YAxisAutoScaleMax = autoScale
+	return c
+}
+
+func (c *GraphComponentConfig) WithXAxisLabelFunc(f func(int) string) *GraphComponentConfig {
+	c.XAxisLabelFunc = f
 	return c
 }

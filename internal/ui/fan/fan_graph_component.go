@@ -21,7 +21,10 @@ type FanGraphComponent struct {
 func NewFanGraphComponent(application *tview.Application, fan *client.Fan) *FanGraphComponent {
 	graphConfig := util.NewGraphComponentConfig().
 		WithReversedOrder().
-		WithPlotColors(theme.Colors.Graph.Rpm, theme.Colors.Graph.Pwm)
+		WithPlotColors(theme.Colors.Graph.Rpm, theme.Colors.Graph.Pwm).
+		WithYAxisAutoScaleMin(false).
+		WithYAxisAutoScaleMax(true)
+
 	graphComponent := util.NewGraphComponent[client.Fan](
 		application,
 		graphConfig,
@@ -35,6 +38,8 @@ func NewFanGraphComponent(application *tview.Application, fan *client.Fan) *FanG
 			},
 		},
 	)
+
+	graphComponent.SetYMinValue(0)
 
 	c := &FanGraphComponent{
 		application:    application,
