@@ -22,9 +22,6 @@ type FanRpmCurveComponent struct {
 	bmScatterPlot  *tvxwidgets.Plot
 	graphComponent *util.GraphComponent[client.Fan]
 
-	// for debugging only
-	configTextView *tview.TextView
-
 	xFunc1 func(i int) float64
 	fFunc  func(x float64) float64
 	yFunc1 func(x float64) float64
@@ -106,10 +103,6 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 
 	c.layout = c.createLayout()
 	c.layout.AddItem(graphComponent.GetLayout(), 0, 1, false)
-
-	configTextView := tview.NewTextView()
-	c.configTextView = configTextView
-	c.layout.AddItem(configTextView, 3, 0, false)
 
 	return c
 }
