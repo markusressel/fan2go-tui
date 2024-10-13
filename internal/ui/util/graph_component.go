@@ -19,6 +19,8 @@ type GraphComponent[T any] struct {
 	Data                *T
 	fetchValueFunctions []func(*T) float64
 
+	graphLines []*GraphLine
+
 	yMinValue *float64
 	yMaxValue *float64
 
@@ -207,4 +209,29 @@ func (c *GraphComponent[T]) setValueBufferSize(i int) {
 
 func (c *GraphComponent[T]) GetValueBufferSize() int {
 	return c.valueBufferSize
+}
+
+func (c *GraphComponent[T]) AddLine(graphLineConfig *GraphLine) *GraphLine {
+	c.graphLines = append(c.graphLines, graphLineConfig)
+	return graphLineConfig
+}
+
+func (c *GraphComponent[T]) GetLines() []*GraphLine {
+	return c.graphLines
+}
+
+func (c *GraphComponent[T]) SetXAxisZoomFactor(xAxisZoomFactor float64) {
+	for _, line := range c.graphLines {
+		line.xAxisZoomFactor = xAxisZoomFactor
+	}
+
+	//c.xAxisZoomFactor = xAxisZoomFactor
+}
+
+func (c *GraphComponent[T]) SetXAxisShift(xAxisShift float64) {
+	for _, line := range c.graphLines {
+		line.xAxisShift = xAxisShift
+	}
+
+	//c.xAxisShift = xAxisShift
 }

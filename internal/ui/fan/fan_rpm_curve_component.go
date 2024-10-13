@@ -24,7 +24,6 @@ type FanRpmCurveComponent struct {
 
 	xFunc1 func(i int) float64
 	fFunc  func(x float64) float64
-	yFunc1 func(x float64) float64
 }
 
 func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *FanRpmCurveComponent {
@@ -32,20 +31,11 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 	pwmKeys := maps.Keys(fanCurveData)
 	slices.Sort(pwmKeys)
 
-	horizontalStretchFactor := 1.0
-	verticalStretchFactor := 1.0
-	xOffset := 0.0
-	yOffset := 0.0
-
-	// TODO: set xAxisZoomFactor based on available graph width
-	xAxisZoomFactor := 0.7
-	xAxisShift := 0.0
-
 	xFunc1 := func(i int) float64 {
 		if i >= len(pwmKeys) {
 			return math.NaN()
 		}
-		return (float64(pwmKeys[i]) / xAxisZoomFactor) + xAxisShift
+		return float64(pwmKeys[i])
 	}
 	fFunc := func(x float64) float64 {
 		val, ok := fanCurveData[int(math.Round(x))]
@@ -54,9 +44,6 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 		} else {
 			return val
 		}
-	}
-	yFunc1 := func(x float64) float64 {
-		return (fFunc((x+xOffset)/horizontalStretchFactor) + yOffset) * verticalStretchFactor
 	}
 
 	xLabelFunc1 := func(i int) string {
@@ -68,6 +55,12 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 		label := strconv.Itoa(int(labelVal))
 		return label
 	}
+
+	rpmGraphLine := util.NewGraphLine(
+		"RPM",
+		xFunc1,
+		fFunc,
+	)
 
 	graphConfig := util.NewGraphComponentConfig().
 		WithReversedOrder().
@@ -89,6 +82,8 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 		},
 	)
 
+	graphComponent.AddLine(rpmGraphLine)
+
 	c := &FanRpmCurveComponent{
 		application:    application,
 		graphComponent: graphComponent,
@@ -98,7 +93,6 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 
 		xFunc1: xFunc1,
 		fFunc:  fFunc,
-		yFunc1: yFunc1,
 	}
 
 	c.layout = c.createLayout()
@@ -119,34 +113,31 @@ func (c *FanRpmCurveComponent) refresh() {
 		return
 	}
 
-	fanRpmGraphData, err := c.computeFanRpmGraphData(c.Fan)
+	fanRpmGraphData, err := c.computeFanRpmGraphData()
 	if err != nil {
 		return
 	}
+
+	c.graphComponent.UpdateValueBufferSize()
+	totalRange := c.graphComponent.GetValueBufferSize()
+	c.graphComponent.SetXAxisZoomFactor(float64(totalRange) / 255.0)
+
 	c.graphComponent.SetRawData(fanRpmGraphData)
 }
 
-func (c *FanRpmCurveComponent) computeFanRpmGraphData(fan *client.Fan) ([][]float64, error) {
+func (c *FanRpmCurveComponent) computeFanRpmGraphData() ([][]float64, error) {
 	graphData := make([][]float64, 1)
 
-	computeDataArray := func() [][]float64 {
-		n := len(c.pwmKeys)
-		data := make([][]float64, 1)
-		data[0] = make([]float64, n)
+	for _, line := range c.graphComponent.GetLines() {
+		n := 200
+		data := make([]float64, n)
 		for i := 0; i < n; i++ {
-			xVal := c.xFunc1(i)
-			yVal := c.yFunc1(xVal)
-			data[0][i] = yVal
+			xVal := line.GetX(i)
+			yVal := line.GetY(xVal)
+			data[i] = yVal
 		}
-
-		return data
+		graphData = append(graphData, data)
 	}
-
-	data := computeDataArray()
-
-	c.graphComponent.UpdateValueBufferSize()
-	//totalRange := c.graphComponent.GetValueBufferSize()
-	graphData[0] = data[0]
 
 	return graphData, nil
 }
