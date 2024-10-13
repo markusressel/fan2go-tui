@@ -113,33 +113,10 @@ func (c *FanRpmCurveComponent) refresh() {
 		return
 	}
 
-	fanRpmGraphData, err := c.computeFanRpmGraphData()
-	if err != nil {
-		return
-	}
-
 	c.graphComponent.UpdateValueBufferSize()
 	totalRange := c.graphComponent.GetValueBufferSize()
 	c.graphComponent.SetXAxisZoomFactor(float64(totalRange) / 255.0)
-
-	c.graphComponent.SetRawData(fanRpmGraphData)
-}
-
-func (c *FanRpmCurveComponent) computeFanRpmGraphData() ([][]float64, error) {
-	graphData := make([][]float64, 1)
-
-	for _, line := range c.graphComponent.GetLines() {
-		n := 200
-		data := make([]float64, n)
-		for i := 0; i < n; i++ {
-			xVal := line.GetX(i)
-			yVal := line.GetY(xVal)
-			data[i] = yVal
-		}
-		graphData = append(graphData, data)
-	}
-
-	return graphData, nil
+	c.graphComponent.Refresh()
 }
 
 func (c *FanRpmCurveComponent) GetLayout() *tview.Flex {

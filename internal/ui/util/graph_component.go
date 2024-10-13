@@ -64,6 +64,11 @@ func (c *GraphComponent[T]) createLayout() *tview.Flex {
 			plotColors = append(plotColors, theme.Colors.Graph.Default)
 		}
 
+		// add default color a couple of times to make sure we have enough colors
+		for i := len(plotColors); i < 5; i++ {
+			plotColors = append(plotColors, theme.Colors.Graph.Default)
+		}
+
 		plotLayout.SetLineColor(plotColors)
 	}
 	plotLayout.SetPlotType(c.config.PlotType)
@@ -106,7 +111,12 @@ func (c *GraphComponent[T]) Refresh() {
 	if c.yMaxValue != nil {
 		c.plotLayout.SetMaxVal(*c.yMaxValue)
 	}
-	c.plotLayout.SetData(c.scatterPlotData)
+
+	lineData := c.computeGraphLineData()
+	combinedData := make([][]float64, 0, len(c.scatterPlotData)+len(lineData))
+	combinedData = append(combinedData, c.scatterPlotData...)
+	combinedData = append(combinedData, lineData...)
+	c.plotLayout.SetData(combinedData)
 
 	c.UpdateValueBufferSize()
 
@@ -234,4 +244,21 @@ func (c *GraphComponent[T]) SetXAxisShift(xAxisShift float64) {
 	}
 
 	//c.xAxisShift = xAxisShift
+}
+
+func (c *GraphComponent[T]) computeGraphLineData() [][]float64 {
+	graphData := make([][]float64, len(c.GetLines()))
+
+	for _, line := range c.GetLines() {
+		n := 200
+		data := make([]float64, n)
+		for i := 0; i < n; i++ {
+			xVal := line.GetX(i)
+			yVal := line.GetY(xVal)
+			data[i] = yVal
+		}
+		graphData = append(graphData, data)
+	}
+
+	return graphData
 }
