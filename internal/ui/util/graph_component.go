@@ -78,7 +78,6 @@ func (c *GraphComponent[T]) createLayout() *tview.Flex {
 	plotLayout.SetDrawYAxisLabel(c.config.DrawYAxisLabel)
 	plotLayout.SetYAxisAutoScaleMin(c.config.YAxisAutoScaleMin)
 	plotLayout.SetYAxisAutoScaleMax(c.config.YAxisAutoScaleMax)
-	plotLayout.SetXAxisLabelFunc(c.config.XAxisLabelFunc)
 
 	layout.AddItem(plotLayout, 0, 1, false)
 	_, _, width, _ := plotLayout.GetRect()
@@ -257,6 +256,11 @@ func (c *GraphComponent[T]) GetValueBufferSize() int {
 
 func (c *GraphComponent[T]) AddLine(graphLineConfig *GraphLine) *GraphLine {
 	c.graphLines = append(c.graphLines, graphLineConfig)
+
+	c.plotLayout.SetXAxisLabelFunc(func(i int) string {
+		return graphLineConfig.GetXLabel(i)
+	})
+
 	return graphLineConfig
 }
 

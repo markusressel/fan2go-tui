@@ -1,57 +1,65 @@
 package util
 
-import "math"
+import (
+	"math"
+)
 
 type GraphLine struct {
-	HorizontalStretchFactor float64
-	VerticalStretchFactor   float64
-	XOffset                 float64
-	YOffset                 float64
+	horizontalStretchFactor float64
+	verticalStretchFactor   float64
+	xOffset                 float64
+	yOffset                 float64
 
 	xAxisZoomFactor float64
 	xAxisShift      float64
 	yAxisZoomFactor float64
 	yAxisShift      float64
 
-	Name string
-	X    func(i int) float64
-	F    func(float64) float64
+	name       string
+	x          func(i int) float64
+	f          func(float64) float64
+	xLabelFunc func(i int, x float64) string
 }
 
-func NewGraphLine(name string, xFunc func(i int) float64, fFunc func(float64) float64) *GraphLine {
+func NewGraphLine(
+	name string,
+	xFunc func(i int) float64,
+	fFunc func(float64) float64,
+	xLabelFunc func(i int, x float64) string,
+) *GraphLine {
 	return &GraphLine{
-		Name: name,
+		name: name,
 
-		HorizontalStretchFactor: 1.0,
-		VerticalStretchFactor:   1.0,
-		XOffset:                 0.0,
-		YOffset:                 0.0,
+		horizontalStretchFactor: 1.0,
+		verticalStretchFactor:   1.0,
+		xOffset:                 0.0,
+		yOffset:                 0.0,
 
-		// TODO: set based on available width if data set is finite
 		xAxisZoomFactor: 1.0,
 		xAxisShift:      0.0,
 		yAxisZoomFactor: 1.0,
 		yAxisShift:      0.0,
 
-		X: xFunc,
-		F: fFunc,
+		x:          xFunc,
+		f:          fFunc,
+		xLabelFunc: xLabelFunc,
 	}
 }
 
 func (l *GraphLine) SetHorizontalStretchFactor(factor float64) {
-	l.HorizontalStretchFactor = factor
+	l.horizontalStretchFactor = factor
 }
 
 func (l *GraphLine) SetVerticalStretchFactor(factor float64) {
-	l.VerticalStretchFactor = factor
+	l.verticalStretchFactor = factor
 }
 
 func (l *GraphLine) SetXOffset(offset float64) {
-	l.XOffset = offset
+	l.xOffset = offset
 }
 
 func (l *GraphLine) SetYOffset(offset float64) {
-	l.YOffset = offset
+	l.yOffset = offset
 }
 
 func (l *GraphLine) SetXAxisZoomFactor(xAxisZoomFactor float64) {
@@ -71,11 +79,11 @@ func (l *GraphLine) SetYAxisShift(yAxisShift float64) {
 }
 
 func (l *GraphLine) GetY(x float64) float64 {
-	return (l.GetF((x+l.XOffset)/l.HorizontalStretchFactor) + l.YOffset) * l.VerticalStretchFactor
+	return (l.GetF((x+l.xOffset)/l.horizontalStretchFactor) + l.yOffset) * l.verticalStretchFactor
 }
 
 func (l *GraphLine) GetX(i int) float64 {
-	x := l.X(i)
+	x := l.x(i)
 	if math.IsNaN(x) {
 		return math.NaN()
 	}
@@ -83,27 +91,27 @@ func (l *GraphLine) GetX(i int) float64 {
 }
 
 func (l *GraphLine) GetF(x float64) float64 {
-	return l.F(x)
+	return l.f(x)
 }
 
 func (l *GraphLine) GetName() string {
-	return l.Name
+	return l.name
 }
 
 func (l *GraphLine) GetHorizontalStretchFactor() float64 {
-	return l.HorizontalStretchFactor
+	return l.horizontalStretchFactor
 }
 
 func (l *GraphLine) GetVerticalStretchFactor() float64 {
-	return l.VerticalStretchFactor
+	return l.verticalStretchFactor
 }
 
 func (l *GraphLine) GetXOffset() float64 {
-	return l.XOffset
+	return l.xOffset
 }
 
 func (l *GraphLine) GetYOffset() float64 {
-	return l.YOffset
+	return l.yOffset
 }
 
 func (l *GraphLine) GetXAxisZoomFactor() float64 {
@@ -123,9 +131,15 @@ func (l *GraphLine) GetYAxisShift() float64 {
 }
 
 func (l *GraphLine) GetXFunc() func(int) float64 {
-	return l.X
+	return l.x
 }
 
 func (l *GraphLine) GetFFunc() func(float64) float64 {
-	return l.F
+	return l.f
+}
+
+func (l *GraphLine) GetXLabel(i int) string {
+	xVal := l.GetX(i)
+	label := l.xLabelFunc(i, xVal)
+	return label
 }

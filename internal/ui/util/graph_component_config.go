@@ -3,7 +3,6 @@ package util
 import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/navidys/tvxwidgets"
-	"strconv"
 )
 
 type GraphComponentConfig struct {
@@ -21,8 +20,6 @@ type GraphComponentConfig struct {
 
 	YAxisAutoScaleMin bool
 	YAxisAutoScaleMax bool
-
-	XAxisLabelFunc func(int) string
 
 	// PlotColors is a list of colors to use for the plot lines
 	PlotColors []tcell.Color
@@ -44,7 +41,6 @@ func NewGraphComponentConfig() *GraphComponentConfig {
 		DrawYAxisLabel:    true,
 		YAxisAutoScaleMin: false,
 		YAxisAutoScaleMax: true,
-		XAxisLabelFunc:    strconv.Itoa,
 		PlotColors:        make([]tcell.Color, 0),
 		Reversed:          false,
 	}
@@ -91,10 +87,5 @@ func (c *GraphComponentConfig) WithYAxisAutoScaleMin(autoScale bool) *GraphCompo
 
 func (c *GraphComponentConfig) WithYAxisAutoScaleMax(autoScale bool) *GraphComponentConfig {
 	c.YAxisAutoScaleMax = autoScale
-	return c
-}
-
-func (c *GraphComponentConfig) WithXAxisLabelFunc(f func(int) string) *GraphComponentConfig {
-	c.XAxisLabelFunc = f
 	return c
 }

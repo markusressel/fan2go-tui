@@ -46,9 +46,8 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 		}
 	}
 
-	xLabelFunc1 := func(i int) string {
-		xVal := xFunc1(i)
-		labelVal := math.Round(xVal)
+	xLabelFunc1 := func(i int, x float64) string {
+		labelVal := math.Round(x)
 		if labelVal > 255 {
 			return ""
 		}
@@ -60,6 +59,7 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 		"RPM",
 		xFunc1,
 		fFunc,
+		xLabelFunc1,
 	)
 
 	graphConfig := util.NewGraphComponentConfig().
@@ -67,19 +67,13 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 		WithPlotColors(theme.Colors.Graph.Rpm, theme.Colors.Graph.Pwm).
 		WithYAxisAutoScaleMin(false).
 		WithYAxisAutoScaleMax(true).
-		WithXMax(255).
-		WithDrawXAxisLabel(true).
-		WithXAxisLabelFunc(xLabelFunc1)
+		WithDrawXAxisLabel(true)
 
 	graphComponent := util.NewGraphComponent[client.Fan](
 		application,
 		graphConfig,
 		fan,
-		[]func(*client.Fan) float64{
-			func(c *client.Fan) float64 {
-				return 0
-			},
-		},
+		[]func(*client.Fan) float64{},
 	)
 
 	graphComponent.AddLine(rpmGraphLine)
@@ -114,9 +108,11 @@ func (c *FanRpmCurveComponent) refresh() {
 	}
 
 	c.graphComponent.UpdateValueBufferSize()
-	totalRange := c.graphComponent.GetValueBufferSize()
+	_, _, width, _ := c.graphComponent.GetLayout().GetInnerRect()
+	//totalRange := c.graphComponent.GetValueBufferSize()
+	totalRange := math.Max(1, float64(width-5))
 	newXAxisZoomFactor := 1 / (255.0 / float64(totalRange))
-	newXAxisZoomFactor = 1.0
+	//newXAxisZoomFactor = 1.0
 	c.graphComponent.SetXAxisZoomFactor(newXAxisZoomFactor)
 	c.graphComponent.Refresh()
 }
