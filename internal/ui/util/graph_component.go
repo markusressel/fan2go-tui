@@ -122,14 +122,14 @@ func (c *GraphComponent[T]) Refresh() {
 		c.plotLayout.SetMaxVal(*c.yMaxValue)
 	}
 
+	c.UpdateValueBufferSize()
+
 	c.updateCamera()
 	lineData := c.computeGraphLineData()
 	combinedData := make([][]float64, 0, len(c.scatterPlotData)+len(lineData))
 	combinedData = append(combinedData, c.scatterPlotData...)
 	combinedData = append(combinedData, lineData...)
 	c.plotLayout.SetData(combinedData)
-
-	c.UpdateValueBufferSize()
 
 	for idx := range c.fetchValueFunctions {
 		c.refreshPlot(idx)
