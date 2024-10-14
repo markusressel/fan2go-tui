@@ -173,6 +173,13 @@ func (c *GraphComponent[T]) computeGraphLineData() [][]float64 {
 			yVal := line.GetY(xVal)
 			data[i] = yVal
 		}
+
+		xMax := line.xMax
+		if xMax != nil && n > int(*xMax) {
+			dataUnitMax := data[:int(*xMax)]
+			data = util.DistributeValuesOverRange(dataUnitMax, n)
+		}
+
 		graphData = append(graphData, data)
 	}
 
@@ -315,4 +322,20 @@ func (c *GraphComponent[T]) SetYAxisShift(yAxisShift float64) {
 		line.SetYAxisShift(yAxisShift)
 	}
 	c.Refresh()
+}
+
+func (c *GraphComponent[T]) GetPlotRect() (int, int, int, int) {
+	return c.plotLayout.GetInnerRect()
+}
+
+func (c *GraphComponent[T]) SetXRange(xMin, xMax float64) {
+	for _, line := range c.graphLines {
+		line.SetXRange(xMin, xMax)
+	}
+}
+
+func (c *GraphComponent[T]) ResetXRange() {
+	for _, line := range c.graphLines {
+		line.ResetXRange()
+	}
 }

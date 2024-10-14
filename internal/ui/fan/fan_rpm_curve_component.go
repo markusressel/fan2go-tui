@@ -74,6 +74,7 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 	)
 
 	graphComponent.AddLine(rpmGraphLine)
+	graphComponent.SetXRange(0, 255)
 
 	c := &FanRpmCurveComponent{
 		application:    application,
@@ -105,10 +106,10 @@ func (c *FanRpmCurveComponent) refresh() {
 	}
 
 	c.graphComponent.UpdateValueBufferSize()
-	_, _, width, _ := c.graphComponent.GetLayout().GetInnerRect()
+	_, _, width, _ := c.graphComponent.GetPlotRect()
 	//totalRange := c.graphComponent.GetValueBufferSize()
-	totalRange := math.Max(1, float64(width))
-	newXAxisZoomFactor := 1 / ((256.0 + 10.0) / float64(totalRange))
+	totalRange := math.Max(1, float64(width-50))
+	newXAxisZoomFactor := 1 / ((255.0) / float64(totalRange))
 	//newXAxisZoomFactor = 1.0
 	c.graphComponent.SetXAxisZoomFactor(newXAxisZoomFactor)
 	c.graphComponent.Refresh()

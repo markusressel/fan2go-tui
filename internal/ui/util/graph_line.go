@@ -12,6 +12,8 @@ type GraphLine struct {
 
 	xAxisZoomFactor float64
 	xAxisShift      float64
+	xMax            *float64
+
 	yAxisZoomFactor float64
 	yAxisShift      float64
 
@@ -37,6 +39,8 @@ func NewGraphLine(
 
 		xAxisZoomFactor: 1.0,
 		xAxisShift:      0.0,
+		xMax:            nil,
+
 		yAxisZoomFactor: 1.0,
 		yAxisShift:      0.0,
 
@@ -78,10 +82,6 @@ func (l *GraphLine) SetYAxisShift(yAxisShift float64) {
 	l.yAxisShift = yAxisShift
 }
 
-func (l *GraphLine) GetY(x float64) float64 {
-	return (l.GetF((x+l.xOffset)/l.horizontalStretchFactor) + l.yOffset) * l.verticalStretchFactor
-}
-
 func (l *GraphLine) GetX(i int) float64 {
 	x := l.x(i)
 	if math.IsNaN(x) {
@@ -92,6 +92,10 @@ func (l *GraphLine) GetX(i int) float64 {
 
 func (l *GraphLine) GetF(x float64) float64 {
 	return l.f(x)
+}
+
+func (l *GraphLine) GetY(x float64) float64 {
+	return (l.GetF((x+l.xOffset)/l.horizontalStretchFactor) + l.yOffset) * l.verticalStretchFactor
 }
 
 func (l *GraphLine) GetName() string {
@@ -145,4 +149,14 @@ func (l *GraphLine) GetXLabel(i int) string {
 	}
 	label := l.xLabelFunc(i, xVal)
 	return label
+}
+
+func (l *GraphLine) SetXRange(xMin, xMax float64) {
+	l.xAxisShift = -1 * xMin
+	l.xMax = &xMax
+}
+
+func (l *GraphLine) ResetXRange() {
+	l.xAxisShift = 0
+	l.xMax = nil
 }
