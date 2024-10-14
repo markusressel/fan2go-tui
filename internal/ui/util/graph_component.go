@@ -86,14 +86,25 @@ func (c *GraphComponent[T]) createLayout() *tview.Flex {
 	return layout
 }
 
-func (c *GraphComponent[T]) SetYMinValue(min float64) {
-	c.yMinValue = &min
-	c.plotLayout.SetMinVal(min)
+func (c *GraphComponent[T]) SetYMinValue(min *float64) {
+	c.yMinValue = min
+	if min != nil {
+		c.plotLayout.SetYAxisAutoScaleMin(false)
+		c.plotLayout.SetMinVal(*min)
+	} else {
+		c.plotLayout.SetYAxisAutoScaleMin(c.config.YAxisAutoScaleMin)
+		c.plotLayout.SetMinVal(0)
+	}
 }
 
-func (c *GraphComponent[T]) SetYMaxValue(max float64) {
-	c.yMaxValue = &max
-	c.plotLayout.SetMaxVal(max)
+func (c *GraphComponent[T]) SetYMaxValue(max *float64) {
+	c.yMaxValue = max
+	if max != nil {
+		c.plotLayout.SetYAxisAutoScaleMax(false)
+		c.plotLayout.SetMaxVal(*max)
+	} else {
+		c.plotLayout.SetYAxisAutoScaleMax(c.config.YAxisAutoScaleMax)
+	}
 }
 
 func (c *GraphComponent[T]) SetYRange(min, max float64) {
@@ -135,17 +146,28 @@ func (c *GraphComponent[T]) updateCamera() {
 		yAxisShift = math.Max(yAxisShift, line.GetYAxisShift())
 	}
 
+	yMinValue := 0.0
+	if c.yMinValue != nil {
+		yMinValue = *c.yMinValue
+	}
+
+	yMaxValue := 0.0
+	if c.yMaxValue != nil {
+		yMaxValue = *c.yMaxValue
+	}
+
 	c.plotLayout.SetYRange(
-		(-1+maxYOffset+yAxisShift)/yAxisZoomFactor,
-		(1+maxYOffset+yAxisShift)/yAxisZoomFactor,
+		(yMinValue+maxYOffset+yAxisShift)/yAxisZoomFactor,
+		(yMaxValue+maxYOffset+yAxisShift)/yAxisZoomFactor,
 	)
 }
 
 func (c *GraphComponent[T]) computeGraphLineData() [][]float64 {
 	graphData := make([][]float64, len(c.GetLines()))
 
+	bufferSize := c.GetValueBufferSize()
 	for _, line := range c.GetLines() {
-		n := 200
+		n := bufferSize
 		data := make([]float64, n)
 		for i := 0; i < n; i++ {
 			xVal := line.GetX(i)
@@ -231,7 +253,7 @@ func (c *GraphComponent[T]) UpdateValueBufferSize() {
 	}
 
 	_, _, width, _ := c.plotLayout.GetInnerRect()
-	c.setValueBufferSize(width - 5)
+	c.setValueBufferSize(width)
 }
 
 func (c *GraphComponent[T]) isVisible() bool {

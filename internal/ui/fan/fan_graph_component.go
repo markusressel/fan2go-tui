@@ -39,7 +39,8 @@ func NewFanGraphComponent(application *tview.Application, fan *client.Fan) *FanG
 		},
 	)
 
-	graphComponent.SetYMinValue(0)
+	minVal := 0.0
+	graphComponent.SetYMinValue(&minVal)
 
 	c := &FanGraphComponent{
 		application:    application,
