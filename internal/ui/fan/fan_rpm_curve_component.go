@@ -115,7 +115,9 @@ func (c *FanRpmCurveComponent) refresh() {
 
 	c.graphComponent.UpdateValueBufferSize()
 	totalRange := c.graphComponent.GetValueBufferSize()
-	c.graphComponent.SetXAxisZoomFactor(float64(totalRange) / 255.0)
+	newXAxisZoomFactor := 1 / (255.0 / float64(totalRange))
+	newXAxisZoomFactor = 1.0
+	c.graphComponent.SetXAxisZoomFactor(newXAxisZoomFactor)
 	c.graphComponent.Refresh()
 }
 

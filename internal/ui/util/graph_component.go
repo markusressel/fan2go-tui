@@ -112,6 +112,7 @@ func (c *GraphComponent[T]) Refresh() {
 		c.plotLayout.SetMaxVal(*c.yMaxValue)
 	}
 
+	c.updateCamera()
 	lineData := c.computeGraphLineData()
 	combinedData := make([][]float64, 0, len(c.scatterPlotData)+len(lineData))
 	combinedData = append(combinedData, c.scatterPlotData...)
@@ -123,6 +124,39 @@ func (c *GraphComponent[T]) Refresh() {
 	for idx := range c.fetchValueFunctions {
 		c.refreshPlot(idx)
 	}
+}
+
+func (c *GraphComponent[T]) updateCamera() {
+	maxYOffset := 0.0
+	yAxisZoomFactor := 1.0
+	yAxisShift := 0.0
+	for _, line := range c.graphLines {
+		maxYOffset = math.Max(maxYOffset, line.GetYOffset())
+		yAxisZoomFactor = math.Max(yAxisZoomFactor, line.GetYAxisZoomFactor())
+		yAxisShift = math.Max(yAxisShift, line.GetYAxisShift())
+	}
+
+	c.plotLayout.SetYRange(
+		(-1+maxYOffset+yAxisShift)/yAxisZoomFactor,
+		(1+maxYOffset+yAxisShift)/yAxisZoomFactor,
+	)
+}
+
+func (c *GraphComponent[T]) computeGraphLineData() [][]float64 {
+	graphData := make([][]float64, len(c.GetLines()))
+
+	for _, line := range c.GetLines() {
+		n := 200
+		data := make([]float64, n)
+		for i := 0; i < n; i++ {
+			xVal := line.GetX(i)
+			yVal := line.GetY(xVal)
+			data[i] = yVal
+		}
+		graphData = append(graphData, data)
+	}
+
+	return graphData
 }
 
 func (c *GraphComponent[T]) refreshPlot(idx int) {
@@ -232,33 +266,28 @@ func (c *GraphComponent[T]) GetLines() []*GraphLine {
 
 func (c *GraphComponent[T]) SetXAxisZoomFactor(xAxisZoomFactor float64) {
 	for _, line := range c.graphLines {
-		line.xAxisZoomFactor = xAxisZoomFactor
+		line.SetXAxisZoomFactor(xAxisZoomFactor)
 	}
-
-	//c.xAxisZoomFactor = xAxisZoomFactor
+	c.Refresh()
 }
 
 func (c *GraphComponent[T]) SetXAxisShift(xAxisShift float64) {
 	for _, line := range c.graphLines {
-		line.xAxisShift = xAxisShift
+		line.SetXAxisShift(xAxisShift)
 	}
-
-	//c.xAxisShift = xAxisShift
+	c.Refresh()
 }
 
-func (c *GraphComponent[T]) computeGraphLineData() [][]float64 {
-	graphData := make([][]float64, len(c.GetLines()))
-
-	for _, line := range c.GetLines() {
-		n := 200
-		data := make([]float64, n)
-		for i := 0; i < n; i++ {
-			xVal := line.GetX(i)
-			yVal := line.GetY(xVal)
-			data[i] = yVal
-		}
-		graphData = append(graphData, data)
+func (c *GraphComponent[T]) SetYAxisZoomFactor(yAxisZoomFactor float64) {
+	for _, line := range c.graphLines {
+		line.SetYAxisZoomFactor(yAxisZoomFactor)
 	}
+	c.Refresh()
+}
 
-	return graphData
+func (c *GraphComponent[T]) SetYAxisShift(yAxisShift float64) {
+	for _, line := range c.graphLines {
+		line.SetYAxisShift(yAxisShift)
+	}
+	c.Refresh()
 }

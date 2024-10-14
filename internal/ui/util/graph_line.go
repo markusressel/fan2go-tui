@@ -10,6 +10,8 @@ type GraphLine struct {
 
 	xAxisZoomFactor float64
 	xAxisShift      float64
+	yAxisZoomFactor float64
+	yAxisShift      float64
 
 	Name string
 	X    func(i int) float64
@@ -28,6 +30,8 @@ func NewGraphLine(name string, xFunc func(i int) float64, fFunc func(float64) fl
 		// TODO: set based on available width if data set is finite
 		xAxisZoomFactor: 1.0,
 		xAxisShift:      0.0,
+		yAxisZoomFactor: 1.0,
+		yAxisShift:      0.0,
 
 		X: xFunc,
 		F: fFunc,
@@ -56,6 +60,14 @@ func (l *GraphLine) SetXAxisZoomFactor(xAxisZoomFactor float64) {
 
 func (l *GraphLine) SetXAxisShift(xAxisShift float64) {
 	l.xAxisShift = xAxisShift
+}
+
+func (l *GraphLine) SetYAxisZoomFactor(yAxisZoomFactor float64) {
+	l.yAxisZoomFactor = yAxisZoomFactor
+}
+
+func (l *GraphLine) SetYAxisShift(yAxisShift float64) {
+	l.yAxisShift = yAxisShift
 }
 
 func (l *GraphLine) GetY(x float64) float64 {
@@ -100,6 +112,14 @@ func (l *GraphLine) GetXAxisZoomFactor() float64 {
 
 func (l *GraphLine) GetXAxisShift() float64 {
 	return l.xAxisShift
+}
+
+func (l *GraphLine) GetYAxisZoomFactor() float64 {
+	return l.yAxisZoomFactor
+}
+
+func (l *GraphLine) GetYAxisShift() float64 {
+	return l.yAxisShift
 }
 
 func (l *GraphLine) GetXFunc() func(int) float64 {
