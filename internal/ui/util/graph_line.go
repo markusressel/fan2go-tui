@@ -140,6 +140,9 @@ func (l *GraphLine) GetFFunc() func(float64) float64 {
 
 func (l *GraphLine) GetXLabel(i int) string {
 	xVal := l.GetX(i)
+	if math.IsNaN(xVal) {
+		return ""
+	}
 	label := l.xLabelFunc(i, xVal)
 	return label
 }

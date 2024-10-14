@@ -38,7 +38,7 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 		return float64(pwmKeys[i])
 	}
 	fFunc := func(x float64) float64 {
-		val, ok := fanCurveData[int(math.Round(x))]
+		val, ok := fanCurveData[int(math.Floor(x))]
 		if !ok {
 			return math.NaN()
 		} else {
@@ -47,11 +47,8 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 	}
 
 	xLabelFunc1 := func(i int, x float64) string {
-		labelVal := math.Round(x)
-		if labelVal > 255 {
-			return ""
-		}
-		label := strconv.Itoa(int(labelVal))
+		labelVal := int(math.Round(x))
+		label := strconv.Itoa(labelVal)
 		return label
 	}
 
@@ -110,8 +107,8 @@ func (c *FanRpmCurveComponent) refresh() {
 	c.graphComponent.UpdateValueBufferSize()
 	_, _, width, _ := c.graphComponent.GetLayout().GetInnerRect()
 	//totalRange := c.graphComponent.GetValueBufferSize()
-	totalRange := math.Max(1, float64(width-5))
-	newXAxisZoomFactor := 1 / (255.0 / float64(totalRange))
+	totalRange := math.Max(1, float64(width))
+	newXAxisZoomFactor := 1 / ((256.0 + 10.0) / float64(totalRange))
 	//newXAxisZoomFactor = 1.0
 	c.graphComponent.SetXAxisZoomFactor(newXAxisZoomFactor)
 	c.graphComponent.Refresh()
