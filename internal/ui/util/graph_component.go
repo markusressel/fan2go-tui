@@ -189,22 +189,12 @@ func (c *GraphComponent[T]) computeGraphLineData() [][]float64 {
 func (c *GraphComponent[T]) refreshPlot(idx int) {
 	missingDataPoints := c.valueBufferSize - len(c.scatterPlotData[idx])
 
-	lastDataPoint := math.NaN()
-	hasDataPoints := len(c.scatterPlotData[idx]) > 0
-	if hasDataPoints {
-		if c.config.Reversed {
-			lastDataPoint = c.scatterPlotData[idx][0]
-		} else {
-			lastDataPoint = c.scatterPlotData[idx][len(c.scatterPlotData[idx])-1]
-		}
-	}
-
 	for i := 0; i < missingDataPoints; i++ {
 		targetIndex := 0
 		if c.config.Reversed {
 			targetIndex = len(c.scatterPlotData[idx])
 		}
-		c.scatterPlotData[idx] = slices.Insert(c.scatterPlotData[idx], targetIndex, lastDataPoint)
+		c.scatterPlotData[idx] = slices.Insert(c.scatterPlotData[idx], targetIndex, math.NaN())
 	}
 
 	// limit data to visible data points
