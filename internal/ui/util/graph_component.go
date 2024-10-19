@@ -79,6 +79,8 @@ func (c *GraphComponent[T]) createLayout() *tview.Flex {
 	plotLayout.SetYAxisAutoScaleMin(c.config.YAxisAutoScaleMin)
 	plotLayout.SetYAxisAutoScaleMax(c.config.YAxisAutoScaleMax)
 
+	plotLayout.SetYAxisLabelDataType(c.config.YAxisLabelDataType)
+
 	layout.AddItem(plotLayout, 0, 1, false)
 	_, _, width, _ := plotLayout.GetRect()
 	c.setValueBufferSize(width * 4)
@@ -124,7 +126,7 @@ func (c *GraphComponent[T]) Refresh() {
 
 	c.UpdateValueBufferSize()
 
-	c.updateCamera()
+	c.updateViewPort()
 	lineData := c.computeGraphLineData()
 	for idx := range c.fetchValueFunctions {
 		c.refreshPlot(idx)
@@ -135,7 +137,7 @@ func (c *GraphComponent[T]) Refresh() {
 	c.plotLayout.SetData(combinedData)
 }
 
-func (c *GraphComponent[T]) updateCamera() {
+func (c *GraphComponent[T]) updateViewPort() {
 	maxYOffset := 0.0
 	yAxisZoomFactor := 1.0
 	yAxisShift := 0.0
@@ -328,4 +330,8 @@ func (c *GraphComponent[T]) ResetXRange() {
 	for _, line := range c.graphLines {
 		line.ResetXRange()
 	}
+}
+
+func (c *GraphComponent[T]) GetXMax() *float64 {
+	return c.graphLines[0].GetXMax()
 }

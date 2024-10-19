@@ -32,7 +32,7 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 	slices.Sort(pwmKeys)
 
 	xFunc1 := func(i int) float64 {
-		if i >= len(pwmKeys) {
+		if i < 0 || i >= len(pwmKeys) {
 			return math.NaN()
 		}
 		return float64(pwmKeys[i])
@@ -64,7 +64,8 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 		WithPlotColors(theme.Colors.Graph.Rpm, theme.Colors.Graph.Pwm).
 		WithYAxisAutoScaleMin(false).
 		WithYAxisAutoScaleMax(true).
-		WithDrawXAxisLabel(true)
+		WithDrawXAxisLabel(true).
+		WithYAxisLabelDataType(tvxwidgets.PlotYAxisLabelDataInt)
 
 	graphComponent := util.NewGraphComponent[client.Fan](
 		application,
@@ -108,10 +109,14 @@ func (c *FanRpmCurveComponent) refresh() {
 	c.graphComponent.UpdateValueBufferSize()
 	_, _, width, _ := c.graphComponent.GetPlotRect()
 	//totalRange := c.graphComponent.GetValueBufferSize()
-	totalRange := math.Max(1, float64(width-50))
-	newXAxisZoomFactor := 1 / ((255.0) / float64(totalRange))
-	//newXAxisZoomFactor = 1.0
-	c.graphComponent.SetXAxisZoomFactor(newXAxisZoomFactor)
+	totalRange := math.Max(1, float64(width-10))
+	xMax := c.graphComponent.GetXMax()
+	if xMax != nil {
+		xMaxVal := *xMax
+		newXAxisZoomFactor := 1 / (xMaxVal / (totalRange))
+		c.graphComponent.SetXAxisZoomFactor(newXAxisZoomFactor)
+	}
+
 	c.graphComponent.Refresh()
 }
 

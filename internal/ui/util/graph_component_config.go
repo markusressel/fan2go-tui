@@ -21,6 +21,8 @@ type GraphComponentConfig struct {
 	YAxisAutoScaleMin bool
 	YAxisAutoScaleMax bool
 
+	YAxisLabelDataType tvxwidgets.PlotYAxisLabelDataType
+
 	// PlotColors is a list of colors to use for the plot lines
 	PlotColors []tcell.Color
 
@@ -35,14 +37,15 @@ type GraphComponentConfig struct {
 // NewGraphComponentConfig creates a new GraphComponentConfig with default values
 func NewGraphComponentConfig() *GraphComponentConfig {
 	return &GraphComponentConfig{
-		PlotType:          tvxwidgets.PlotTypeLineChart,
-		MarkerType:        tvxwidgets.PlotMarkerBraille,
-		DrawXAxisLabel:    true,
-		DrawYAxisLabel:    true,
-		YAxisAutoScaleMin: false,
-		YAxisAutoScaleMax: true,
-		PlotColors:        make([]tcell.Color, 0),
-		Reversed:          false,
+		PlotType:           tvxwidgets.PlotTypeLineChart,
+		MarkerType:         tvxwidgets.PlotMarkerBraille,
+		DrawXAxisLabel:     true,
+		DrawYAxisLabel:     true,
+		YAxisAutoScaleMin:  false,
+		YAxisAutoScaleMax:  true,
+		YAxisLabelDataType: tvxwidgets.PlotYAxisLabelDataFloat,
+		PlotColors:         make([]tcell.Color, 0),
+		Reversed:           false,
 	}
 }
 
@@ -87,5 +90,10 @@ func (c *GraphComponentConfig) WithYAxisAutoScaleMin(autoScale bool) *GraphCompo
 
 func (c *GraphComponentConfig) WithYAxisAutoScaleMax(autoScale bool) *GraphComponentConfig {
 	c.YAxisAutoScaleMax = autoScale
+	return c
+}
+
+func (c *GraphComponentConfig) WithYAxisLabelDataType(dataType tvxwidgets.PlotYAxisLabelDataType) *GraphComponentConfig {
+	c.YAxisLabelDataType = dataType
 	return c
 }

@@ -23,7 +23,8 @@ func NewFanGraphComponent(application *tview.Application, fan *client.Fan) *FanG
 		WithReversedOrder().
 		WithPlotColors(theme.Colors.Graph.Rpm, theme.Colors.Graph.Pwm).
 		WithYAxisAutoScaleMin(false).
-		WithYAxisAutoScaleMax(true)
+		WithYAxisAutoScaleMax(true).
+		WithYAxisLabelDataType(tvxwidgets.PlotYAxisLabelDataInt)
 
 	graphComponent := util.NewGraphComponent[client.Fan](
 		application,
