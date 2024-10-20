@@ -44,7 +44,7 @@ func NewGraphComponentConfig() *GraphComponentConfig {
 		YAxisAutoScaleMin:  false,
 		YAxisAutoScaleMax:  true,
 		YAxisLabelDataType: tvxwidgets.PlotYAxisLabelDataFloat,
-		PlotColors:         make([]tcell.Color, 0),
+		PlotColors:         []tcell.Color{tcell.ColorWhite, tcell.ColorWhite, tcell.ColorWhite, tcell.ColorWhite, tcell.ColorWhite},
 		Reversed:           false,
 	}
 }
