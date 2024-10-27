@@ -160,14 +160,12 @@ func (l *GraphLine) GetXLabel(i int) string {
 		return ""
 	}
 
-	scaledX := xVal*l.xAxisZoomFactor + l.xAxisShift
-
 	xMax := l.GetXMax()
-	if xMax != nil && scaledX > *xMax {
+	if xMax != nil && xVal > *xMax {
 		return ""
 	}
 
-	label := l.xLabelFunc(i, scaledX)
+	label := l.xLabelFunc(i, xVal)
 	return label
 }
 
