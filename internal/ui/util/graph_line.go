@@ -1,6 +1,7 @@
 package util
 
 import (
+	"github.com/gdamore/tcell/v2"
 	"math"
 )
 
@@ -23,6 +24,8 @@ type GraphLine struct {
 	x          func(i int) float64
 	f          func(float64) float64
 	xLabelFunc func(i int, x float64) string
+
+	color tcell.Color
 }
 
 func NewGraphLine(
@@ -49,6 +52,8 @@ func NewGraphLine(
 		x:          xFunc,
 		f:          fFunc,
 		xLabelFunc: xLabelFunc,
+
+		color: tcell.ColorWhite,
 	}
 }
 
@@ -85,11 +90,11 @@ func (l *GraphLine) SetYAxisShift(yAxisShift float64) {
 }
 
 func (l *GraphLine) GetX(i int) float64 {
-	x := l.x(i)
+	x := l.MapItoX(i)
 	if math.IsNaN(x) {
 		return math.NaN()
 	}
-	return (float64(i) / l.xAxisZoomFactor) + l.xAxisShift
+	return x
 }
 
 func (l *GraphLine) GetF(x float64) float64 {
@@ -139,7 +144,10 @@ func (l *GraphLine) GetYAxisShift() float64 {
 }
 
 func (l *GraphLine) GetXFunc() func(int) float64 {
-	return l.x
+	// TODO should this be static or a parameter?
+	return func(i int) float64 {
+		return l.MapItoX(i)
+	}
 }
 
 func (l *GraphLine) GetFFunc() func(float64) float64 {
@@ -159,7 +167,7 @@ func (l *GraphLine) GetXLabel(i int) string {
 		return ""
 	}
 
-	label := l.xLabelFunc(i, xVal)
+	label := l.xLabelFunc(i, scaledX)
 	return label
 }
 
@@ -179,4 +187,20 @@ func (l *GraphLine) ResetXRange() {
 
 func (l *GraphLine) GetXRange() (float64, *float64) {
 	return l.xAxisShift, l.xMax
+}
+
+func (l *GraphLine) GetColor() tcell.Color {
+	return l.color
+}
+
+func (l *GraphLine) SetColor(color tcell.Color) {
+	l.color = color
+}
+
+func (l *GraphLine) MapItoX(i int) float64 {
+	return float64(i)*l.xAxisZoomFactor + l.xAxisShift
+}
+
+func (l *GraphLine) MapXtoI(x float64) int {
+	return int((x - l.xAxisShift) / l.xAxisZoomFactor)
 }

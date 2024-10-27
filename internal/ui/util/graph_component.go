@@ -30,6 +30,10 @@ type GraphComponent[T any] struct {
 	valueBufferSize int
 }
 
+type GraphDataSource struct {
+	Value float64
+}
+
 func NewGraphComponent[T any](
 	application *tview.Application,
 	config *GraphComponentConfig,
@@ -177,9 +181,13 @@ func (c *GraphComponent[T]) computeGraphLineData() [][]float64 {
 		}
 
 		xMax := line.xMax
+
 		if xMax != nil && n > int(*xMax) {
-			dataUnitMax := data[:int(*xMax)]
-			data = util.DistributeValuesOverRange(dataUnitMax, n)
+			// TODO: test this
+			iAt0 := line.MapXtoI(0)
+			iAtXMax := line.MapXtoI(*xMax)
+			xScaleFactorToGetXMaxAtEndOfBuffer := float64(n) / float64(iAtXMax-iAt0)
+			line.SetXAxisZoomFactor(xScaleFactorToGetXMaxAtEndOfBuffer)
 		}
 
 		graphData = append(graphData, data)
@@ -288,11 +296,19 @@ func (c *GraphComponent[T]) GetLines() []*GraphLine {
 	return c.graphLines
 }
 
+func (c *GraphComponent[T]) GetXAxisZoomFactor() float64 {
+	return c.graphLines[0].GetXAxisZoomFactor()
+}
+
 func (c *GraphComponent[T]) SetXAxisZoomFactor(xAxisZoomFactor float64) {
 	for _, line := range c.graphLines {
 		line.SetXAxisZoomFactor(xAxisZoomFactor)
 	}
 	c.Refresh()
+}
+
+func (c *GraphComponent[T]) GetXAxisShift() float64 {
+	return c.graphLines[0].GetXAxisShift()
 }
 
 func (c *GraphComponent[T]) SetXAxisShift(xAxisShift float64) {
@@ -302,11 +318,19 @@ func (c *GraphComponent[T]) SetXAxisShift(xAxisShift float64) {
 	c.Refresh()
 }
 
+func (c *GraphComponent[T]) GetYAxisZoomFactor() float64 {
+	return c.graphLines[0].GetYAxisZoomFactor()
+}
+
 func (c *GraphComponent[T]) SetYAxisZoomFactor(yAxisZoomFactor float64) {
 	for _, line := range c.graphLines {
 		line.SetYAxisZoomFactor(yAxisZoomFactor)
 	}
 	c.Refresh()
+}
+
+func (c *GraphComponent[T]) GetYAxisShift() float64 {
+	return c.graphLines[0].GetYAxisShift()
 }
 
 func (c *GraphComponent[T]) SetYAxisShift(yAxisShift float64) {
