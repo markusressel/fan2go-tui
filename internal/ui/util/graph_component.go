@@ -139,6 +139,14 @@ func (c *GraphComponent[T]) Refresh() {
 	combinedData = append(combinedData, c.scatterPlotData...)
 	combinedData = append(combinedData, lineData...)
 	c.plotLayout.SetData(combinedData)
+
+	// TODO: think about what to do with multiple lines
+	for _, line := range c.graphLines {
+		xMax := line.xMax
+		if xMax != nil {
+			c.ZoomToRangeX(0, *xMax)
+		}
+	}
 }
 
 func (c *GraphComponent[T]) updateViewPort() {
@@ -180,20 +188,24 @@ func (c *GraphComponent[T]) computeGraphLineData() [][]float64 {
 			data[i] = yVal
 		}
 
-		xMax := line.xMax
-
-		if xMax != nil && n > int(*xMax) {
-			// TODO: test this
-			iAt0 := line.MapXtoI(0)
-			iAtXMax := line.MapXtoI(*xMax)
-			xScaleFactorToGetXMaxAtEndOfBuffer := float64(n) / float64(iAtXMax-iAt0)
-			line.SetXAxisZoomFactor(xScaleFactorToGetXMaxAtEndOfBuffer)
-		}
-
 		graphData = append(graphData, data)
 	}
 
 	return graphData
+}
+
+func (c *GraphComponent[T]) ZoomToRangeX(minX, maxX float64) {
+	for _, line := range c.GetLines() {
+		iAt0 := line.MapXtoI(minX)
+		iAtXMax := line.MapXtoI(maxX)
+
+		_, _, width, _ := c.plotLayout.GetRect()
+		availableSlots := width - 10
+
+		xScaleFactorToGetXMaxAtEndOfBuffer := float64(1) / (float64(availableSlots) / float64(iAtXMax-iAt0))
+		newFactor := line.GetXAxisZoomFactor() * xScaleFactorToGetXMaxAtEndOfBuffer
+		line.SetXAxisZoomFactor(newFactor)
+	}
 }
 
 func (c *GraphComponent[T]) refreshPlot(idx int) {
