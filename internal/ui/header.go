@@ -7,6 +7,7 @@ import (
 	"fan2go-tui/internal/ui/theme"
 	uiutil "fan2go-tui/internal/ui/util"
 	"fmt"
+	"github.com/elliotchance/orderedmap/v2"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 	"strings"
@@ -24,18 +25,23 @@ type ApplicationHeaderComponent struct {
 	pageIndicatorTextView *tview.TextView
 
 	lastStatus             *status_message.StatusMessage
+	pagesMap               orderedmap.OrderedMap[Page, uiutil.PagesPage]
 	page                   Page
 	updateIntervalTextView *tview.TextView
 }
 
-func NewApplicationHeader(application *tview.Application) *ApplicationHeaderComponent {
+func NewApplicationHeader(
+	application *tview.Application,
+	pagesMap orderedmap.OrderedMap[Page, uiutil.PagesPage],
+) *ApplicationHeaderComponent {
 	versionText := fmt.Sprintf("%s-(#%s)-%s", global.Version, global.Commit, global.Date)
 
 	applicationHeader := &ApplicationHeaderComponent{
 		application: application,
 		name:        "fan2go-tui",
 		version:     versionText,
-		page:        FansPage,
+		pagesMap:    pagesMap,
+		page:        pagesMap.Keys()[0],
 	}
 
 	applicationHeader.createLayout()
@@ -73,8 +79,8 @@ func (applicationHeader *ApplicationHeaderComponent) createLayout() {
 
 	page := applicationHeader.page
 	pageName := string(applicationHeader.page)
-	pageIdx := indexOf(page, Pages)
-	pageCount := len(Pages)
+	pageIdx := indexOf(page, applicationHeader.pagesMap.Keys())
+	pageCount := len(applicationHeader.pagesMap.Keys())
 	pageIndicatorText := fmt.Sprintf("%-7s %d/%d", pageName, pageIdx+1, pageCount)
 
 	pageIndicatorTextView := tview.NewTextView()
@@ -104,8 +110,8 @@ func (applicationHeader *ApplicationHeaderComponent) createLayout() {
 func (applicationHeader *ApplicationHeaderComponent) updateUi() {
 	page := applicationHeader.page
 	pageName := strings.ToUpper(string(applicationHeader.page))
-	pageIdx := indexOf(page, Pages)
-	pageCount := len(Pages)
+	pageIdx := indexOf(page, applicationHeader.pagesMap.Keys())
+	pageCount := len(applicationHeader.pagesMap.Keys())
 	pageIndicatorText := fmt.Sprintf("%-7s %d/%d", pageName, pageIdx+1, pageCount)
 	applicationHeader.pageIndicatorTextView.SetText(pageIndicatorText)
 }

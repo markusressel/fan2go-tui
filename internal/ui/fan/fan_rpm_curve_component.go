@@ -106,17 +106,7 @@ func (c *FanRpmCurveComponent) refresh() {
 		return
 	}
 
-	c.graphComponent.UpdateValueBufferSize()
-	_, _, width, _ := c.graphComponent.GetPlotRect()
-	//totalRange := c.graphComponent.GetValueBufferSize()
-	totalRange := math.Max(1, float64(width-10))
-	xMax := c.graphComponent.GetXMax()
-	if xMax != nil {
-		xMaxVal := *xMax
-		newXAxisZoomFactor := xMaxVal / (totalRange)
-		c.graphComponent.SetXAxisZoomFactor(newXAxisZoomFactor)
-	}
-
+	c.graphComponent.ZoomToRangeX(0, 255)
 	c.graphComponent.Refresh()
 }
 

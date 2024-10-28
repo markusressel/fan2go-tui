@@ -6,6 +6,8 @@ import (
 	"fan2go-tui/internal/ui/fan"
 	"fan2go-tui/internal/ui/sensor"
 	"fan2go-tui/internal/ui/status_message"
+	"fan2go-tui/internal/ui/util"
+	"github.com/elliotchance/orderedmap/v2"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 	"slices"
@@ -14,17 +16,10 @@ import (
 type Page string
 
 const (
-	FansPage    Page = "fans"
-	CurvesPage  Page = "curves"
-	SensorsPage Page = "sensors"
-)
-
-var (
-	Pages = []Page{
-		FansPage,
-		CurvesPage,
-		SensorsPage,
-	}
+	GraphTestPage Page = "graph_test"
+	FansPage      Page = "fans"
+	CurvesPage    Page = "curves"
+	SensorsPage   Page = "sensors"
 )
 
 type MainPage struct {
@@ -38,9 +33,7 @@ type MainPage struct {
 	page                Page
 	mainPagePagerLayout *tview.Pages
 
-	fansPage    *fan.FansPage
-	curvesPage  *curve.CurvesPage
-	sensorsPage *sensor.SensorsPage
+	pagesMap orderedmap.OrderedMap[Page, util.PagesPage]
 }
 
 func NewMainPage(application *tview.Application, client client.Fan2goApiClient) *MainPage {
@@ -49,6 +42,7 @@ func NewMainPage(application *tview.Application, client client.Fan2goApiClient) 
 		application: application,
 		client:      client,
 		page:        FansPage,
+		pagesMap:    *orderedmap.NewOrderedMap[Page, util.PagesPage](),
 	}
 
 	mainPage.layout = mainPage.createLayout()
@@ -60,13 +54,13 @@ func NewMainPage(application *tview.Application, client client.Fan2goApiClient) 
 		} else if key == tcell.KeyCtrlR {
 
 		} else if rune == int32(49) {
-			page := Pages[0]
+			page := mainPage.GetPageAtIndex(0)
 			mainPage.SetPage(page)
 		} else if rune == int32(50) {
-			page := Pages[1]
+			page := mainPage.GetPageAtIndex(1)
 			mainPage.SetPage(page)
 		} else if rune == int32(51) {
-			page := Pages[2]
+			page := mainPage.GetPageAtIndex(2)
 			mainPage.SetPage(page)
 		}
 		return event
@@ -78,32 +72,42 @@ func NewMainPage(application *tview.Application, client client.Fan2goApiClient) 
 func (mainPage *MainPage) createLayout() *tview.Flex {
 	mainPageLayout := tview.NewFlex().SetDirection(tview.FlexRow)
 
-	header := NewApplicationHeader(mainPage.application)
-	mainPage.header = header
-	mainPageLayout.AddItem(header.layout, 1, 0, false)
-
 	mainPagePagerLayout := tview.NewPages()
 	mainPage.mainPagePagerLayout = mainPagePagerLayout
+
+	//graphTestPage := graph_test.NewGraphTestPage(mainPage.application)
+	fansPage := fan.NewFansPage(mainPage.application, mainPage.client)
+	curvesPage := curve.NewCurvesPage(mainPage.application, mainPage.client)
+	sensorsPage := sensor.NewSensorsPage(mainPage.application, mainPage.client)
+
+	//mainPage.AddPage(GraphTestPage, &graphTestPage, true)
+	mainPage.AddPage(FansPage, &fansPage)
+	mainPage.AddPage(CurvesPage, &curvesPage)
+	mainPage.AddPage(SensorsPage, &sensorsPage)
+
+	header := NewApplicationHeader(
+		mainPage.application,
+		mainPage.pagesMap,
+	)
+	mainPage.header = header
+
+	mainPageLayout.AddItem(header.layout, 1, 0, false)
 	mainPageLayout.AddItem(mainPagePagerLayout, 0, 1, true)
 
-	fansPage := fan.NewFansPage(mainPage.application, mainPage.client)
-	mainPage.fansPage = &fansPage
-
-	curvesPage := curve.NewCurvesPage(mainPage.application, mainPage.client)
-	mainPage.curvesPage = &curvesPage
-
-	sensorsPage := sensor.NewSensorsPage(mainPage.application, mainPage.client)
-	mainPage.sensorsPage = &sensorsPage
-
-	fansPageLayout := mainPage.fansPage.GetLayout()
-	curvesPageLayout := mainPage.curvesPage.GetLayout()
-	sensorsPageLayout := mainPage.sensorsPage.GetLayout()
-
-	mainPagePagerLayout.AddPage(string(FansPage), fansPageLayout, true, true)
-	mainPagePagerLayout.AddPage(string(CurvesPage), curvesPageLayout, true, false)
-	mainPagePagerLayout.AddPage(string(SensorsPage), sensorsPageLayout, true, false)
+	for page, pagesPage := range mainPage.pagesMap.Iterator() {
+		mainPage.mainPagePagerLayout.AddPage(
+			string(page),
+			pagesPage.GetLayout(),
+			true,
+			page == mainPage.page,
+		)
+	}
 
 	return mainPageLayout
+}
+
+func (mainPage *MainPage) AddPage(s Page, pagesPage util.PagesPage) {
+	mainPage.pagesMap.Set(s, pagesPage)
 }
 
 func (mainPage *MainPage) Init() {
@@ -114,23 +118,31 @@ func (mainPage *MainPage) Refresh() {
 	defer mainPage.application.ForceDraw()
 	mainPage.UpdateHeader()
 
-	err := mainPage.sensorsPage.Refresh()
-	if err != nil {
-		mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
-		return
-	}
-	err = mainPage.curvesPage.Refresh()
-	if err != nil {
-		mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
-		return
-	}
-	err = mainPage.fansPage.Refresh()
-	if err != nil {
-		mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
-		return
+	currentPage := mainPage.GetCurrentPage()
+	err := currentPage.Refresh()
+
+	for page, pagesPage := range mainPage.pagesMap.Iterator() {
+		if page == mainPage.page {
+			continue
+		}
+		err = pagesPage.Refresh()
+		if err != nil {
+			mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
+			return
+		}
 	}
 
 	mainPage.clearStatusMessage()
+}
+
+func (mainPage *MainPage) GetCurrentPage() util.PagesPage {
+	val, _ := mainPage.pagesMap.Get(mainPage.page)
+	return val
+}
+
+func (mainPage *MainPage) GetPageAtIndex(i int) Page {
+	page := mainPage.pagesMap.Keys()[i]
+	return page
 }
 
 func (mainPage *MainPage) SetPage(page Page) {
@@ -140,26 +152,26 @@ func (mainPage *MainPage) SetPage(page Page) {
 	mainPage.mainPagePagerLayout.SwitchToPage(string(page))
 	mainPage.Refresh()
 
-	switch mainPage.page {
-	case FansPage:
-		mainPage.fansPage.ScrollToItem()
-	case CurvesPage:
-		mainPage.curvesPage.ScrollToItem()
-	case SensorsPage:
-		mainPage.sensorsPage.ScrollToItem()
+	pagesPages, _ := mainPage.pagesMap.Get(mainPage.page)
+
+	switch pagesPages.(type) {
+	case util.CanScrollToItem:
+		pagesPages.(util.CanScrollToItem).ScrollToItem()
 	}
 }
 
 func (mainPage *MainPage) PreviousPage() {
-	currentIndex := slices.Index(Pages, mainPage.page)
-	nextIndex := (len(Pages) + currentIndex - 1) % len(Pages)
-	mainPage.SetPage(Pages[nextIndex])
+	keys := mainPage.pagesMap.Keys()
+	currentIndex := slices.Index(keys, mainPage.page)
+	nextIndex := (len(keys) + currentIndex - 1) % len(keys)
+	mainPage.SetPage(keys[nextIndex])
 }
 
 func (mainPage *MainPage) NextPage() {
-	currentIndex := slices.Index(Pages, mainPage.page)
-	nextIndex := (currentIndex + 1) % len(Pages)
-	mainPage.SetPage(Pages[nextIndex])
+	keys := mainPage.pagesMap.Keys()
+	currentIndex := slices.Index(keys, mainPage.page)
+	nextIndex := (currentIndex + 1) % len(keys)
+	mainPage.SetPage(keys[nextIndex])
 }
 
 func (mainPage *MainPage) clearStatusMessage() {
