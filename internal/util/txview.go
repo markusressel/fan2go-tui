@@ -8,6 +8,10 @@ import (
 func IsTxViewVisible(view tview.Primitive) bool {
 	var viewToCheck interface{}
 	switch view.(type) {
+	case *tview.Box:
+		box := view.(*tview.Box)
+		_, _, width, height := box.GetInnerRect()
+		return width <= 0 && height <= 0
 	case *tview.Flex:
 		viewToCheck = view.(*tview.Flex).Box
 	case *tview.Grid:

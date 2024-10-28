@@ -13,6 +13,8 @@ type Fan struct {
 	Pwm int `json:"pwm"`
 	Rpm int `json:"rpm"`
 
+	FanCurveData *map[int]float64 `json:"fanCurveData,omitempty"`
+
 	Config FanConfig `json:"config"`
 }
 

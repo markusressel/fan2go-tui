@@ -12,21 +12,40 @@ type GraphComponentConfig struct {
 	// MarkerType defines the character style to use for plot markers (points)
 	MarkerType tvxwidgets.Marker
 
+	// DrawXAxisLabel determines if the x-axis label should be drawn
+	DrawXAxisLabel bool
+
+	// DrawXAxisLabel determines if the y-axis label should be drawn
+	DrawYAxisLabel bool
+
+	YAxisAutoScaleMin bool
+	YAxisAutoScaleMax bool
+
+	YAxisLabelDataType tvxwidgets.PlotYAxisLabelDataType
+
 	// PlotColors is a list of colors to use for the plot lines
 	PlotColors []tcell.Color
 
 	// Reversed determines if the graph should be drawn from left tp right instead of right to left
 	// Default: false
 	Reversed bool
+
+	// XMax is the maximum value for the x-axis
+	XMax int
 }
 
 // NewGraphComponentConfig creates a new GraphComponentConfig with default values
 func NewGraphComponentConfig() *GraphComponentConfig {
 	return &GraphComponentConfig{
-		PlotType:   tvxwidgets.PlotTypeLineChart,
-		MarkerType: tvxwidgets.PlotMarkerBraille,
-		PlotColors: make([]tcell.Color, 0),
-		Reversed:   false,
+		PlotType:           tvxwidgets.PlotTypeLineChart,
+		MarkerType:         tvxwidgets.PlotMarkerBraille,
+		DrawXAxisLabel:     true,
+		DrawYAxisLabel:     true,
+		YAxisAutoScaleMin:  false,
+		YAxisAutoScaleMax:  true,
+		YAxisLabelDataType: tvxwidgets.PlotYAxisLabelDataFloat,
+		PlotColors:         []tcell.Color{tcell.ColorWhite, tcell.ColorWhite, tcell.ColorWhite, tcell.ColorWhite, tcell.ColorWhite},
+		Reversed:           false,
 	}
 }
 
@@ -45,5 +64,36 @@ func (c *GraphComponentConfig) WithPlotColors(colors ...tcell.Color) *GraphCompo
 // WithPlotColorList sets the list of colors to use for the plot lines
 func (c *GraphComponentConfig) WithPlotColorList(colors []tcell.Color) *GraphComponentConfig {
 	c.PlotColors = colors
+	return c
+}
+
+// WithXMax sets the maximum value for the x-axis
+func (c *GraphComponentConfig) WithXMax(xMax int) *GraphComponentConfig {
+	c.XMax = xMax
+	return c
+}
+
+func (c *GraphComponentConfig) WithDrawXAxisLabel(draw bool) *GraphComponentConfig {
+	c.DrawXAxisLabel = draw
+	return c
+}
+
+func (c *GraphComponentConfig) WithDrawYAxisLabel(draw bool) *GraphComponentConfig {
+	c.DrawYAxisLabel = draw
+	return c
+}
+
+func (c *GraphComponentConfig) WithYAxisAutoScaleMin(autoScale bool) *GraphComponentConfig {
+	c.YAxisAutoScaleMin = autoScale
+	return c
+}
+
+func (c *GraphComponentConfig) WithYAxisAutoScaleMax(autoScale bool) *GraphComponentConfig {
+	c.YAxisAutoScaleMax = autoScale
+	return c
+}
+
+func (c *GraphComponentConfig) WithYAxisLabelDataType(dataType tvxwidgets.PlotYAxisLabelDataType) *GraphComponentConfig {
+	c.YAxisLabelDataType = dataType
 	return c
 }

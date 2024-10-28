@@ -54,7 +54,7 @@ func (c *SensorInfoComponent) SetSensor(sensor *client.Sensor) {
 
 func (c *SensorInfoComponent) refresh() {
 	// print basic info
-	valueText := fmt.Sprintf("Avg: %f", c.Sensor.MovingAvg/1000)
+	valueText := fmt.Sprintf("Avg: %.2f", c.Sensor.MovingAvg/1000)
 	c.valueTextView.SetText(valueText)
 
 	// print config

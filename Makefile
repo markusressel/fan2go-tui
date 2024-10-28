@@ -24,8 +24,11 @@ build:  ## Builds the CLI
 run: build
 	./${OUTPUT_BIN}
 
-deploy: clean build
+deploy-custom: clean build
 	cp ./${OUTPUT_BIN} ~/.custom/bin/
+
+deploy: clean build
+	sudo cp ./${OUTPUT_BIN} /usr/bin/
 
 clean:
 	go clean
