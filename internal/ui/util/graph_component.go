@@ -144,7 +144,7 @@ func (c *GraphComponent[T]) Refresh() {
 	for _, line := range c.graphLines {
 		xMax := line.xMax
 		if xMax != nil {
-			c.ZoomToRangeX(0, *xMax)
+			//c.ZoomToRangeX(0, *xMax)
 		}
 	}
 }
@@ -156,7 +156,7 @@ func (c *GraphComponent[T]) updateViewPort() {
 	for _, line := range c.graphLines {
 		maxYOffset = math.Max(maxYOffset, line.GetYOffset())
 		yAxisZoomFactor = math.Max(yAxisZoomFactor, line.GetYAxisZoomFactor())
-		yAxisShift = math.Max(yAxisShift, line.GetYAxisShift())
+		yAxisShift = line.GetYAxisShift()
 	}
 
 	yMinValue := 0.0
@@ -196,13 +196,13 @@ func (c *GraphComponent[T]) computeGraphLineData() [][]float64 {
 
 func (c *GraphComponent[T]) ZoomToRangeX(minX, maxX float64) {
 	for _, line := range c.GetLines() {
-		iAt0 := line.MapXtoI(minX)
+		iAtXMin := line.MapXtoI(minX)
 		iAtXMax := line.MapXtoI(maxX)
 
 		_, _, width, _ := c.plotLayout.GetRect()
 		availableSlots := width - 10
 
-		xScaleFactorToGetXMaxAtEndOfBuffer := float64(1) / (float64(availableSlots) / float64(iAtXMax-iAt0))
+		xScaleFactorToGetXMaxAtEndOfBuffer := float64(1) / (float64(availableSlots) / float64(iAtXMax-iAtXMin))
 		newFactor := line.GetXAxisZoomFactor() * xScaleFactorToGetXMaxAtEndOfBuffer
 		line.SetXAxisZoomFactor(newFactor)
 	}
