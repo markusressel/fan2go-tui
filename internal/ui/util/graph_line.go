@@ -15,10 +15,15 @@ type GraphLine struct {
 	// ViewPort settings
 	xAxisZoomFactor float64
 	xAxisShift      float64
-	xMax            *float64
+
+	xMax *float64
+	xMin *float64
 
 	yAxisZoomFactor float64
 	yAxisShift      float64
+
+	yMax *float64
+	yMin *float64
 
 	name       string
 	x          func(i int) float64
@@ -45,9 +50,12 @@ func NewGraphLine(
 		xAxisZoomFactor: 1.0,
 		xAxisShift:      0.0,
 		xMax:            nil,
+		xMin:            nil,
 
 		yAxisZoomFactor: 1.0,
 		yAxisShift:      0.0,
+		yMax:            nil,
+		yMin:            nil,
 
 		x:          xFunc,
 		f:          fFunc,
@@ -173,6 +181,10 @@ func (l *GraphLine) GetXMax() *float64 {
 	return l.xMax
 }
 
+func (l *GraphLine) GetXMin() *float64 {
+	return l.xMin
+}
+
 func (l *GraphLine) SetXRange(xMin, xMax float64) {
 	l.xAxisShift = -1 * xMin
 	l.xMax = &xMax
@@ -185,6 +197,28 @@ func (l *GraphLine) ResetXRange() {
 
 func (l *GraphLine) GetXRange() (float64, *float64) {
 	return l.xAxisShift, l.xMax
+}
+
+func (l *GraphLine) GetYMax() *float64 {
+	return l.yMax
+}
+
+func (l *GraphLine) GetYMin() *float64 {
+	return l.yMin
+}
+
+func (l *GraphLine) SetYRange(yMin, yMax float64) {
+	l.yAxisShift = -1 * yMin
+	l.yMax = &yMax
+}
+
+func (l *GraphLine) ResetYRange() {
+	l.yAxisShift = 0
+	l.yMax = nil
+}
+
+func (l *GraphLine) GetYRange() (float64, *float64) {
+	return l.yAxisShift, l.yMax
 }
 
 func (l *GraphLine) GetColor() tcell.Color {

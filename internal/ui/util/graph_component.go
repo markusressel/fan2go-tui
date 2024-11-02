@@ -368,6 +368,10 @@ func (c *GraphComponent[T]) ResetXRange() {
 	}
 }
 
+func (c *GraphComponent[T]) GetXMin() *float64 {
+	return c.graphLines[0].GetXMin()
+}
+
 func (c *GraphComponent[T]) GetXMax() *float64 {
 	return c.graphLines[0].GetXMax()
 }
