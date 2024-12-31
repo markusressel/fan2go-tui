@@ -4,7 +4,7 @@ go 1.23.1
 
 require (
 	github.com/asecurityteam/rolling v2.0.4+incompatible
-	github.com/elliotchance/orderedmap/v2 v2.6.0
+	github.com/elliotchance/orderedmap/v2 v2.6.1
 	github.com/gdamore/tcell/v2 v2.7.4
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/navidys/tvxwidgets v0.9.0
