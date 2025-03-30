@@ -13,7 +13,7 @@ require (
 	github.com/qdm12/reprint v0.0.0-20200326205758-722754a53494
 	github.com/rivo/tview v0.0.0-20241016194538-c5e4fb24af13
 	github.com/spf13/cobra v1.9.1
-	github.com/spf13/viper v1.20.0
+	github.com/spf13/viper v1.20.1
 	golang.org/x/exp v0.0.0-20241009180824-f66d83c29e7c
 )
 
