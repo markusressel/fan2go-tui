@@ -50,22 +50,23 @@ jobs:
       - name: Test
         run: make test
 
-      - name: Build
-        run: make build
-
-      - name: Generate build files
+      - name: Generate build files (amd64)
         run: |
           GOOS="linux"
           GOARCH="amd64"
-          filename="$GOOS-$GOARCH"
-          go build -o ./dist/fan2go-tui-$filename -buildmode "exe" main.go
+          GOFLAGS="-buildmode=exe"
+          NAME="fan2go-tui-${GOOS}-${GOARCH}"
+          OUTPUT_BIN="dist/${NAME}"
+          make build GOOS="${GOOS}" OARCH="${GOARCH}" GOFLAGS="${GOFLAGS}" OUTPUT_BIN="${OUTPUT_BIN}"
 
-      - name: Generate build files
+      - name: Generate build files (arm64)
         run: |
           GOOS="linux"
           GOARCH="arm64"
-          filename="$GOOS-$GOARCH"
-          go build -o ./dist/fan2go-tui-$filename -buildmode "exe" main.go
+          GOFLAGS="-buildmode=exe"
+          NAME="fan2go-tui-${GOOS}-${GOARCH}"
+          OUTPUT_BIN="dist/${NAME}"
+          make build GOOS="${GOOS}" OARCH="${GOARCH}" GOFLAGS="${GOFLAGS}" OUTPUT_BIN="${OUTPUT_BIN}"
 
       - name: Release
         uses: softprops/action-gh-release@v2
