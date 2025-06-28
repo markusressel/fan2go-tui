@@ -24,7 +24,7 @@ require (
 	github.com/containerd/console v1.0.5 // indirect
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/gdamore/encoding v1.0.1 // indirect
-	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
+	github.com/go-viper/mapstructure/v2 v2.3.0 // indirect
 	github.com/gookit/color v1.5.4 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/lithammer/fuzzysearch v1.1.8 // indirect
