@@ -7,7 +7,7 @@ require (
 	github.com/elliotchance/orderedmap/v2 v2.7.0
 	github.com/gdamore/tcell/v2 v2.8.1
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/navidys/tvxwidgets v0.11.1
+	github.com/navidys/tvxwidgets v0.11.3
 	github.com/oklog/run v1.2.0
 	github.com/pterm/pterm v0.12.81
 	github.com/qdm12/reprint v0.0.0-20200326205758-722754a53494
