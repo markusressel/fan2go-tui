@@ -12,7 +12,7 @@ require (
 	github.com/pterm/pterm v0.12.81
 	github.com/qdm12/reprint v0.0.0-20200326205758-722754a53494
 	github.com/rivo/tview v0.42.0
-	github.com/spf13/cobra v1.10.0
+	github.com/spf13/cobra v1.10.1
 	github.com/spf13/viper v1.21.0
 	golang.org/x/exp v0.0.0-20241009180824-f66d83c29e7c
 )
