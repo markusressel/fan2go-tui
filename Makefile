@@ -19,17 +19,17 @@ build:  ## Builds the CLI
 	-X ${PACKAGE}/cmd/global.Commit=${GIT_REV} \
 	-X ${NAME}/cmd/global.Date=${DATE} \
 	-X ${PACKAGE}/cmd/global.Date=${DATE}" \
-	-a -tags netgo -o ${OUTPUT_BIN} main.go
+	-a -tags netgo -o "${OUTPUT_BIN}" main.go
 
 run: build
 	./${OUTPUT_BIN}
 
 deploy-custom: clean build
-	cp ./${OUTPUT_BIN} ~/.custom/bin/
+	cp "./${OUTPUT_BIN}" ~/.custom/bin/
 
 deploy: clean build
-	sudo cp ./${OUTPUT_BIN} /usr/bin/
+	sudo cp "./${OUTPUT_BIN}" "/usr/bin/${NAME}"
 
 clean:
 	go clean
-	rm ${OUTPUT_BIN}
+	rm -f "${OUTPUT_BIN}"
