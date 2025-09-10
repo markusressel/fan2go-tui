@@ -47,8 +47,8 @@ func RunApplication() {
 				return nil
 			}, func(err error) {
 				if err != nil {
-					logging.Warning("Error stopping parca webserver: " + err.Error())
-					pterm.Warning.Printfln("Error stopping parca webserver: " + err.Error())
+					logging.Warning("Error stopping parca webserver: %v", err.Error())
+					pterm.Warning.Printfln("Error stopping parca webserver: %v", err.Error())
 				} else {
 					logging.Debug("Webservers stopped.")
 					pterm.Debug.Printfln("parca webserver stopped.")
@@ -63,8 +63,8 @@ func RunApplication() {
 			return ui.CreateUi(true).Run()
 		}, func(err error) {
 			if err != nil {
-				logging.Warning("Error stopping UI: " + err.Error())
-				pterm.Warning.Printfln("Error stopping UI: " + err.Error())
+				logging.Warning("Error stopping UI: %v", err.Error())
+				pterm.Warning.Printfln("Error stopping UI: %v", err.Error())
 			} else {
 				logging.Debug("UI stopped.")
 				pterm.Debug.Printfln("Received SIGTERM signal, exiting...")
