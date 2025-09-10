@@ -6,9 +6,10 @@ import (
 	"fan2go-tui/internal/configuration"
 	"fan2go-tui/internal/logging"
 	"fmt"
+	"os"
+
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 // rootCmd represents the base command when called without any subcommands

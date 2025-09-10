@@ -2,12 +2,13 @@ package util
 
 import (
 	"fan2go-tui/internal/util"
+	"math"
+	"sync"
+
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
-	"math"
-	"sync"
 )
 
 type ListComponent[T comparable] struct {

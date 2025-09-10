@@ -3,12 +3,13 @@ package util
 import (
 	"fan2go-tui/internal/ui/theme"
 	"fan2go-tui/internal/util"
+	"math"
+
 	"github.com/gdamore/tcell/v2"
 	"github.com/navidys/tvxwidgets"
 	"github.com/qdm12/reprint"
 	"github.com/rivo/tview"
 	"golang.org/x/exp/slices"
-	"math"
 )
 
 type GraphComponent[T any] struct {

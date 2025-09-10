@@ -1,8 +1,9 @@
 package util
 
 import (
-	"github.com/rivo/tview"
 	"reflect"
+
+	"github.com/rivo/tview"
 )
 
 func IsTxViewVisible(view tview.Primitive) bool {

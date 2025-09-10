@@ -3,6 +3,7 @@ package fan
 import (
 	"fan2go-tui/internal/client"
 	uiutil "fan2go-tui/internal/ui/util"
+
 	"github.com/rivo/tview"
 )
 

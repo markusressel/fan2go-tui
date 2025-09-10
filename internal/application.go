@@ -6,13 +6,14 @@ import (
 	"fan2go-tui/internal/logging"
 	"fan2go-tui/internal/ui"
 	"fmt"
-	"github.com/oklog/run"
-	"github.com/pterm/pterm"
 	"net/http"
 	"net/http/pprof"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/oklog/run"
+	"github.com/pterm/pterm"
 )
 
 func RunApplication() {

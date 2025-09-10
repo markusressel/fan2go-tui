@@ -3,6 +3,7 @@ package cmd
 import (
 	"fan2go-tui/cmd/global"
 	"fan2go-tui/internal/logging"
+
 	"github.com/spf13/cobra"
 )
 

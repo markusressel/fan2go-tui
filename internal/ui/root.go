@@ -5,9 +5,10 @@ import (
 	"fan2go-tui/internal/configuration"
 	"fan2go-tui/internal/ui/dialog"
 	"fan2go-tui/internal/ui/util"
+	"time"
+
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
-	"time"
 )
 
 const (

@@ -2,6 +2,7 @@ package util
 
 import (
 	"fan2go-tui/internal/ui/theme"
+
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )

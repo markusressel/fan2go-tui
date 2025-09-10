@@ -2,9 +2,10 @@ package util
 
 import (
 	"fan2go-tui/internal/ui/theme"
+	"math"
+
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
-	"math"
 )
 
 type ScrollBarOrientation int

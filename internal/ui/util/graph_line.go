@@ -1,8 +1,9 @@
 package util
 
 import (
-	"github.com/gdamore/tcell/v2"
 	"math"
+
+	"github.com/gdamore/tcell/v2"
 )
 
 type GraphLine struct {

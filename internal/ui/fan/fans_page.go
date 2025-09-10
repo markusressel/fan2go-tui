@@ -3,11 +3,12 @@ package fan
 import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/ui/util"
+	"sort"
+	"strings"
+
 	"github.com/rivo/tview"
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
-	"sort"
-	"strings"
 )
 
 type FansPage struct {

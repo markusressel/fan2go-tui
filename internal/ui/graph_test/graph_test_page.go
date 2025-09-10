@@ -2,10 +2,11 @@ package fan
 
 import (
 	"fan2go-tui/internal/ui/util"
-	"github.com/gdamore/tcell/v2"
-	"github.com/rivo/tview"
 	"math"
 	"strconv"
+
+	"github.com/gdamore/tcell/v2"
+	"github.com/rivo/tview"
 )
 
 type GraphTestPage struct {

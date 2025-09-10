@@ -4,6 +4,7 @@ import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/ui/theme"
 	"fmt"
+
 	"github.com/rivo/tview"
 )
 

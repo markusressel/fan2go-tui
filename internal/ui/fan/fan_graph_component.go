@@ -4,6 +4,7 @@ import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/ui/theme"
 	"fan2go-tui/internal/ui/util"
+
 	"github.com/navidys/tvxwidgets"
 	"github.com/rivo/tview"
 )

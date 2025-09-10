@@ -2,11 +2,12 @@ package configuration
 
 import (
 	"fan2go-tui/internal/logging"
-	"github.com/mitchellh/go-homedir"
-	"github.com/spf13/viper"
 	"os"
 	path2 "path"
 	"time"
+
+	"github.com/mitchellh/go-homedir"
+	"github.com/spf13/viper"
 )
 
 type Configuration struct {

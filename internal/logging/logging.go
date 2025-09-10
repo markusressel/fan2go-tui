@@ -1,9 +1,10 @@
 package logging
 
 import (
-	"github.com/pterm/pterm"
 	"log"
 	"os"
+
+	"github.com/pterm/pterm"
 )
 
 func SetDebugEnabled(enabled bool) {

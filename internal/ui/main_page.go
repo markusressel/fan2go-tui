@@ -7,10 +7,11 @@ import (
 	"fan2go-tui/internal/ui/sensor"
 	"fan2go-tui/internal/ui/status_message"
 	"fan2go-tui/internal/ui/util"
+	"slices"
+
 	"github.com/elliotchance/orderedmap/v2"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
-	"slices"
 )
 
 type Page string

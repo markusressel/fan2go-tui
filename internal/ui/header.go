@@ -7,11 +7,12 @@ import (
 	"fan2go-tui/internal/ui/theme"
 	uiutil "fan2go-tui/internal/ui/util"
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/elliotchance/orderedmap/v2"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
-	"strings"
-	"time"
 )
 
 type ApplicationHeaderComponent struct {
