@@ -1,15 +1,13 @@
 module fan2go-tui
 
-go 1.24.0
-
-toolchain go1.24.7
+go 1.24.7
 
 require (
 	github.com/asecurityteam/rolling v2.0.4+incompatible
 	github.com/elliotchance/orderedmap/v2 v2.7.0
 	github.com/gdamore/tcell/v2 v2.9.0
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/navidys/tvxwidgets v0.12.0
+	github.com/navidys/tvxwidgets v0.12.1
 	github.com/oklog/run v1.2.0
 	github.com/pterm/pterm v0.12.81
 	github.com/qdm12/reprint v0.0.0-20200326205758-722754a53494
