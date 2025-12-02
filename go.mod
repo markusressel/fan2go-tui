@@ -5,7 +5,7 @@ go 1.24.7
 require (
 	github.com/asecurityteam/rolling v2.0.4+incompatible
 	github.com/elliotchance/orderedmap/v2 v2.7.0
-	github.com/gdamore/tcell/v2 v2.12.2
+	github.com/gdamore/tcell/v2 v2.13.1
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/navidys/tvxwidgets v0.12.1
 	github.com/oklog/run v1.2.0
