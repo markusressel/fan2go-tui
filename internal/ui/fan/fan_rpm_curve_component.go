@@ -28,7 +28,10 @@ type FanRpmCurveComponent struct {
 }
 
 func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *FanRpmCurveComponent {
-	fanCurveData := *fan.FanCurveData
+	fanCurveData := map[int]float64{}
+	if fan.FanCurveData != nil {
+		fanCurveData = *fan.FanCurveData
+	}
 	pwmKeys := maps.Keys(fanCurveData)
 	slices.Sort(pwmKeys)
 
@@ -104,6 +107,9 @@ func (c *FanRpmCurveComponent) createLayout() *tview.Flex {
 func (c *FanRpmCurveComponent) refresh() {
 	fan := c.Fan
 	if fan == nil {
+		return
+	}
+	if c.graphComponent == nil {
 		return
 	}
 

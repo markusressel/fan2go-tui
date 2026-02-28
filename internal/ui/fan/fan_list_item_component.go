@@ -56,13 +56,11 @@ func (c *FanListItemComponent) createLayout() *tview.Flex {
 		layout = fanGraphComponent.GetLayout()
 		fanGraphsRowLayout.AddItem(layout, 0, 1, true)
 
-		if f.FanCurveData != nil {
-			fanRpmCurveComponent := NewFanRpmCurveComponent(c.application, f)
-			c.fanRpmCurveComponent = fanRpmCurveComponent
-			fanRpmCurveComponent.SetFan(f)
-			layout = fanRpmCurveComponent.GetLayout()
-			fanGraphsRowLayout.AddItem(layout, 0, 1, true)
-		}
+		fanRpmCurveComponent := NewFanRpmCurveComponent(c.application, f)
+		c.fanRpmCurveComponent = fanRpmCurveComponent
+		fanRpmCurveComponent.SetFan(f)
+		layout = fanRpmCurveComponent.GetLayout()
+		fanGraphsRowLayout.AddItem(layout, 0, 1, true)
 	}
 
 	return rootLayout
