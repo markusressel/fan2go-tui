@@ -122,6 +122,9 @@ func (c *FanRpmCurveComponent) GetLayout() *tview.Flex {
 }
 
 func (c *FanRpmCurveComponent) SetFan(fan *client.Fan) {
+	if c == nil {
+		return
+	}
 	c.Fan = fan
 	c.refresh()
 }

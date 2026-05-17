@@ -62,9 +62,7 @@ func (c *RowSelectionTable[T]) createLayout() {
 	table.SetMouseCapture(func(action tview.MouseAction, event *tcell.EventMouse) (tview.MouseAction, *tcell.EventMouse) {
 		switch action {
 		case tview.MouseLeftDoubleClick:
-			go func() {
-				c.doubleClickCallback()
-			}()
+			c.doubleClickCallback()
 			return action, nil
 		}
 		return action, event

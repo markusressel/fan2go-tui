@@ -76,7 +76,13 @@ func (c *FanListItemComponent) SetFan(fan *client.Fan) {
 }
 
 func (c *FanListItemComponent) refresh() {
-	c.fanInfoComponent.SetFan(c.Fan)
-	c.fanGraphComponent.SetFan(c.Fan)
-	c.fanRpmCurveComponent.SetFan(c.Fan)
+	if c.fanInfoComponent != nil {
+		c.fanInfoComponent.SetFan(c.Fan)
+	}
+	if c.fanGraphComponent != nil {
+		c.fanGraphComponent.SetFan(c.Fan)
+	}
+	if c.fanRpmCurveComponent != nil {
+		c.fanRpmCurveComponent.SetFan(c.Fan)
+	}
 }

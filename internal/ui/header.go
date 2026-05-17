@@ -123,10 +123,12 @@ func (applicationHeader *ApplicationHeaderComponent) SetStatus(status *status_me
 	if status.Duration > 0 {
 		go func() {
 			time.Sleep(status.Duration)
-			if applicationHeader.lastStatus != status {
-				return
-			}
-			applicationHeader.ResetStatus()
+			applicationHeader.application.QueueUpdateDraw(func() {
+				if applicationHeader.lastStatus != status {
+					return
+				}
+				applicationHeader.ResetStatus()
+			})
 		}()
 	}
 	applicationHeader.lastStatus = status

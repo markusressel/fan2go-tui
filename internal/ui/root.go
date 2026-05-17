@@ -82,8 +82,9 @@ func CreateUi(fullscreen bool) *tview.Application {
 	go func() {
 		for {
 			<-UpdateTicker.C
-			mainPage.Refresh()
-			application.Draw()
+			application.QueueUpdateDraw(func() {
+				mainPage.Refresh()
+			})
 		}
 	}()
 
