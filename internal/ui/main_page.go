@@ -8,6 +8,7 @@ import (
 	"fan2go-tui/internal/ui/status_message"
 	"fan2go-tui/internal/ui/util"
 	"slices"
+	"sync"
 
 	"github.com/elliotchance/orderedmap/v2"
 	"github.com/gdamore/tcell/v2"
@@ -33,6 +34,7 @@ type MainPage struct {
 
 	page                Page
 	mainPagePagerLayout *tview.Pages
+	refreshMutex        sync.Mutex
 
 	pagesMap orderedmap.OrderedMap[Page, util.PagesPage]
 }
@@ -116,6 +118,9 @@ func (mainPage *MainPage) Init() {
 }
 
 func (mainPage *MainPage) Refresh() {
+	mainPage.refreshMutex.Lock()
+	defer mainPage.refreshMutex.Unlock()
+
 	defer mainPage.application.ForceDraw()
 	mainPage.UpdateHeader()
 
