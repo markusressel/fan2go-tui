@@ -6,16 +6,9 @@ import (
 	"github.com/rivo/tview"
 )
 
-type DialogAction int
-
-const (
-	ActionClose DialogAction = iota
-)
-
 type Dialog interface {
 	GetName() string
 	GetLayout() *tview.Flex
-	GetActionChannel() <-chan DialogAction
 }
 
 type DialogOptionId int
