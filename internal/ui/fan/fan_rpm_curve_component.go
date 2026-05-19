@@ -80,6 +80,7 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 
 	graphComponent.AddLine(rpmGraphLine)
 	graphComponent.SetXRange(0, 255)
+	graphComponent.SetOverlayColors(theme.Colors.Graph.CurrentPwmLine, theme.Colors.Graph.CurrentRpmMarker)
 
 	c := &FanRpmCurveComponent{
 		application:    application,
@@ -114,6 +115,10 @@ func (c *FanRpmCurveComponent) refresh() {
 	}
 
 	c.graphComponent.ZoomToRangeX(0, 255)
+	currentPwm := float64(fan.Pwm)
+	currentRpm := float64(fan.Rpm)
+	c.graphComponent.SetVerticalIndicatorX(&currentPwm)
+	c.graphComponent.SetOverlayPoint(&currentPwm, &currentRpm)
 	c.graphComponent.Refresh()
 }
 

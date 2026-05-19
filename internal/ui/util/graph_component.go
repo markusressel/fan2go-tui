@@ -6,7 +6,6 @@ import (
 	"math"
 
 	"github.com/gdamore/tcell/v2"
-	"github.com/navidys/tvxwidgets"
 	"github.com/qdm12/reprint"
 	"github.com/rivo/tview"
 	"golang.org/x/exp/slices"
@@ -26,9 +25,13 @@ type GraphComponent[T any] struct {
 	yMaxValue *float64
 
 	layout          *tview.Flex
-	plotLayout      *tvxwidgets.Plot
+	plotLayout      *OverlayPlot
 	scatterPlotData [][]float64
 	valueBufferSize int
+
+	verticalIndicatorX *float64
+	overlayPointX      *float64
+	overlayPointY      *float64
 }
 
 type GraphDataSource struct {
@@ -59,7 +62,7 @@ func (c *GraphComponent[T]) createLayout() *tview.Flex {
 
 	SetupWindow(layout, "")
 
-	plotLayout := tvxwidgets.NewPlot()
+	plotLayout := NewOverlayPlot()
 	c.plotLayout = plotLayout
 
 	if len(c.config.PlotColors) > 0 {
@@ -132,6 +135,8 @@ func (c *GraphComponent[T]) Refresh() {
 	c.UpdateValueBufferSize()
 
 	c.updateViewPort()
+	c.updateVerticalIndicator()
+	c.updateOverlayPoint()
 	lineData := c.computeGraphLineData()
 	for idx := range c.fetchValueFunctions {
 		c.refreshPlot(idx)
@@ -140,6 +145,8 @@ func (c *GraphComponent[T]) Refresh() {
 	combinedData = append(combinedData, c.scatterPlotData...)
 	combinedData = append(combinedData, lineData...)
 	c.plotLayout.SetData(combinedData)
+	overlayYMin, overlayYMax := c.computeOverlayPointYRange(combinedData)
+	c.plotLayout.SetOverlayPointYRange(overlayYMin, overlayYMax)
 
 	// TODO: think about what to do with multiple lines
 	for _, line := range c.graphLines {
@@ -148,6 +155,26 @@ func (c *GraphComponent[T]) Refresh() {
 			//c.ZoomToRangeX(0, *xMax)
 		}
 	}
+}
+
+func (c *GraphComponent[T]) updateVerticalIndicator() {
+	if c.verticalIndicatorX == nil || len(c.graphLines) == 0 {
+		c.plotLayout.SetVerticalLineIndex(nil)
+		return
+	}
+
+	idx := c.graphLines[0].MapXtoI(*c.verticalIndicatorX)
+	c.plotLayout.SetVerticalLineIndex(&idx)
+}
+
+func (c *GraphComponent[T]) updateOverlayPoint() {
+	if c.overlayPointX == nil || c.overlayPointY == nil || len(c.graphLines) == 0 {
+		c.plotLayout.SetOverlayPoint(nil, nil)
+		return
+	}
+
+	idx := c.graphLines[0].MapXtoI(*c.overlayPointX)
+	c.plotLayout.SetOverlayPoint(&idx, c.overlayPointY)
 }
 
 func (c *GraphComponent[T]) updateViewPort() {
@@ -170,10 +197,51 @@ func (c *GraphComponent[T]) updateViewPort() {
 		yMaxValue = *c.yMaxValue
 	}
 
-	c.plotLayout.SetYRange(
-		(yMinValue+maxYOffset+yAxisShift)/yAxisZoomFactor,
-		(yMaxValue+maxYOffset+yAxisShift)/yAxisZoomFactor,
-	)
+	viewPortMin := (yMinValue + maxYOffset + yAxisShift) / yAxisZoomFactor
+	viewPortMax := (yMaxValue + maxYOffset + yAxisShift) / yAxisZoomFactor
+	c.plotLayout.SetYRange(viewPortMin, viewPortMax)
+}
+
+func (c *GraphComponent[T]) computeOverlayPointYRange(data [][]float64) (float64, float64) {
+	minData := math.Inf(1)
+	maxData := math.Inf(-1)
+	hasFinite := false
+
+	for _, series := range data {
+		for _, value := range series {
+			if math.IsNaN(value) || math.IsInf(value, 0) {
+				continue
+			}
+
+			hasFinite = true
+			minData = math.Min(minData, value)
+			maxData = math.Max(maxData, value)
+		}
+	}
+
+	minVal := 0.0
+	if c.yMinValue != nil {
+		minVal = *c.yMinValue
+	} else if c.config.YAxisAutoScaleMin && hasFinite {
+		minVal = minData
+	}
+
+	maxVal := 0.0
+	if c.yMaxValue != nil {
+		maxVal = *c.yMaxValue
+	} else if c.config.YAxisAutoScaleMax && hasFinite {
+		maxVal = maxData
+	}
+
+	if maxVal <= minVal {
+		if hasFinite && maxData > minVal {
+			maxVal = maxData
+		} else {
+			maxVal = minVal + 1
+		}
+	}
+
+	return minVal, maxVal
 }
 
 func (c *GraphComponent[T]) computeGraphLineData() [][]float64 {
@@ -354,7 +422,31 @@ func (c *GraphComponent[T]) SetYAxisShift(yAxisShift float64) {
 }
 
 func (c *GraphComponent[T]) GetPlotRect() (int, int, int, int) {
-	return c.plotLayout.GetInnerRect()
+	return c.plotLayout.GetPlotRect()
+}
+
+func (c *GraphComponent[T]) SetVerticalIndicatorX(x *float64) {
+	c.verticalIndicatorX = x
+	c.updateVerticalIndicator()
+}
+
+func (c *GraphComponent[T]) SetVerticalIndicatorColor(color tcell.Color) {
+	c.plotLayout.SetVerticalLineColor(color)
+}
+
+func (c *GraphComponent[T]) SetOverlayPoint(x *float64, y *float64) {
+	c.overlayPointX = x
+	c.overlayPointY = y
+	c.updateOverlayPoint()
+}
+
+func (c *GraphComponent[T]) SetOverlayPointColor(color tcell.Color) {
+	c.plotLayout.SetOverlayPointColor(color)
+}
+
+func (c *GraphComponent[T]) SetOverlayColors(verticalLineColor, pointColor tcell.Color) {
+	c.SetVerticalIndicatorColor(verticalLineColor)
+	c.SetOverlayPointColor(pointColor)
 }
 
 func (c *GraphComponent[T]) SetXRange(xMin, xMax float64) {
