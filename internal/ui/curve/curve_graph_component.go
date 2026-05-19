@@ -2,8 +2,8 @@ package curve
 
 import (
 	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/ui/graph"
 	"fan2go-tui/internal/ui/theme"
-	"fan2go-tui/internal/ui/util"
 
 	"github.com/navidys/tvxwidgets"
 	"github.com/rivo/tview"
@@ -16,11 +16,11 @@ type CurveGraphComponent struct {
 
 	layout         *tview.Flex
 	bmScatterPlot  *tvxwidgets.Plot
-	graphComponent *util.GraphComponent[client.Curve]
+	graphComponent *graph.GraphComponent[client.Curve]
 }
 
 func NewCurveGraphComponent(application *tview.Application, curve *client.Curve) *CurveGraphComponent {
-	graphConfig := util.NewGraphComponentConfig().
+	graphConfig := graph.NewGraphComponentConfigFor(curve).
 		WithReversedOrder().
 		WithPlotColors(
 			theme.Colors.Graph.Curve,
@@ -30,7 +30,7 @@ func NewCurveGraphComponent(application *tview.Application, curve *client.Curve)
 		WithYAxisAutoScaleMin(false).
 		WithYAxisAutoScaleMax(false)
 
-	graphComponent := util.NewGraphComponent[client.Curve](
+	graphComponent := graph.NewGraphComponent[client.Curve](
 		application,
 		graphConfig,
 		curve,

@@ -1,12 +1,12 @@
-package util
+package graph
 
 import (
 	"fan2go-tui/internal/ui/theme"
-	"fan2go-tui/internal/util"
+	uiutil "fan2go-tui/internal/ui/util"
+	coreutil "fan2go-tui/internal/util"
 	"math"
 
 	"github.com/gdamore/tcell/v2"
-	"github.com/navidys/tvxwidgets"
 	"github.com/qdm12/reprint"
 	"github.com/rivo/tview"
 	"golang.org/x/exp/slices"
@@ -15,7 +15,7 @@ import (
 type GraphComponent[T any] struct {
 	application *tview.Application
 
-	config *GraphComponentConfig
+	config *GraphComponentConfig[T]
 
 	Data                *T
 	fetchValueFunctions []func(*T) float64
@@ -26,7 +26,7 @@ type GraphComponent[T any] struct {
 	yMaxValue *float64
 
 	layout          *tview.Flex
-	plotLayout      *tvxwidgets.Plot
+	plotLayout      *OverlayPlot[T]
 	scatterPlotData [][]float64
 	valueBufferSize int
 }
@@ -37,7 +37,7 @@ type GraphDataSource struct {
 
 func NewGraphComponent[T any](
 	application *tview.Application,
-	config *GraphComponentConfig,
+	config *GraphComponentConfig[T],
 	data *T,
 	fetchValueFunctions []func(*T) float64,
 ) *GraphComponent[T] {
@@ -57,10 +57,13 @@ func NewGraphComponent[T any](
 func (c *GraphComponent[T]) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 
-	SetupWindow(layout, "")
+	uiutil.SetupWindow(layout, "")
 
-	plotLayout := tvxwidgets.NewPlot()
+	plotLayout := NewOverlayPlot[T]()
 	c.plotLayout = plotLayout
+	if len(c.config.Overlays) > 0 {
+		plotLayout.SetOverlays(c.config.Overlays)
+	}
 
 	if len(c.config.PlotColors) > 0 {
 		// Ensure that the number of plot colors matches the number of fetch value functions
@@ -140,6 +143,14 @@ func (c *GraphComponent[T]) Refresh() {
 	combinedData = append(combinedData, c.scatterPlotData...)
 	combinedData = append(combinedData, lineData...)
 	c.plotLayout.SetData(combinedData)
+	overlayYMin, overlayYMax := c.computeOverlayPointYRange(combinedData)
+	c.plotLayout.SetOverlayContext(OverlayRenderContext[T]{
+		XValueToIndex:      c.mapXValueToIndex,
+		XValueToIndexFloat: c.mapXValueToIndexFloat,
+		YMin:               overlayYMin,
+		YMax:               overlayYMax,
+		Data:               c.Data,
+	})
 
 	// TODO: think about what to do with multiple lines
 	for _, line := range c.graphLines {
@@ -148,6 +159,27 @@ func (c *GraphComponent[T]) Refresh() {
 			//c.ZoomToRangeX(0, *xMax)
 		}
 	}
+}
+
+func (c *GraphComponent[T]) mapXValueToIndex(x float64) int {
+	if len(c.graphLines) == 0 || math.IsNaN(x) || math.IsInf(x, 0) {
+		return -1
+	}
+	return c.graphLines[0].MapXtoI(x)
+}
+
+func (c *GraphComponent[T]) mapXValueToIndexFloat(x float64) float64 {
+	if len(c.graphLines) == 0 || math.IsNaN(x) || math.IsInf(x, 0) {
+		return math.NaN()
+	}
+
+	line := c.graphLines[0]
+	xAxisZoomFactor := line.GetXAxisZoomFactor()
+	if xAxisZoomFactor == 0 {
+		return math.NaN()
+	}
+
+	return (x - line.GetXAxisShift()) / xAxisZoomFactor
 }
 
 func (c *GraphComponent[T]) updateViewPort() {
@@ -170,10 +202,51 @@ func (c *GraphComponent[T]) updateViewPort() {
 		yMaxValue = *c.yMaxValue
 	}
 
-	c.plotLayout.SetYRange(
-		(yMinValue+maxYOffset+yAxisShift)/yAxisZoomFactor,
-		(yMaxValue+maxYOffset+yAxisShift)/yAxisZoomFactor,
-	)
+	viewPortMin := (yMinValue + maxYOffset + yAxisShift) / yAxisZoomFactor
+	viewPortMax := (yMaxValue + maxYOffset + yAxisShift) / yAxisZoomFactor
+	c.plotLayout.SetYRange(viewPortMin, viewPortMax)
+}
+
+func (c *GraphComponent[T]) computeOverlayPointYRange(data [][]float64) (float64, float64) {
+	minData := math.Inf(1)
+	maxData := math.Inf(-1)
+	hasFinite := false
+
+	for _, series := range data {
+		for _, value := range series {
+			if math.IsNaN(value) || math.IsInf(value, 0) {
+				continue
+			}
+
+			hasFinite = true
+			minData = math.Min(minData, value)
+			maxData = math.Max(maxData, value)
+		}
+	}
+
+	minVal := 0.0
+	if c.yMinValue != nil {
+		minVal = *c.yMinValue
+	} else if c.config.YAxisAutoScaleMin && hasFinite {
+		minVal = minData
+	}
+
+	maxVal := 0.0
+	if c.yMaxValue != nil {
+		maxVal = *c.yMaxValue
+	} else if c.config.YAxisAutoScaleMax && hasFinite {
+		maxVal = maxData
+	}
+
+	if maxVal <= minVal {
+		if hasFinite && maxData > minVal {
+			maxVal = maxData
+		} else {
+			maxVal = minVal + 1
+		}
+	}
+
+	return minVal, maxVal
 }
 
 func (c *GraphComponent[T]) computeGraphLineData() [][]float64 {
@@ -245,6 +318,8 @@ func (c *GraphComponent[T]) SetRawData(data [][]float64) {
 }
 
 func (c *GraphComponent[T]) InsertValue(data *T) {
+	c.Data = data
+
 	for idx, fetchValue := range c.fetchValueFunctions {
 		value := fetchValue(data)
 		plotDataPoints := c.scatterPlotData[idx]
@@ -276,7 +351,7 @@ func (c *GraphComponent[T]) UpdateValueBufferSize() {
 }
 
 func (c *GraphComponent[T]) isVisible() bool {
-	return util.IsTxViewVisible(c.layout.Box)
+	return coreutil.IsTxViewVisible(c.layout.Box)
 }
 
 func (c *GraphComponent[T]) setValueBufferSize(i int) {
@@ -354,7 +429,7 @@ func (c *GraphComponent[T]) SetYAxisShift(yAxisShift float64) {
 }
 
 func (c *GraphComponent[T]) GetPlotRect() (int, int, int, int) {
-	return c.plotLayout.GetInnerRect()
+	return c.plotLayout.GetPlotRect()
 }
 
 func (c *GraphComponent[T]) SetXRange(xMin, xMax float64) {

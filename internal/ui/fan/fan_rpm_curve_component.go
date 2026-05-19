@@ -2,8 +2,8 @@ package fan
 
 import (
 	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/ui/graph"
 	"fan2go-tui/internal/ui/theme"
-	"fan2go-tui/internal/ui/util"
 	"math"
 	"slices"
 	"strconv"
@@ -21,7 +21,7 @@ type FanRpmCurveComponent struct {
 
 	layout         *tview.Flex
 	bmScatterPlot  *tvxwidgets.Plot
-	graphComponent *util.GraphComponent[client.Fan]
+	graphComponent *graph.GraphComponent[client.Fan]
 
 	xFunc1 func(i int) float64
 	fFunc  func(x float64) float64
@@ -56,22 +56,50 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 		return label
 	}
 
-	rpmGraphLine := util.NewGraphLine(
+	rpmGraphLine := graph.NewGraphLine(
 		"RPM",
 		xFunc1,
 		fFunc,
 		xLabelFunc1,
 	)
 
-	graphConfig := util.NewGraphComponentConfig().
+	c := &FanRpmCurveComponent{
+		application: application,
+		Fan:         fan,
+
+		pwmKeys: pwmKeys,
+
+		xFunc1: xFunc1,
+		fFunc:  fFunc,
+	}
+
+	graphConfig := graph.NewGraphComponentConfigFor(fan).
 		WithReversedOrder().
 		WithPlotColors(theme.Colors.Graph.Rpm, theme.Colors.Graph.Pwm).
 		WithYAxisAutoScaleMin(false).
 		WithYAxisAutoScaleMax(true).
 		WithDrawXAxisLabel(true).
-		WithYAxisLabelDataType(tvxwidgets.PlotYAxisLabelDataInt)
+		WithYAxisLabelDataType(tvxwidgets.PlotYAxisLabelDataInt).
+		WithOverlays(
+			graph.VLine(
+				func(fan *client.Fan) float64 {
+					if fan == nil {
+						return math.NaN()
+					}
+					return float64(fan.Pwm)
+				},
+			).WithColor(theme.Colors.Graph.CurrentPwmLine),
+			graph.Marker(
+				func(fan *client.Fan) graph.XY {
+					if fan == nil {
+						return graph.XY{X: math.NaN(), Y: math.NaN()}
+					}
+					return graph.XY{X: float64(fan.Pwm), Y: float64(fan.Rpm)}
+				},
+			).WithColor(theme.Colors.Graph.CurrentRpmMarker),
+		)
 
-	graphComponent := util.NewGraphComponent[client.Fan](
+	graphComponent := graph.NewGraphComponent[client.Fan](
 		application,
 		graphConfig,
 		fan,
@@ -80,17 +108,7 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 
 	graphComponent.AddLine(rpmGraphLine)
 	graphComponent.SetXRange(0, 255)
-
-	c := &FanRpmCurveComponent{
-		application:    application,
-		graphComponent: graphComponent,
-		Fan:            fan,
-
-		pwmKeys: pwmKeys,
-
-		xFunc1: xFunc1,
-		fFunc:  fFunc,
-	}
+	c.graphComponent = graphComponent
 
 	c.layout = c.createLayout()
 	c.layout.AddItem(graphComponent.GetLayout(), 0, 1, false)
@@ -126,6 +144,7 @@ func (c *FanRpmCurveComponent) SetFan(fan *client.Fan) {
 		return
 	}
 	c.Fan = fan
+	c.graphComponent.Data = fan
 	c.refresh()
 }
 

@@ -1,4 +1,4 @@
-package util
+package graph
 
 import (
 	"math"

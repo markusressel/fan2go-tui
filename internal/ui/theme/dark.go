@@ -39,8 +39,10 @@ var (
 		Graph: GraphsColors{
 			Default: tcell.ColorBlue,
 
-			Rpm: tcell.ColorBlue,
-			Pwm: PrimaryVariantColor,
+			Rpm:              tcell.ColorBlue,
+			Pwm:              PrimaryVariantColor,
+			CurrentPwmLine:   PrimaryVariantColor,
+			CurrentRpmMarker: tcell.ColorGold,
 
 			Curve:    tcell.ColorBlue,
 			CurveMin: tcell.ColorGray,

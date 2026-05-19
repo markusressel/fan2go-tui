@@ -45,8 +45,10 @@ type GraphsColors struct {
 	Default tcell.Color
 
 	// Fan
-	Rpm tcell.Color
-	Pwm tcell.Color
+	Rpm              tcell.Color
+	Pwm              tcell.Color
+	CurrentPwmLine   tcell.Color
+	CurrentRpmMarker tcell.Color
 
 	// Curve
 	Curve    tcell.Color

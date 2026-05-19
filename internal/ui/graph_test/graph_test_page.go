@@ -1,7 +1,7 @@
 package fan
 
 import (
-	"fan2go-tui/internal/ui/util"
+	"fan2go-tui/internal/ui/graph"
 	"math"
 	"strconv"
 
@@ -14,7 +14,7 @@ type GraphTestPage struct {
 
 	layout *tview.Flex
 
-	graphComponent *util.GraphComponent[util.GraphDataSource]
+	graphComponent *graph.GraphComponent[graph.GraphDataSource]
 }
 
 func NewGraphTestPage(application *tview.Application) GraphTestPage {
@@ -32,17 +32,17 @@ func (c *GraphTestPage) createLayout() *tview.Flex {
 	graphTestPageLayout := tview.NewFlex()
 	c.layout = graphTestPageLayout
 
-	graphDataSource := &util.GraphDataSource{
+	graphDataSource := &graph.GraphDataSource{
 		Value: 0.0,
 	}
-	graphComponent := util.NewGraphComponent[util.GraphDataSource](
+	graphComponent := graph.NewGraphComponent[graph.GraphDataSource](
 		c.application,
-		util.NewGraphComponentConfig().
+		graph.NewGraphComponentConfigFor(graphDataSource).
 			WithYAxisAutoScaleMin(false).
 			WithYAxisAutoScaleMax(false),
 		graphDataSource,
-		[]func(val *util.GraphDataSource) float64{
-			func(val *util.GraphDataSource) float64 {
+		[]func(val *graph.GraphDataSource) float64{
+			func(val *graph.GraphDataSource) float64 {
 				return val.Value
 			},
 		},
@@ -70,7 +70,7 @@ func (c *GraphTestPage) createLayout() *tview.Flex {
 		return strconv.Itoa(int(x))
 	}
 
-	graphComponent.AddLine(util.NewGraphLine(
+	graphComponent.AddLine(graph.NewGraphLine(
 		"Test",
 		xFunc,
 		fFunc,
