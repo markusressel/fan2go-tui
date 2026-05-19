@@ -4,8 +4,9 @@ import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/ui/graph"
 	"fan2go-tui/internal/ui/theme"
+	"math"
+	"strconv"
 
-	"github.com/navidys/tvxwidgets"
 	"github.com/rivo/tview"
 )
 
@@ -15,8 +16,9 @@ type SensorGraphComponent struct {
 	Sensor *client.Sensor
 
 	layout         *tview.Flex
-	bmScatterPlot  *tvxwidgets.Plot
 	graphComponent *graph.GraphComponent[client.Sensor]
+	graphBar       *graph.GraphBar
+	values         *[]float64
 }
 
 func NewSensorGraphComponent(application *tview.Application, sensor *client.Sensor) *SensorGraphComponent {
@@ -34,19 +36,36 @@ func NewSensorGraphComponent(application *tview.Application, sensor *client.Sens
 		application,
 		graphConfig,
 		sensor,
-		[]func(*client.Sensor) float64{
-			func(c *client.Sensor) float64 {
-				return c.MovingAvg / 1000
-			},
-		},
+		[]func(*client.Sensor) float64{},
 	)
+
+	values := &[]float64{}
+	xFunc := func(i int) float64 {
+		return float64(i)
+	}
+	fFunc := func(x float64) float64 {
+		idx := int(math.Round(x))
+		if idx < 0 || idx >= len(*values) {
+			return math.NaN()
+		}
+		return (*values)[idx]
+	}
+	xLabelFunc := func(i int, x float64) string {
+		return strconv.Itoa(int(math.Round(x)))
+	}
+
+	bar := graph.NewGraphBar("Sensor", xFunc, fFunc, xLabelFunc)
+	bar.SetColor(theme.Colors.Graph.Sensor)
+	graphComponent.AddSeries(bar)
 
 	graphComponent.SetYRange(0, 100)
 
 	c := &SensorGraphComponent{
 		application:    application,
 		graphComponent: graphComponent,
+		graphBar:       bar,
 		Sensor:         sensor,
+		values:         values,
 	}
 
 	c.layout = c.createLayout()
@@ -66,7 +85,16 @@ func (c *SensorGraphComponent) refresh() {
 		return
 	}
 	component := c.graphComponent
-	component.InsertValue(sensor)
+	value := sensor.MovingAvg / 1000
+	*c.values = append(*c.values, value)
+
+	bufferSize := component.GetValueBufferSize()
+	if len(*c.values) > bufferSize {
+		trimmed := (*c.values)[len(*c.values)-bufferSize:]
+		*c.values = trimmed
+	}
+
+	component.Refresh()
 }
 
 func (c *SensorGraphComponent) GetLayout() *tview.Flex {

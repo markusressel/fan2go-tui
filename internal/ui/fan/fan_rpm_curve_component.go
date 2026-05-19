@@ -106,7 +106,7 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 		[]func(*client.Fan) float64{},
 	)
 
-	graphComponent.AddLine(rpmGraphLine)
+	graphComponent.AddSeries(rpmGraphLine)
 	graphComponent.SetXRange(0, 255)
 	c.graphComponent = graphComponent
 

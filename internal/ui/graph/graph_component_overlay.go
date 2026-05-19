@@ -21,6 +21,9 @@ type OverlayRenderContext[T any] struct {
 	YMax               float64
 	Background         tcell.Color
 	Data               *T
+	Bars               []*GraphBar
+	ValueBufferSize    int
+	Reversed           bool
 }
 
 type GraphComponentOverlay[T any] interface {

@@ -20,7 +20,7 @@ type GraphComponent[T any] struct {
 	Data                *T
 	fetchValueFunctions []func(*T) float64
 
-	graphLines []*GraphLine
+	series []GraphSeries
 
 	yMinValue *float64
 	yMaxValue *float64
@@ -29,6 +29,20 @@ type GraphComponent[T any] struct {
 	plotLayout      *OverlayPlot[T]
 	scatterPlotData [][]float64
 	valueBufferSize int
+}
+
+// GraphSeries captures shared x-axis behavior for lines and bars.
+type GraphSeries interface {
+	GetXLabel(i int) string
+	MapXtoI(x float64) int
+	GetXAxisZoomFactor() float64
+	SetXAxisZoomFactor(xAxisZoomFactor float64)
+	GetXAxisShift() float64
+	SetXAxisShift(xAxisShift float64)
+	SetXRange(xMin, xMax float64)
+	ResetXRange()
+	GetXMin() *float64
+	GetXMax() *float64
 }
 
 type GraphDataSource struct {
@@ -150,10 +164,13 @@ func (c *GraphComponent[T]) Refresh() {
 		YMin:               overlayYMin,
 		YMax:               overlayYMax,
 		Data:               c.Data,
+		Bars:               c.GetBars(),
+		ValueBufferSize:    c.GetValueBufferSize(),
+		Reversed:           c.config.Reversed,
 	})
 
 	// TODO: think about what to do with multiple lines
-	for _, line := range c.graphLines {
+	for _, line := range c.GetLines() {
 		xMax := line.xMax
 		if xMax != nil {
 			//c.ZoomToRangeX(0, *xMax)
@@ -162,31 +179,73 @@ func (c *GraphComponent[T]) Refresh() {
 }
 
 func (c *GraphComponent[T]) mapXValueToIndex(x float64) int {
-	if len(c.graphLines) == 0 || math.IsNaN(x) || math.IsInf(x, 0) {
+	if math.IsNaN(x) || math.IsInf(x, 0) {
 		return -1
 	}
-	return c.graphLines[0].MapXtoI(x)
+
+	series := c.GetSeries()
+	if len(series) == 0 {
+		return -1
+	}
+	return series[0].MapXtoI(x)
 }
 
 func (c *GraphComponent[T]) mapXValueToIndexFloat(x float64) float64 {
-	if len(c.graphLines) == 0 || math.IsNaN(x) || math.IsInf(x, 0) {
+	if math.IsNaN(x) || math.IsInf(x, 0) {
 		return math.NaN()
 	}
 
-	line := c.graphLines[0]
-	xAxisZoomFactor := line.GetXAxisZoomFactor()
+	series := c.GetSeries()
+	if len(series) == 0 {
+		return math.NaN()
+	}
+
+	first := series[0]
+	xAxisZoomFactor := first.GetXAxisZoomFactor()
 	if xAxisZoomFactor == 0 {
 		return math.NaN()
 	}
 
-	return (x - line.GetXAxisShift()) / xAxisZoomFactor
+	return (x - first.GetXAxisShift()) / xAxisZoomFactor
+}
+
+func (c *GraphComponent[T]) getXAxisZoomFactor() float64 {
+	series := c.GetSeries()
+	if len(series) > 0 {
+		return series[0].GetXAxisZoomFactor()
+	}
+	return 1.0
+}
+
+func (c *GraphComponent[T]) getXAxisShift() float64 {
+	series := c.GetSeries()
+	if len(series) > 0 {
+		return series[0].GetXAxisShift()
+	}
+	return 0.0
+}
+
+func (c *GraphComponent[T]) getXMin() *float64 {
+	series := c.GetSeries()
+	if len(series) > 0 {
+		return series[0].GetXMin()
+	}
+	return nil
+}
+
+func (c *GraphComponent[T]) getXMax() *float64 {
+	series := c.GetSeries()
+	if len(series) > 0 {
+		return series[0].GetXMax()
+	}
+	return nil
 }
 
 func (c *GraphComponent[T]) updateViewPort() {
 	maxYOffset := 0.0
 	yAxisZoomFactor := 1.0
 	yAxisShift := 0.0
-	for _, line := range c.graphLines {
+	for _, line := range c.GetLines() {
 		maxYOffset = math.Max(maxYOffset, line.GetYOffset())
 		yAxisZoomFactor = math.Max(yAxisZoomFactor, line.GetYAxisZoomFactor())
 		yAxisShift = line.GetYAxisShift()
@@ -269,16 +328,16 @@ func (c *GraphComponent[T]) computeGraphLineData() [][]float64 {
 }
 
 func (c *GraphComponent[T]) ZoomToRangeX(minX, maxX float64) {
-	for _, line := range c.GetLines() {
-		iAtXMin := line.MapXtoI(minX)
-		iAtXMax := line.MapXtoI(maxX)
+	for _, series := range c.GetSeries() {
+		iAtXMin := series.MapXtoI(minX)
+		iAtXMax := series.MapXtoI(maxX)
 
 		_, _, width, _ := c.plotLayout.GetRect()
 		availableSlots := width - 10
 
 		xScaleFactorToGetXMaxAtEndOfBuffer := float64(1) / (float64(availableSlots) / float64(iAtXMax-iAtXMin))
-		newFactor := line.GetXAxisZoomFactor() * xScaleFactorToGetXMaxAtEndOfBuffer
-		line.SetXAxisZoomFactor(newFactor)
+		newFactor := series.GetXAxisZoomFactor() * xScaleFactorToGetXMaxAtEndOfBuffer
+		series.SetXAxisZoomFactor(newFactor)
 	}
 }
 
@@ -370,59 +429,94 @@ func (c *GraphComponent[T]) GetValueBufferSize() int {
 	return c.valueBufferSize
 }
 
-func (c *GraphComponent[T]) AddLine(graphLineConfig *GraphLine) *GraphLine {
-	c.graphLines = append(c.graphLines, graphLineConfig)
+func (c *GraphComponent[T]) AddSeries(series GraphSeries) {
+	switch series.(type) {
+	case *GraphLine, *GraphBar:
+		c.series = append(c.series, series)
+	default:
+		panic("unsupported graph series type")
+	}
 
+	c.setXAxisLabelFunc(series)
+}
+
+func (c *GraphComponent[T]) setXAxisLabelFunc(series GraphSeries) {
 	c.plotLayout.SetXAxisLabelFunc(func(i int) string {
-		return graphLineConfig.GetXLabel(i)
+		return series.GetXLabel(i)
 	})
+}
 
-	return graphLineConfig
+func (c *GraphComponent[T]) GetSeries() []GraphSeries {
+	return c.series
 }
 
 func (c *GraphComponent[T]) GetLines() []*GraphLine {
-	return c.graphLines
+	lines := make([]*GraphLine, 0, len(c.series))
+	for _, s := range c.series {
+		if line, ok := s.(*GraphLine); ok {
+			lines = append(lines, line)
+		}
+	}
+	return lines
+}
+
+func (c *GraphComponent[T]) GetBars() []*GraphBar {
+	bars := make([]*GraphBar, 0, len(c.series))
+	for _, s := range c.series {
+		if bar, ok := s.(*GraphBar); ok {
+			bars = append(bars, bar)
+		}
+	}
+	return bars
 }
 
 func (c *GraphComponent[T]) GetXAxisZoomFactor() float64 {
-	return c.graphLines[0].GetXAxisZoomFactor()
+	return c.getXAxisZoomFactor()
 }
 
 func (c *GraphComponent[T]) SetXAxisZoomFactor(xAxisZoomFactor float64) {
-	for _, line := range c.graphLines {
-		line.SetXAxisZoomFactor(xAxisZoomFactor)
+	for _, series := range c.GetSeries() {
+		series.SetXAxisZoomFactor(xAxisZoomFactor)
 	}
 	c.Refresh()
 }
 
 func (c *GraphComponent[T]) GetXAxisShift() float64 {
-	return c.graphLines[0].GetXAxisShift()
+	return c.getXAxisShift()
 }
 
 func (c *GraphComponent[T]) SetXAxisShift(xAxisShift float64) {
-	for _, line := range c.graphLines {
-		line.SetXAxisShift(xAxisShift)
+	for _, series := range c.GetSeries() {
+		series.SetXAxisShift(xAxisShift)
 	}
 	c.Refresh()
 }
 
 func (c *GraphComponent[T]) GetYAxisZoomFactor() float64 {
-	return c.graphLines[0].GetYAxisZoomFactor()
+	lines := c.GetLines()
+	if len(lines) == 0 {
+		return 1.0
+	}
+	return lines[0].GetYAxisZoomFactor()
 }
 
 func (c *GraphComponent[T]) SetYAxisZoomFactor(yAxisZoomFactor float64) {
-	for _, line := range c.graphLines {
+	for _, line := range c.GetLines() {
 		line.SetYAxisZoomFactor(yAxisZoomFactor)
 	}
 	c.Refresh()
 }
 
 func (c *GraphComponent[T]) GetYAxisShift() float64 {
-	return c.graphLines[0].GetYAxisShift()
+	lines := c.GetLines()
+	if len(lines) == 0 {
+		return 0.0
+	}
+	return lines[0].GetYAxisShift()
 }
 
 func (c *GraphComponent[T]) SetYAxisShift(yAxisShift float64) {
-	for _, line := range c.graphLines {
+	for _, line := range c.GetLines() {
 		line.SetYAxisShift(yAxisShift)
 	}
 	c.Refresh()
@@ -433,21 +527,21 @@ func (c *GraphComponent[T]) GetPlotRect() (int, int, int, int) {
 }
 
 func (c *GraphComponent[T]) SetXRange(xMin, xMax float64) {
-	for _, line := range c.graphLines {
-		line.SetXRange(xMin, xMax)
+	for _, series := range c.GetSeries() {
+		series.SetXRange(xMin, xMax)
 	}
 }
 
 func (c *GraphComponent[T]) ResetXRange() {
-	for _, line := range c.graphLines {
-		line.ResetXRange()
+	for _, series := range c.GetSeries() {
+		series.ResetXRange()
 	}
 }
 
 func (c *GraphComponent[T]) GetXMin() *float64 {
-	return c.graphLines[0].GetXMin()
+	return c.getXMin()
 }
 
 func (c *GraphComponent[T]) GetXMax() *float64 {
-	return c.graphLines[0].GetXMax()
+	return c.getXMax()
 }

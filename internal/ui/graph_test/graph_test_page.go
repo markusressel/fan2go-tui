@@ -70,7 +70,7 @@ func (c *GraphTestPage) createLayout() *tview.Flex {
 		return strconv.Itoa(int(x))
 	}
 
-	graphComponent.AddLine(graph.NewGraphLine(
+	graphComponent.AddSeries(graph.NewGraphLine(
 		"Test",
 		xFunc,
 		fFunc,
