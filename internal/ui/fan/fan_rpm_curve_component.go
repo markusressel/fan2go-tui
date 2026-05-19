@@ -74,7 +74,6 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 	}
 
 	graphConfig := graph.NewGraphComponentConfigFor(fan).
-		WithReversedOrder().
 		WithPlotColors(theme.Colors.Graph.Rpm, theme.Colors.Graph.Pwm).
 		WithYAxisAutoScaleMin(false).
 		WithYAxisAutoScaleMax(true).
@@ -103,7 +102,6 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 		application,
 		graphConfig,
 		fan,
-		[]func(*client.Fan) float64{},
 	)
 
 	graphComponent.AddSeries(rpmGraphLine)

@@ -9,7 +9,6 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/qdm12/reprint"
 	"github.com/rivo/tview"
-	"golang.org/x/exp/slices"
 )
 
 type GraphComponent[T any] struct {
@@ -17,8 +16,7 @@ type GraphComponent[T any] struct {
 
 	config *GraphComponentConfig[T]
 
-	Data                *T
-	fetchValueFunctions []func(*T) float64
+	Data *T
 
 	series []GraphSeries
 
@@ -27,7 +25,6 @@ type GraphComponent[T any] struct {
 
 	layout          *tview.Flex
 	plotLayout      *OverlayPlot[T]
-	scatterPlotData [][]float64
 	valueBufferSize int
 }
 
@@ -63,14 +60,11 @@ func NewGraphComponent[T any](
 	application *tview.Application,
 	config *GraphComponentConfig[T],
 	data *T,
-	fetchValueFunctions []func(*T) float64,
 ) *GraphComponent[T] {
 	c := &GraphComponent[T]{
-		application:         application,
-		config:              config,
-		Data:                data,
-		fetchValueFunctions: fetchValueFunctions,
-		scatterPlotData:     make([][]float64, len(fetchValueFunctions)),
+		application: application,
+		config:      config,
+		Data:        data,
 	}
 
 	c.layout = c.createLayout()
@@ -90,11 +84,8 @@ func (c *GraphComponent[T]) createLayout() *tview.Flex {
 	}
 
 	if len(c.config.PlotColors) > 0 {
-		// Ensure that the number of plot colors matches the number of fetch value functions
+		// Ensure we have enough default colors for multi-series rendering.
 		plotColors := reprint.This(c.config.PlotColors).([]tcell.Color)
-		for i := len(plotColors); i < len(c.fetchValueFunctions); i++ {
-			plotColors = append(plotColors, theme.Colors.Graph.Default)
-		}
 
 		// add default color a couple of times to make sure we have enough colors
 		for i := len(plotColors); i < 5; i++ {
@@ -159,14 +150,10 @@ func (c *GraphComponent[T]) Refresh() {
 	c.UpdateValueBufferSize()
 
 	c.updateViewPort()
-	lineData := c.computeGraphLineData()
-	for idx := range c.fetchValueFunctions {
-		c.refreshPlot(idx)
-	}
-	combinedData := make([][]float64, 0, len(c.scatterPlotData)+len(lineData))
-	combinedData = append(combinedData, c.scatterPlotData...)
-	combinedData = append(combinedData, lineData...)
-	c.plotLayout.SetData(combinedData)
+	combinedData := c.computePlotSeriesData()
+	placeholderData := c.createPlaceholderSeriesData()
+	c.plotLayout.SetData(placeholderData)
+	c.applyAutoScaleFromData(combinedData)
 	overlayYMin, overlayYMax := c.computeOverlayPointYRange(combinedData)
 	c.plotLayout.SetOverlayContext(OverlayRenderContext[T]{
 		XValueToIndex:      c.mapXValueToIndex,
@@ -177,6 +164,8 @@ func (c *GraphComponent[T]) Refresh() {
 		Bars:               c.GetBars(),
 		ValueBufferSize:    c.GetValueBufferSize(),
 		Reversed:           c.config.Reversed,
+		SeriesData:         combinedData,
+		SeriesColors:       c.getPlotColors(len(combinedData)),
 	})
 
 	// TODO: think about what to do with multiple lines
@@ -186,6 +175,63 @@ func (c *GraphComponent[T]) Refresh() {
 			//c.ZoomToRangeX(0, *xMax)
 		}
 	}
+}
+
+func (c *GraphComponent[T]) createPlaceholderSeriesData() [][]float64 {
+	bufferSize := c.GetValueBufferSize()
+	placeholder := make([]float64, bufferSize)
+	for i := 0; i < bufferSize; i++ {
+		placeholder[i] = math.NaN()
+	}
+	return [][]float64{placeholder}
+}
+
+func (c *GraphComponent[T]) applyAutoScaleFromData(data [][]float64) {
+	if len(data) == 0 {
+		return
+	}
+
+	if c.yMinValue == nil && c.config.YAxisAutoScaleMin {
+		min := math.Inf(1)
+		has := false
+		for _, s := range data {
+			for _, v := range s {
+				if math.IsNaN(v) || math.IsInf(v, 0) {
+					continue
+				}
+				has = true
+				min = math.Min(min, v)
+			}
+		}
+		if has {
+			c.plotLayout.SetMinVal(min)
+		}
+	}
+
+	if c.yMaxValue == nil && c.config.YAxisAutoScaleMax {
+		max := math.Inf(-1)
+		has := false
+		for _, s := range data {
+			for _, v := range s {
+				if math.IsNaN(v) || math.IsInf(v, 0) {
+					continue
+				}
+				has = true
+				max = math.Max(max, v)
+			}
+		}
+		if has {
+			c.plotLayout.SetMaxVal(max)
+		}
+	}
+}
+
+func (c *GraphComponent[T]) getPlotColors(required int) []tcell.Color {
+	colors := reprint.This(c.config.PlotColors).([]tcell.Color)
+	for i := len(colors); i < required; i++ {
+		colors = append(colors, theme.Colors.Graph.Default)
+	}
+	return colors
 }
 
 func (c *GraphComponent[T]) mapXValueToIndex(x float64) int {
@@ -318,23 +364,23 @@ func (c *GraphComponent[T]) computeOverlayPointYRange(data [][]float64) (float64
 	return minVal, maxVal
 }
 
-func (c *GraphComponent[T]) computeGraphLineData() [][]float64 {
-	graphData := make([][]float64, len(c.GetLines()))
+func (c *GraphComponent[T]) computePlotSeriesData() [][]float64 {
+	lines := c.GetLines()
+	lineSeriesData := make([][]float64, 0, len(lines))
 
 	bufferSize := c.GetValueBufferSize()
-	for _, line := range c.GetLines() {
-		n := bufferSize
-		data := make([]float64, n)
-		for i := 0; i < n; i++ {
+	for _, line := range lines {
+		data := make([]float64, bufferSize)
+		for i := 0; i < bufferSize; i++ {
 			xVal := line.GetX(i)
 			yVal := line.GetY(xVal)
 			data[i] = yVal
 		}
 
-		graphData = append(graphData, data)
+		lineSeriesData = append(lineSeriesData, data)
 	}
 
-	return graphData
+	return lineSeriesData
 }
 
 func (c *GraphComponent[T]) ZoomToRangeX(minX, maxX float64) {
@@ -351,26 +397,6 @@ func (c *GraphComponent[T]) ZoomToRangeX(minX, maxX float64) {
 	}
 }
 
-func (c *GraphComponent[T]) refreshPlot(idx int) {
-	missingDataPoints := c.valueBufferSize - len(c.scatterPlotData[idx])
-
-	for i := 0; i < missingDataPoints; i++ {
-		targetIndex := 0
-		if c.config.Reversed {
-			targetIndex = len(c.scatterPlotData[idx])
-		}
-		c.scatterPlotData[idx] = slices.Insert(c.scatterPlotData[idx], targetIndex, math.NaN())
-	}
-
-	// limit data to visible data points
-	overflow := len(c.scatterPlotData[idx]) - c.valueBufferSize
-	if c.config.Reversed {
-		c.scatterPlotData[idx] = c.scatterPlotData[idx][:len(c.scatterPlotData[idx])-overflow]
-	} else {
-		c.scatterPlotData[idx] = c.scatterPlotData[idx][overflow:]
-	}
-}
-
 func (c *GraphComponent[T]) GetLayout() *tview.Flex {
 	return c.layout
 }
@@ -378,35 +404,6 @@ func (c *GraphComponent[T]) GetLayout() *tview.Flex {
 func (c *GraphComponent[T]) SetTitle(title string) {
 	titleText := theme.CreateTitleText(title)
 	c.layout.SetTitle(titleText)
-}
-
-// SetRawData sets the raw data for the graph component.
-func (c *GraphComponent[T]) SetRawData(data [][]float64) {
-	c.scatterPlotData = data
-	c.Refresh()
-}
-
-func (c *GraphComponent[T]) InsertValue(data *T) {
-	c.Data = data
-
-	for idx, fetchValue := range c.fetchValueFunctions {
-		value := fetchValue(data)
-		plotDataPoints := c.scatterPlotData[idx]
-		targetIndex := len(plotDataPoints)
-
-		if c.config.Reversed {
-			reversedCopy := slices.Clone(plotDataPoints)
-			slices.Reverse(reversedCopy)
-			reversedCopy = slices.Insert(reversedCopy, targetIndex, value)
-			slices.Reverse(reversedCopy)
-			plotDataPoints = reversedCopy
-		} else {
-			plotDataPoints = slices.Insert(plotDataPoints, targetIndex, value)
-		}
-		c.scatterPlotData[idx] = plotDataPoints
-	}
-
-	c.Refresh()
 }
 
 func (c *GraphComponent[T]) UpdateValueBufferSize() {

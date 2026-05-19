@@ -4,6 +4,8 @@ import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/ui/graph"
 	"fan2go-tui/internal/ui/theme"
+	"math"
+	"strconv"
 
 	"github.com/navidys/tvxwidgets"
 	"github.com/rivo/tview"
@@ -17,6 +19,7 @@ type CurveGraphComponent struct {
 	layout         *tview.Flex
 	bmScatterPlot  *tvxwidgets.Plot
 	graphComponent *graph.GraphComponent[client.Curve]
+	values         *[]float64
 }
 
 func NewCurveGraphComponent(application *tview.Application, curve *client.Curve) *CurveGraphComponent {
@@ -34,12 +37,24 @@ func NewCurveGraphComponent(application *tview.Application, curve *client.Curve)
 		application,
 		graphConfig,
 		curve,
-		[]func(*client.Curve) float64{
-			func(c *client.Curve) float64 {
-				return c.Value
-			},
-		},
 	)
+
+	values := &[]float64{}
+	xFunc := func(i int) float64 { return float64(i) }
+	xLabelFunc := func(i int, x float64) string { return strconv.Itoa(int(math.Round(x))) }
+	line := graph.NewGraphLine(
+		"Curve",
+		xFunc,
+		func(x float64) float64 {
+			idx := int(math.Round(x))
+			if idx < 0 || idx >= len(*values) {
+				return math.NaN()
+			}
+			return (*values)[idx]
+		},
+		xLabelFunc,
+	)
+	graphComponent.AddSeries(line)
 
 	graphComponent.SetYRange(0, 255)
 
@@ -47,6 +62,7 @@ func NewCurveGraphComponent(application *tview.Application, curve *client.Curve)
 		application:    application,
 		graphComponent: graphComponent,
 		Curve:          curve,
+		values:         values,
 	}
 
 	c.layout = c.createLayout()
@@ -69,7 +85,12 @@ func (c *CurveGraphComponent) refresh() {
 		return
 	}
 	component := c.graphComponent
-	component.InsertValue(curve)
+	*c.values = append(*c.values, curve.Value)
+	bufferSize := component.GetValueBufferSize()
+	if len(*c.values) > bufferSize {
+		*c.values = (*c.values)[len(*c.values)-bufferSize:]
+	}
+	component.Refresh()
 }
 
 func (c *CurveGraphComponent) GetLayout() *tview.Flex {

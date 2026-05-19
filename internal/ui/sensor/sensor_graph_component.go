@@ -37,7 +37,6 @@ func NewSensorGraphComponent(application *tview.Application, sensor *client.Sens
 		application,
 		graphConfig,
 		sensor,
-		[]func(*client.Sensor) float64{},
 	)
 
 	values := &[]float64{}

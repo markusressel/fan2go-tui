@@ -24,6 +24,8 @@ type OverlayRenderContext[T any] struct {
 	Bars               []*GraphBar
 	ValueBufferSize    int
 	Reversed           bool
+	SeriesData         [][]float64
+	SeriesColors       []tcell.Color
 }
 
 type GraphComponentOverlay[T any] interface {

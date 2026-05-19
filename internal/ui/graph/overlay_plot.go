@@ -54,6 +54,18 @@ type OverlayPlot[T any] struct {
 	overlayCtx OverlayRenderContext[T]
 }
 
+type brailleLineCell struct {
+	bits  rune
+	color tcell.Color
+}
+
+var brailleLineBit = [4][2]rune{
+	{rune(0x0001), rune(0x0008)},
+	{rune(0x0002), rune(0x0010)},
+	{rune(0x0004), rune(0x0020)},
+	{rune(0x0040), rune(0x0080)},
+}
+
 func NewOverlayPlot[T any]() *OverlayPlot[T] {
 	return &OverlayPlot[T]{
 		Plot: tvxwidgets.NewPlot(),
@@ -74,9 +86,154 @@ func (p *OverlayPlot[T]) Draw(screen tcell.Screen) {
 	ctx.Plot = p.Plot
 	ctx.Background = p.GetBackgroundColor()
 	p.drawBars(screen, ctx)
+	p.drawLineSeries(screen, ctx)
 	for _, overlay := range p.overlays {
 		overlay.draw(screen, ctx)
 	}
+}
+
+func (p *OverlayPlot[T]) drawLineSeries(screen tcell.Screen, ctx OverlayRenderContext[T]) {
+	if len(ctx.SeriesData) == 0 || ctx.YMax <= ctx.YMin {
+		return
+	}
+
+	x, y, width, height := p.Plot.GetPlotRect()
+	if width <= 0 || height <= 0 {
+		return
+	}
+
+	for seriesIdx, series := range ctx.SeriesData {
+		displaySlots := len(series)
+		if ctx.ValueBufferSize > 0 && ctx.ValueBufferSize < displaySlots {
+			displaySlots = ctx.ValueBufferSize
+		}
+		if width < displaySlots {
+			displaySlots = width
+		}
+
+		availableCount := 0
+		for sourceIdx := 0; sourceIdx < displaySlots; sourceIdx++ {
+			val := series[sourceIdx]
+			if math.IsNaN(val) || math.IsInf(val, 0) {
+				continue
+			}
+			pointY := int(math.Round(((val - ctx.YMin) / (ctx.YMax - ctx.YMin)) * float64(height-1)))
+			if pointY < 0 || pointY >= height {
+				continue
+			}
+			availableCount++
+		}
+
+		seriesColor := tcell.ColorWhite
+		if seriesIdx < len(ctx.SeriesColors) {
+			seriesColor = ctx.SeriesColors[seriesIdx]
+		}
+
+		cells := map[[2]int]brailleLineCell{}
+		hasPrev := false
+		prevX := 0
+		prevY := 0
+
+		for i := 0; i < displaySlots; i++ {
+			sourceIndex := i
+			if ctx.Reversed {
+				sourceIndex = availableCount - 1 - i
+			} else {
+				sourceIndex = i - (displaySlots - availableCount)
+			}
+
+			if sourceIndex < 0 || sourceIndex >= displaySlots {
+				hasPrev = false
+				continue
+			}
+
+			val := series[sourceIndex]
+			if math.IsNaN(val) || math.IsInf(val, 0) {
+				hasPrev = false
+				continue
+			}
+
+			pointY := int(math.Round(((val - ctx.YMin) / (ctx.YMax - ctx.YMin)) * float64(height-1)))
+			if pointY < 0 || pointY >= height {
+				hasPrev = false
+				continue
+			}
+
+			if hasPrev {
+				p.drawLineSegment(cells, prevX, prevY, i, pointY, height, seriesColor)
+			} else {
+				p.setLinePoint(cells, i*2, (height-1-pointY)*4, seriesColor)
+			}
+
+			hasPrev = true
+			prevX = i
+			prevY = pointY
+		}
+
+		for point, cell := range cells {
+			screenX := x + point[0]
+			screenY := y + point[1]
+			if screenX < x || screenX >= x+width || screenY < y || screenY >= y+height {
+				continue
+			}
+
+			_, combc, _, _ := screen.GetContent(screenX, screenY)
+			style := tcell.StyleDefault.Background(ctx.Background).Foreground(cell.color)
+			screen.SetContent(screenX, screenY, rune(0x2800)+cell.bits, combc, style)
+		}
+	}
+}
+
+func (p *OverlayPlot[T]) drawLineSegment(cells map[[2]int]brailleLineCell, x0, y0, x1, y1, height int, color tcell.Color) {
+	sx0 := x0 * 2
+	sy0 := (height - 1 - y0) * 4
+	sx1 := x1 * 2
+	sy1 := (height - 1 - y1) * 4
+
+	dx := int(math.Abs(float64(sx1 - sx0)))
+	dy := -int(math.Abs(float64(sy1 - sy0)))
+	sx := -1
+	if sx0 < sx1 {
+		sx = 1
+	}
+	sy := -1
+	if sy0 < sy1 {
+		sy = 1
+	}
+	err := dx + dy
+
+	for {
+		p.setLinePoint(cells, sx0, sy0, color)
+		if sx0 == sx1 && sy0 == sy1 {
+			break
+		}
+
+		e2 := 2 * err
+		if e2 >= dy {
+			err += dy
+			sx0 += sx
+		}
+		if e2 <= dx {
+			err += dx
+			sy0 += sy
+		}
+	}
+}
+
+func (p *OverlayPlot[T]) setLinePoint(cells map[[2]int]brailleLineCell, sx, sy int, color tcell.Color) {
+	if sx < 0 || sy < 0 {
+		return
+	}
+
+	cellX := sx / 2
+	cellY := sy / 4
+	bit := brailleLineBit[sy%4][sx%2]
+
+	key := [2]int{cellX, cellY}
+	cell := cells[key]
+	cell.bits |= bit
+	cell.color = color
+	cells[key] = cell
 }
 
 func barFillRune(level int) rune {

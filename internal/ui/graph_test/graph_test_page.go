@@ -41,11 +41,6 @@ func (c *GraphTestPage) createLayout() *tview.Flex {
 			WithYAxisAutoScaleMin(false).
 			WithYAxisAutoScaleMax(false),
 		graphDataSource,
-		[]func(val *graph.GraphDataSource) float64{
-			func(val *graph.GraphDataSource) float64 {
-				return val.Value
-			},
-		},
 	)
 	c.graphComponent = graphComponent
 
