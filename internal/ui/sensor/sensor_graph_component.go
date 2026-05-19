@@ -2,8 +2,8 @@ package sensor
 
 import (
 	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/ui/graph"
 	"fan2go-tui/internal/ui/theme"
-	"fan2go-tui/internal/ui/util"
 
 	"github.com/navidys/tvxwidgets"
 	"github.com/rivo/tview"
@@ -16,11 +16,11 @@ type SensorGraphComponent struct {
 
 	layout         *tview.Flex
 	bmScatterPlot  *tvxwidgets.Plot
-	graphComponent *util.GraphComponent[client.Sensor]
+	graphComponent *graph.GraphComponent[client.Sensor]
 }
 
 func NewSensorGraphComponent(application *tview.Application, sensor *client.Sensor) *SensorGraphComponent {
-	graphConfig := util.NewGraphComponentConfig().
+	graphConfig := graph.NewGraphComponentConfigFor(sensor).
 		WithReversedOrder().
 		WithPlotColors(
 			theme.Colors.Graph.Sensor,
@@ -30,7 +30,7 @@ func NewSensorGraphComponent(application *tview.Application, sensor *client.Sens
 		WithYAxisAutoScaleMin(false).
 		WithYAxisAutoScaleMax(false)
 
-	graphComponent := util.NewGraphComponent[client.Sensor](
+	graphComponent := graph.NewGraphComponent[client.Sensor](
 		application,
 		graphConfig,
 		sensor,

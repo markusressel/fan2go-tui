@@ -2,8 +2,8 @@ package fan
 
 import (
 	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/ui/graph"
 	"fan2go-tui/internal/ui/theme"
-	"fan2go-tui/internal/ui/util"
 
 	"github.com/navidys/tvxwidgets"
 	"github.com/rivo/tview"
@@ -16,18 +16,18 @@ type FanGraphComponent struct {
 
 	layout         *tview.Flex
 	bmScatterPlot  *tvxwidgets.Plot
-	graphComponent *util.GraphComponent[client.Fan]
+	graphComponent *graph.GraphComponent[client.Fan]
 }
 
 func NewFanGraphComponent(application *tview.Application, fan *client.Fan) *FanGraphComponent {
-	graphConfig := util.NewGraphComponentConfig().
+	graphConfig := graph.NewGraphComponentConfigFor(fan).
 		WithReversedOrder().
 		WithPlotColors(theme.Colors.Graph.Rpm, theme.Colors.Graph.Pwm).
 		WithYAxisAutoScaleMin(false).
 		WithYAxisAutoScaleMax(true).
 		WithYAxisLabelDataType(tvxwidgets.PlotYAxisLabelDataInt)
 
-	graphComponent := util.NewGraphComponent[client.Fan](
+	graphComponent := graph.NewGraphComponent[client.Fan](
 		application,
 		graphConfig,
 		fan,
