@@ -15,10 +15,12 @@ type XY struct {
 type OverlayRenderContext[T any] struct {
 	Plot          *tvxwidgets.Plot
 	XValueToIndex func(float64) int
-	YMin          float64
-	YMax          float64
-	Background    tcell.Color
-	Data          *T
+	// XValueToIndexFloat preserves the fractional sub-cell x position.
+	XValueToIndexFloat func(float64) float64
+	YMin               float64
+	YMax               float64
+	Background         tcell.Color
+	Data               *T
 }
 
 type GraphComponentOverlay[T any] interface {
@@ -39,7 +41,7 @@ func NewMarkerOverlay[T any](coord func(*T) XY) *MarkerOverlay[T] {
 	return &MarkerOverlay[T]{
 		coord: coord,
 		color: tcell.ColorYellow,
-		rune:  'o',
+		rune:  rune(0x2836),
 	}
 }
 
@@ -83,13 +85,32 @@ func (o *MarkerOverlay[T]) draw(screen tcell.Screen, ctx OverlayRenderContext[T]
 		return
 	}
 
-	pointHeight := int(((coord.Y - ctx.YMin) / (ctx.YMax - ctx.YMin)) * float64(height-1))
+	pointHeightFloat := ((coord.Y - ctx.YMin) / (ctx.YMax - ctx.YMin)) * float64(height-1)
+	pointHeight := int(pointHeightFloat)
 	if pointHeight < 0 || pointHeight >= height {
 		return
 	}
 
 	pointStyle := tcell.StyleDefault.Background(ctx.Background).Foreground(o.color)
-	screen.SetContent(x+xIndex, y+height-1-pointHeight, o.rune, nil, pointStyle)
+	screenX := x + xIndex
+	screenY := y + height - 1 - pointHeight
+	_, currentCombc, _, _ := screen.GetContent(screenX, screenY)
+
+	markerRune := o.rune
+	if markerRune == rune(0x2836) {
+		// Shift a 4-dot block top/center/bottom depending on sub-cell Y position.
+		fraction := pointHeightFloat - float64(pointHeight)
+		switch {
+		case fraction >= 2.0/3.0:
+			markerRune = rune(0x281B) // rows 0+1
+		case fraction <= 1.0/3.0:
+			markerRune = rune(0x28E4) // rows 2+3
+		default:
+			markerRune = rune(0x2836) // rows 1+2
+		}
+	}
+
+	screen.SetContent(screenX, screenY, markerRune, currentCombc, pointStyle)
 }
 
 type VerticalLine[T any] struct {
@@ -106,7 +127,7 @@ func NewVerticalLine[T any](x func(*T) float64) *VerticalLine[T] {
 	return &VerticalLine[T]{
 		x:     x,
 		color: tcell.ColorYellow,
-		rune:  '|',
+		rune:  rune(0x2830),
 	}
 }
 
@@ -152,7 +173,24 @@ func (o *VerticalLine[T]) draw(screen tcell.Screen, ctx OverlayRenderContext[T])
 
 	lineStyle := tcell.StyleDefault.Background(ctx.Background).Foreground(o.color)
 	screenX := x + xIndex
+	lineRune := o.rune
+	if lineRune == rune(0x2830) {
+		// Adapt default dotted vertical line glyph to the closest sub-cell x position.
+		if ctx.XValueToIndexFloat != nil {
+			xIndexFloat := ctx.XValueToIndexFloat(xValue)
+			if !math.IsNaN(xIndexFloat) && !math.IsInf(xIndexFloat, 0) {
+				fraction := xIndexFloat - math.Floor(xIndexFloat)
+				if fraction < 0.5 {
+					lineRune = rune(0x2806) // left column, middle two dots
+				} else {
+					lineRune = rune(0x2830) // right column, middle two dots
+				}
+			}
+		}
+	}
+
 	for yPos := y; yPos < y+height; yPos++ {
-		screen.SetContent(screenX, yPos, o.rune, nil, lineStyle)
+		_, currentCombc, _, _ := screen.GetContent(screenX, yPos)
+		screen.SetContent(screenX, yPos, lineRune, currentCombc, lineStyle)
 	}
 }

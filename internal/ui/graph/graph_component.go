@@ -145,10 +145,11 @@ func (c *GraphComponent[T]) Refresh() {
 	c.plotLayout.SetData(combinedData)
 	overlayYMin, overlayYMax := c.computeOverlayPointYRange(combinedData)
 	c.plotLayout.SetOverlayContext(OverlayRenderContext[T]{
-		XValueToIndex: c.mapXValueToIndex,
-		YMin:          overlayYMin,
-		YMax:          overlayYMax,
-		Data:          c.Data,
+		XValueToIndex:      c.mapXValueToIndex,
+		XValueToIndexFloat: c.mapXValueToIndexFloat,
+		YMin:               overlayYMin,
+		YMax:               overlayYMax,
+		Data:               c.Data,
 	})
 
 	// TODO: think about what to do with multiple lines
@@ -165,6 +166,20 @@ func (c *GraphComponent[T]) mapXValueToIndex(x float64) int {
 		return -1
 	}
 	return c.graphLines[0].MapXtoI(x)
+}
+
+func (c *GraphComponent[T]) mapXValueToIndexFloat(x float64) float64 {
+	if len(c.graphLines) == 0 || math.IsNaN(x) || math.IsInf(x, 0) {
+		return math.NaN()
+	}
+
+	line := c.graphLines[0]
+	xAxisZoomFactor := line.GetXAxisZoomFactor()
+	if xAxisZoomFactor == 0 {
+		return math.NaN()
+	}
+
+	return (x - line.GetXAxisShift()) / xAxisZoomFactor
 }
 
 func (c *GraphComponent[T]) updateViewPort() {
