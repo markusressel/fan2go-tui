@@ -7,6 +7,7 @@ import (
 	"math"
 	"strconv"
 
+	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
@@ -56,6 +57,19 @@ func NewSensorGraphComponent(application *tview.Application, sensor *client.Sens
 
 	bar := graph.NewGraphBar("Sensor", xFunc, fFunc, xLabelFunc)
 	bar.SetColor(theme.Colors.Graph.Sensor)
+	bar.WithGradient(func(yMin, yMax float64) []graph.GraphBarGradientStop {
+		rangeY := yMax - yMin
+		if rangeY <= 0 {
+			rangeY = 1
+		}
+
+		return []graph.GraphBarGradientStop{
+			{YValue: yMin, Color: tcell.NewRGBColor(0, 120, 255)},
+			{YValue: yMin + rangeY*(1.0/3.0), Color: tcell.NewRGBColor(0, 200, 80)},
+			{YValue: yMin + rangeY*(2.0/3.0), Color: tcell.NewRGBColor(240, 220, 0)},
+			{YValue: yMax, Color: tcell.NewRGBColor(220, 40, 30)},
+		}
+	})
 	graphComponent.AddSeries(bar)
 
 	graphComponent.SetYRange(0, 100)

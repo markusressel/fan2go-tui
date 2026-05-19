@@ -1,11 +1,51 @@
 package graph
 
 import (
+	coreutil "fan2go-tui/internal/util"
 	"math"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/navidys/tvxwidgets"
 )
+
+func lerpColor(a, b tcell.Color, t float64) tcell.Color {
+	t = coreutil.Clamp01(t)
+	ar, ag, ab := a.RGB()
+	br, bg, bb := b.RGB()
+	r := int32(math.Round(float64(ar) + (float64(br-ar) * t)))
+	g := int32(math.Round(float64(ag) + (float64(bg-ag) * t)))
+	bv := int32(math.Round(float64(ab) + (float64(bb-ab) * t)))
+	return tcell.NewRGBColor(r, g, bv)
+}
+
+func colorAtY(y float64, stops []GraphBarGradientStop, fallback tcell.Color) tcell.Color {
+	if len(stops) == 0 {
+		return fallback
+	}
+
+	if y <= stops[0].YValue {
+		return stops[0].Color
+	}
+	last := stops[len(stops)-1]
+	if y >= last.YValue {
+		return last.Color
+	}
+
+	for i := 1; i < len(stops); i++ {
+		prev := stops[i-1]
+		next := stops[i]
+		if y <= next.YValue {
+			rangeY := next.YValue - prev.YValue
+			if rangeY <= 0 {
+				return next.Color
+			}
+			t := (y - prev.YValue) / rangeY
+			return lerpColor(prev.Color, next.Color, t)
+		}
+	}
+
+	return fallback
+}
 
 // OverlayPlot extends tvxwidgets.Plot with lightweight overlay rendering.
 type OverlayPlot[T any] struct {
@@ -63,7 +103,7 @@ func (p *OverlayPlot[T]) drawBars(screen tcell.Screen, ctx OverlayRenderContext[
 	totalSubRows := height * 4
 
 	for _, bar := range ctx.Bars {
-		barStyle := tcell.StyleDefault.Background(ctx.Background).Foreground(bar.GetColor())
+		stops := bar.GetGradientStops(ctx.YMin, ctx.YMax)
 
 		availableCount := 0
 		for sourceIdx := 0; sourceIdx < ctx.ValueBufferSize; sourceIdx++ {
@@ -72,7 +112,7 @@ func (p *OverlayPlot[T]) drawBars(screen tcell.Screen, ctx OverlayRenderContext[
 				continue
 			}
 			yVal := bar.GetY(xVal)
-			if !math.IsNaN(yVal) && !math.IsInf(yVal, 0) {
+			if !math.IsNaN(yVal) && !math.IsInf(yVal, 0) && yVal > ctx.YMin {
 				availableCount++
 			}
 		}
@@ -130,6 +170,13 @@ func (p *OverlayPlot[T]) drawBars(screen tcell.Screen, ctx OverlayRenderContext[
 
 				r := barFillRune(subRowsInCell)
 				yPos := y + height - 1 - cellOffset
+				normalizedVertical := 0.0
+				if height > 1 {
+					normalizedVertical = float64(cellOffset) / float64(height-1)
+				}
+				yAtCell := ctx.YMin + (normalizedVertical * (ctx.YMax - ctx.YMin))
+				gradientColor := colorAtY(yAtCell, stops, bar.GetColor())
+				barStyle := tcell.StyleDefault.Background(ctx.Background).Foreground(gradientColor)
 				_, combc, _, _ := screen.GetContent(screenX, yPos)
 				screen.SetContent(screenX, yPos, r, combc, barStyle)
 			}

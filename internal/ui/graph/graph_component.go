@@ -43,6 +43,16 @@ type GraphSeries interface {
 	ResetXRange()
 	GetXMin() *float64
 	GetXMax() *float64
+	GetYOffset() float64
+	SetYOffset(offset float64)
+	GetYAxisZoomFactor() float64
+	SetYAxisZoomFactor(yAxisZoomFactor float64)
+	GetYAxisShift() float64
+	SetYAxisShift(yAxisShift float64)
+	SetYRange(yMin, yMax float64)
+	ResetYRange()
+	GetYMin() *float64
+	GetYMax() *float64
 }
 
 type GraphDataSource struct {
@@ -245,10 +255,10 @@ func (c *GraphComponent[T]) updateViewPort() {
 	maxYOffset := 0.0
 	yAxisZoomFactor := 1.0
 	yAxisShift := 0.0
-	for _, line := range c.GetLines() {
-		maxYOffset = math.Max(maxYOffset, line.GetYOffset())
-		yAxisZoomFactor = math.Max(yAxisZoomFactor, line.GetYAxisZoomFactor())
-		yAxisShift = line.GetYAxisShift()
+	for _, series := range c.GetSeries() {
+		maxYOffset = math.Max(maxYOffset, series.GetYOffset())
+		yAxisZoomFactor = math.Max(yAxisZoomFactor, series.GetYAxisZoomFactor())
+		yAxisShift = series.GetYAxisShift()
 	}
 
 	yMinValue := 0.0
@@ -493,31 +503,31 @@ func (c *GraphComponent[T]) SetXAxisShift(xAxisShift float64) {
 }
 
 func (c *GraphComponent[T]) GetYAxisZoomFactor() float64 {
-	lines := c.GetLines()
-	if len(lines) == 0 {
+	series := c.GetSeries()
+	if len(series) == 0 {
 		return 1.0
 	}
-	return lines[0].GetYAxisZoomFactor()
+	return series[0].GetYAxisZoomFactor()
 }
 
 func (c *GraphComponent[T]) SetYAxisZoomFactor(yAxisZoomFactor float64) {
-	for _, line := range c.GetLines() {
-		line.SetYAxisZoomFactor(yAxisZoomFactor)
+	for _, series := range c.GetSeries() {
+		series.SetYAxisZoomFactor(yAxisZoomFactor)
 	}
 	c.Refresh()
 }
 
 func (c *GraphComponent[T]) GetYAxisShift() float64 {
-	lines := c.GetLines()
-	if len(lines) == 0 {
+	series := c.GetSeries()
+	if len(series) == 0 {
 		return 0.0
 	}
-	return lines[0].GetYAxisShift()
+	return series[0].GetYAxisShift()
 }
 
 func (c *GraphComponent[T]) SetYAxisShift(yAxisShift float64) {
-	for _, line := range c.GetLines() {
-		line.SetYAxisShift(yAxisShift)
+	for _, series := range c.GetSeries() {
+		series.SetYAxisShift(yAxisShift)
 	}
 	c.Refresh()
 }
