@@ -32,15 +32,11 @@ func (c *GraphTestPage) createLayout() *tview.Flex {
 	graphTestPageLayout := tview.NewFlex()
 	c.layout = graphTestPageLayout
 
-	graphDataSource := &graph.GraphDataSource{
-		Value: 0.0,
-	}
 	graphComponent := graph.NewGraphComponent[graph.GraphDataSource](
 		c.application,
-		graph.NewGraphComponentConfigFor(graphDataSource).
+		graph.NewGraphComponentConfig().
 			WithYAxisAutoScaleMin(false).
 			WithYAxisAutoScaleMax(false),
-		graphDataSource,
 	)
 	c.graphComponent = graphComponent
 

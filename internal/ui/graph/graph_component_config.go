@@ -5,7 +5,7 @@ import (
 	"github.com/navidys/tvxwidgets"
 )
 
-type GraphComponentConfig[T any] struct {
+type GraphComponentConfig struct {
 	// PlotType defines the plot type to use
 	PlotType tvxwidgets.PlotType
 
@@ -34,12 +34,12 @@ type GraphComponentConfig[T any] struct {
 	XMax int
 
 	// Overlays are rendered in declaration order, later overlays are drawn on top.
-	Overlays []GraphComponentOverlay[T]
+	Overlays []GraphComponentOverlay
 }
 
 // NewGraphComponentConfig creates a new GraphComponentConfig with default values
-func NewGraphComponentConfig[T any]() *GraphComponentConfig[T] {
-	return &GraphComponentConfig[T]{
+func NewGraphComponentConfig() *GraphComponentConfig {
+	return &GraphComponentConfig{
 		PlotType:           tvxwidgets.PlotTypeLineChart,
 		MarkerType:         tvxwidgets.PlotMarkerBraille,
 		DrawXAxisLabel:     true,
@@ -52,66 +52,61 @@ func NewGraphComponentConfig[T any]() *GraphComponentConfig[T] {
 	}
 }
 
-// NewGraphComponentConfigFor infers the generic type from a sample pointer.
-func NewGraphComponentConfigFor[T any](_ *T) *GraphComponentConfig[T] {
-	return NewGraphComponentConfig[T]()
-}
-
 // WithReversedOrder sets the graph to be drawn from left to right instead of right to left
-func (c *GraphComponentConfig[T]) WithReversedOrder() *GraphComponentConfig[T] {
+func (c *GraphComponentConfig) WithReversedOrder() *GraphComponentConfig {
 	c.Reversed = true
 	return c
 }
 
 // WithPlotColors sets the colors to use for the plot lines
-func (c *GraphComponentConfig[T]) WithPlotColors(colors ...tcell.Color) *GraphComponentConfig[T] {
+func (c *GraphComponentConfig) WithPlotColors(colors ...tcell.Color) *GraphComponentConfig {
 	c.PlotColors = colors
 	return c
 }
 
 // WithPlotColorList sets the list of colors to use for the plot lines
-func (c *GraphComponentConfig[T]) WithPlotColorList(colors []tcell.Color) *GraphComponentConfig[T] {
+func (c *GraphComponentConfig) WithPlotColorList(colors []tcell.Color) *GraphComponentConfig {
 	c.PlotColors = colors
 	return c
 }
 
 // WithXMax sets the maximum value for the x-axis
-func (c *GraphComponentConfig[T]) WithXMax(xMax int) *GraphComponentConfig[T] {
+func (c *GraphComponentConfig) WithXMax(xMax int) *GraphComponentConfig {
 	c.XMax = xMax
 	return c
 }
 
-func (c *GraphComponentConfig[T]) WithDrawXAxisLabel(draw bool) *GraphComponentConfig[T] {
+func (c *GraphComponentConfig) WithDrawXAxisLabel(draw bool) *GraphComponentConfig {
 	c.DrawXAxisLabel = draw
 	return c
 }
 
-func (c *GraphComponentConfig[T]) WithDrawYAxisLabel(draw bool) *GraphComponentConfig[T] {
+func (c *GraphComponentConfig) WithDrawYAxisLabel(draw bool) *GraphComponentConfig {
 	c.DrawYAxisLabel = draw
 	return c
 }
 
-func (c *GraphComponentConfig[T]) WithYAxisAutoScaleMin(autoScale bool) *GraphComponentConfig[T] {
+func (c *GraphComponentConfig) WithYAxisAutoScaleMin(autoScale bool) *GraphComponentConfig {
 	c.YAxisAutoScaleMin = autoScale
 	return c
 }
 
-func (c *GraphComponentConfig[T]) WithYAxisAutoScaleMax(autoScale bool) *GraphComponentConfig[T] {
+func (c *GraphComponentConfig) WithYAxisAutoScaleMax(autoScale bool) *GraphComponentConfig {
 	c.YAxisAutoScaleMax = autoScale
 	return c
 }
 
-func (c *GraphComponentConfig[T]) WithYAxisLabelDataType(dataType tvxwidgets.PlotYAxisLabelDataType) *GraphComponentConfig[T] {
+func (c *GraphComponentConfig) WithYAxisLabelDataType(dataType tvxwidgets.PlotYAxisLabelDataType) *GraphComponentConfig {
 	c.YAxisLabelDataType = dataType
 	return c
 }
 
-func (c *GraphComponentConfig[T]) WithOverlays(overlays ...GraphComponentOverlay[T]) *GraphComponentConfig[T] {
+func (c *GraphComponentConfig) WithOverlays(overlays ...GraphComponentOverlay) *GraphComponentConfig {
 	c.Overlays = append(c.Overlays, overlays...)
 	return c
 }
 
 // WithOverlay is a backward-compatible alias for WithOverlays.
-func (c *GraphComponentConfig[T]) WithOverlay(overlays ...GraphComponentOverlay[T]) *GraphComponentConfig[T] {
+func (c *GraphComponentConfig) WithOverlay(overlays ...GraphComponentOverlay) *GraphComponentConfig {
 	return c.WithOverlays(overlays...)
 }

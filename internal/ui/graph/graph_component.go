@@ -11,12 +11,10 @@ import (
 	"github.com/rivo/tview"
 )
 
-type GraphComponent[T any] struct {
+type GraphComponent struct {
 	application *tview.Application
 
-	config *GraphComponentConfig[T]
-
-	Data *T
+	config *GraphComponentConfig
 
 	series []GraphSeries
 
@@ -24,7 +22,7 @@ type GraphComponent[T any] struct {
 	yMaxValue *float64
 
 	layout          *tview.Flex
-	plotLayout      *OverlayPlot[T]
+	plotLayout      *OverlayPlot
 	valueBufferSize int
 }
 
@@ -56,15 +54,13 @@ type GraphDataSource struct {
 	Value float64
 }
 
-func NewGraphComponent[T any](
+func NewGraphComponent(
 	application *tview.Application,
-	config *GraphComponentConfig[T],
-	data *T,
-) *GraphComponent[T] {
-	c := &GraphComponent[T]{
+	config *GraphComponentConfig,
+) *GraphComponent {
+	c := &GraphComponent{
 		application: application,
 		config:      config,
-		Data:        data,
 	}
 
 	c.layout = c.createLayout()
@@ -72,12 +68,12 @@ func NewGraphComponent[T any](
 	return c
 }
 
-func (c *GraphComponent[T]) createLayout() *tview.Flex {
+func (c *GraphComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 
 	uiutil.SetupWindow(layout, "")
 
-	plotLayout := NewOverlayPlot[T]()
+	plotLayout := NewOverlayPlot()
 	c.plotLayout = plotLayout
 	if len(c.config.Overlays) > 0 {
 		plotLayout.SetOverlays(c.config.Overlays)
@@ -111,7 +107,7 @@ func (c *GraphComponent[T]) createLayout() *tview.Flex {
 	return layout
 }
 
-func (c *GraphComponent[T]) SetYMinValue(min *float64) {
+func (c *GraphComponent) SetYMinValue(min *float64) {
 	c.yMinValue = min
 	if min != nil {
 		c.plotLayout.SetYAxisAutoScaleMin(false)
@@ -122,7 +118,7 @@ func (c *GraphComponent[T]) SetYMinValue(min *float64) {
 	}
 }
 
-func (c *GraphComponent[T]) SetYMaxValue(max *float64) {
+func (c *GraphComponent) SetYMaxValue(max *float64) {
 	c.yMaxValue = max
 	if max != nil {
 		c.plotLayout.SetYAxisAutoScaleMax(false)
@@ -132,13 +128,13 @@ func (c *GraphComponent[T]) SetYMaxValue(max *float64) {
 	}
 }
 
-func (c *GraphComponent[T]) SetYRange(min, max float64) {
+func (c *GraphComponent) SetYRange(min, max float64) {
 	c.yMinValue = &min
 	c.yMaxValue = &max
 	c.plotLayout.SetYRange(min, max)
 }
 
-func (c *GraphComponent[T]) Refresh() {
+func (c *GraphComponent) Refresh() {
 	c.plotLayout.SetDrawAxes(true)
 	if c.yMinValue != nil {
 		c.plotLayout.SetMinVal(*c.yMinValue)
@@ -155,12 +151,11 @@ func (c *GraphComponent[T]) Refresh() {
 	c.plotLayout.SetData(placeholderData)
 	c.applyAutoScaleFromData(combinedData)
 	overlayYMin, overlayYMax := c.computeOverlayPointYRange(combinedData)
-	c.plotLayout.SetOverlayContext(OverlayRenderContext[T]{
+	c.plotLayout.SetOverlayContext(OverlayRenderContext{
 		XValueToIndex:      c.mapXValueToIndex,
 		XValueToIndexFloat: c.mapXValueToIndexFloat,
 		YMin:               overlayYMin,
 		YMax:               overlayYMax,
-		Data:               c.Data,
 		Bars:               c.GetBars(),
 		ValueBufferSize:    c.GetValueBufferSize(),
 		Reversed:           c.config.Reversed,
@@ -177,7 +172,7 @@ func (c *GraphComponent[T]) Refresh() {
 	}
 }
 
-func (c *GraphComponent[T]) createPlaceholderSeriesData() [][]float64 {
+func (c *GraphComponent) createPlaceholderSeriesData() [][]float64 {
 	bufferSize := c.GetValueBufferSize()
 	placeholder := make([]float64, bufferSize)
 	for i := 0; i < bufferSize; i++ {
@@ -186,7 +181,7 @@ func (c *GraphComponent[T]) createPlaceholderSeriesData() [][]float64 {
 	return [][]float64{placeholder}
 }
 
-func (c *GraphComponent[T]) applyAutoScaleFromData(data [][]float64) {
+func (c *GraphComponent) applyAutoScaleFromData(data [][]float64) {
 	if len(data) == 0 {
 		return
 	}
@@ -226,7 +221,7 @@ func (c *GraphComponent[T]) applyAutoScaleFromData(data [][]float64) {
 	}
 }
 
-func (c *GraphComponent[T]) getPlotColors(required int) []tcell.Color {
+func (c *GraphComponent) getPlotColors(required int) []tcell.Color {
 	colors := reprint.This(c.config.PlotColors).([]tcell.Color)
 	for i := len(colors); i < required; i++ {
 		colors = append(colors, theme.Colors.Graph.Default)
@@ -234,7 +229,7 @@ func (c *GraphComponent[T]) getPlotColors(required int) []tcell.Color {
 	return colors
 }
 
-func (c *GraphComponent[T]) mapXValueToIndex(x float64) int {
+func (c *GraphComponent) mapXValueToIndex(x float64) int {
 	if math.IsNaN(x) || math.IsInf(x, 0) {
 		return -1
 	}
@@ -246,7 +241,7 @@ func (c *GraphComponent[T]) mapXValueToIndex(x float64) int {
 	return series[0].MapXtoI(x)
 }
 
-func (c *GraphComponent[T]) mapXValueToIndexFloat(x float64) float64 {
+func (c *GraphComponent) mapXValueToIndexFloat(x float64) float64 {
 	if math.IsNaN(x) || math.IsInf(x, 0) {
 		return math.NaN()
 	}
@@ -265,7 +260,7 @@ func (c *GraphComponent[T]) mapXValueToIndexFloat(x float64) float64 {
 	return (x - first.GetXAxisShift()) / xAxisZoomFactor
 }
 
-func (c *GraphComponent[T]) getXAxisZoomFactor() float64 {
+func (c *GraphComponent) getXAxisZoomFactor() float64 {
 	series := c.GetSeries()
 	if len(series) > 0 {
 		return series[0].GetXAxisZoomFactor()
@@ -273,7 +268,7 @@ func (c *GraphComponent[T]) getXAxisZoomFactor() float64 {
 	return 1.0
 }
 
-func (c *GraphComponent[T]) getXAxisShift() float64 {
+func (c *GraphComponent) getXAxisShift() float64 {
 	series := c.GetSeries()
 	if len(series) > 0 {
 		return series[0].GetXAxisShift()
@@ -281,7 +276,7 @@ func (c *GraphComponent[T]) getXAxisShift() float64 {
 	return 0.0
 }
 
-func (c *GraphComponent[T]) getXMin() *float64 {
+func (c *GraphComponent) getXMin() *float64 {
 	series := c.GetSeries()
 	if len(series) > 0 {
 		return series[0].GetXMin()
@@ -289,7 +284,7 @@ func (c *GraphComponent[T]) getXMin() *float64 {
 	return nil
 }
 
-func (c *GraphComponent[T]) getXMax() *float64 {
+func (c *GraphComponent) getXMax() *float64 {
 	series := c.GetSeries()
 	if len(series) > 0 {
 		return series[0].GetXMax()
@@ -297,7 +292,7 @@ func (c *GraphComponent[T]) getXMax() *float64 {
 	return nil
 }
 
-func (c *GraphComponent[T]) updateViewPort() {
+func (c *GraphComponent) updateViewPort() {
 	maxYOffset := 0.0
 	yAxisZoomFactor := 1.0
 	yAxisShift := 0.0
@@ -322,7 +317,7 @@ func (c *GraphComponent[T]) updateViewPort() {
 	c.plotLayout.SetYRange(viewPortMin, viewPortMax)
 }
 
-func (c *GraphComponent[T]) computeOverlayPointYRange(data [][]float64) (float64, float64) {
+func (c *GraphComponent) computeOverlayPointYRange(data [][]float64) (float64, float64) {
 	minData := math.Inf(1)
 	maxData := math.Inf(-1)
 	hasFinite := false
@@ -364,7 +359,7 @@ func (c *GraphComponent[T]) computeOverlayPointYRange(data [][]float64) (float64
 	return minVal, maxVal
 }
 
-func (c *GraphComponent[T]) computePlotSeriesData() [][]float64 {
+func (c *GraphComponent) computePlotSeriesData() [][]float64 {
 	lines := c.GetLines()
 	lineSeriesData := make([][]float64, 0, len(lines))
 
@@ -383,7 +378,7 @@ func (c *GraphComponent[T]) computePlotSeriesData() [][]float64 {
 	return lineSeriesData
 }
 
-func (c *GraphComponent[T]) ZoomToRangeX(minX, maxX float64) {
+func (c *GraphComponent) ZoomToRangeX(minX, maxX float64) {
 	for _, series := range c.GetSeries() {
 		iAtXMin := series.MapXtoI(minX)
 		iAtXMax := series.MapXtoI(maxX)
@@ -397,16 +392,16 @@ func (c *GraphComponent[T]) ZoomToRangeX(minX, maxX float64) {
 	}
 }
 
-func (c *GraphComponent[T]) GetLayout() *tview.Flex {
+func (c *GraphComponent) GetLayout() *tview.Flex {
 	return c.layout
 }
 
-func (c *GraphComponent[T]) SetTitle(title string) {
+func (c *GraphComponent) SetTitle(title string) {
 	titleText := theme.CreateTitleText(title)
 	c.layout.SetTitle(titleText)
 }
 
-func (c *GraphComponent[T]) UpdateValueBufferSize() {
+func (c *GraphComponent) UpdateValueBufferSize() {
 	if !c.isVisible() {
 		c.setValueBufferSize(500)
 		return
@@ -416,11 +411,11 @@ func (c *GraphComponent[T]) UpdateValueBufferSize() {
 	c.setValueBufferSize(width)
 }
 
-func (c *GraphComponent[T]) isVisible() bool {
+func (c *GraphComponent) isVisible() bool {
 	return coreutil.IsTxViewVisible(c.layout.Box)
 }
 
-func (c *GraphComponent[T]) setValueBufferSize(i int) {
+func (c *GraphComponent) setValueBufferSize(i int) {
 	if c.config.XMax > 0 {
 		if i > c.config.XMax {
 			i = c.config.XMax
@@ -432,11 +427,11 @@ func (c *GraphComponent[T]) setValueBufferSize(i int) {
 	c.valueBufferSize = i
 }
 
-func (c *GraphComponent[T]) GetValueBufferSize() int {
+func (c *GraphComponent) GetValueBufferSize() int {
 	return c.valueBufferSize
 }
 
-func (c *GraphComponent[T]) AddSeries(series GraphSeries) {
+func (c *GraphComponent) AddSeries(series GraphSeries) {
 	switch series.(type) {
 	case *GraphLine, *GraphBar:
 		c.series = append(c.series, series)
@@ -447,17 +442,17 @@ func (c *GraphComponent[T]) AddSeries(series GraphSeries) {
 	c.setXAxisLabelFunc(series)
 }
 
-func (c *GraphComponent[T]) setXAxisLabelFunc(series GraphSeries) {
+func (c *GraphComponent) setXAxisLabelFunc(series GraphSeries) {
 	c.plotLayout.SetXAxisLabelFunc(func(i int) string {
 		return series.GetXLabel(i)
 	})
 }
 
-func (c *GraphComponent[T]) GetSeries() []GraphSeries {
+func (c *GraphComponent) GetSeries() []GraphSeries {
 	return c.series
 }
 
-func (c *GraphComponent[T]) GetLines() []*GraphLine {
+func (c *GraphComponent) GetLines() []*GraphLine {
 	lines := make([]*GraphLine, 0, len(c.series))
 	for _, s := range c.series {
 		if line, ok := s.(*GraphLine); ok {
@@ -467,7 +462,7 @@ func (c *GraphComponent[T]) GetLines() []*GraphLine {
 	return lines
 }
 
-func (c *GraphComponent[T]) GetBars() []*GraphBar {
+func (c *GraphComponent) GetBars() []*GraphBar {
 	bars := make([]*GraphBar, 0, len(c.series))
 	for _, s := range c.series {
 		if bar, ok := s.(*GraphBar); ok {
@@ -477,29 +472,29 @@ func (c *GraphComponent[T]) GetBars() []*GraphBar {
 	return bars
 }
 
-func (c *GraphComponent[T]) GetXAxisZoomFactor() float64 {
+func (c *GraphComponent) GetXAxisZoomFactor() float64 {
 	return c.getXAxisZoomFactor()
 }
 
-func (c *GraphComponent[T]) SetXAxisZoomFactor(xAxisZoomFactor float64) {
+func (c *GraphComponent) SetXAxisZoomFactor(xAxisZoomFactor float64) {
 	for _, series := range c.GetSeries() {
 		series.SetXAxisZoomFactor(xAxisZoomFactor)
 	}
 	c.Refresh()
 }
 
-func (c *GraphComponent[T]) GetXAxisShift() float64 {
+func (c *GraphComponent) GetXAxisShift() float64 {
 	return c.getXAxisShift()
 }
 
-func (c *GraphComponent[T]) SetXAxisShift(xAxisShift float64) {
+func (c *GraphComponent) SetXAxisShift(xAxisShift float64) {
 	for _, series := range c.GetSeries() {
 		series.SetXAxisShift(xAxisShift)
 	}
 	c.Refresh()
 }
 
-func (c *GraphComponent[T]) GetYAxisZoomFactor() float64 {
+func (c *GraphComponent) GetYAxisZoomFactor() float64 {
 	series := c.GetSeries()
 	if len(series) == 0 {
 		return 1.0
@@ -507,14 +502,14 @@ func (c *GraphComponent[T]) GetYAxisZoomFactor() float64 {
 	return series[0].GetYAxisZoomFactor()
 }
 
-func (c *GraphComponent[T]) SetYAxisZoomFactor(yAxisZoomFactor float64) {
+func (c *GraphComponent) SetYAxisZoomFactor(yAxisZoomFactor float64) {
 	for _, series := range c.GetSeries() {
 		series.SetYAxisZoomFactor(yAxisZoomFactor)
 	}
 	c.Refresh()
 }
 
-func (c *GraphComponent[T]) GetYAxisShift() float64 {
+func (c *GraphComponent) GetYAxisShift() float64 {
 	series := c.GetSeries()
 	if len(series) == 0 {
 		return 0.0
@@ -522,33 +517,33 @@ func (c *GraphComponent[T]) GetYAxisShift() float64 {
 	return series[0].GetYAxisShift()
 }
 
-func (c *GraphComponent[T]) SetYAxisShift(yAxisShift float64) {
+func (c *GraphComponent) SetYAxisShift(yAxisShift float64) {
 	for _, series := range c.GetSeries() {
 		series.SetYAxisShift(yAxisShift)
 	}
 	c.Refresh()
 }
 
-func (c *GraphComponent[T]) GetPlotRect() (int, int, int, int) {
+func (c *GraphComponent) GetPlotRect() (int, int, int, int) {
 	return c.plotLayout.GetPlotRect()
 }
 
-func (c *GraphComponent[T]) SetXRange(xMin, xMax float64) {
+func (c *GraphComponent) SetXRange(xMin, xMax float64) {
 	for _, series := range c.GetSeries() {
 		series.SetXRange(xMin, xMax)
 	}
 }
 
-func (c *GraphComponent[T]) ResetXRange() {
+func (c *GraphComponent) ResetXRange() {
 	for _, series := range c.GetSeries() {
 		series.ResetXRange()
 	}
 }
 
-func (c *GraphComponent[T]) GetXMin() *float64 {
+func (c *GraphComponent) GetXMin() *float64 {
 	return c.getXMin()
 }
 
-func (c *GraphComponent[T]) GetXMax() *float64 {
+func (c *GraphComponent) GetXMax() *float64 {
 	return c.getXMax()
 }

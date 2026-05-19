@@ -18,12 +18,12 @@ type CurveGraphComponent struct {
 
 	layout         *tview.Flex
 	bmScatterPlot  *tvxwidgets.Plot
-	graphComponent *graph.GraphComponent[client.Curve]
+	graphComponent *graph.GraphComponent
 	values         *[]float64
 }
 
 func NewCurveGraphComponent(application *tview.Application, curve *client.Curve) *CurveGraphComponent {
-	graphConfig := graph.NewGraphComponentConfigFor(curve).
+	graphConfig := graph.NewGraphComponentConfig().
 		WithReversedOrder().
 		WithPlotColors(
 			theme.Colors.Graph.Curve,
@@ -33,10 +33,9 @@ func NewCurveGraphComponent(application *tview.Application, curve *client.Curve)
 		WithYAxisAutoScaleMin(false).
 		WithYAxisAutoScaleMax(false)
 
-	graphComponent := graph.NewGraphComponent[client.Curve](
+	graphComponent := graph.NewGraphComponent(
 		application,
 		graphConfig,
-		curve,
 	)
 
 	values := &[]float64{}

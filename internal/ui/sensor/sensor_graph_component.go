@@ -17,13 +17,13 @@ type SensorGraphComponent struct {
 	Sensor *client.Sensor
 
 	layout         *tview.Flex
-	graphComponent *graph.GraphComponent[client.Sensor]
+	graphComponent *graph.GraphComponent
 	graphBar       *graph.GraphBar
 	values         *[]float64
 }
 
 func NewSensorGraphComponent(application *tview.Application, sensor *client.Sensor) *SensorGraphComponent {
-	graphConfig := graph.NewGraphComponentConfigFor(sensor).
+	graphConfig := graph.NewGraphComponentConfig().
 		WithReversedOrder().
 		WithPlotColors(
 			theme.Colors.Graph.Sensor,
@@ -33,10 +33,9 @@ func NewSensorGraphComponent(application *tview.Application, sensor *client.Sens
 		WithYAxisAutoScaleMin(false).
 		WithYAxisAutoScaleMax(false)
 
-	graphComponent := graph.NewGraphComponent[client.Sensor](
+	graphComponent := graph.NewGraphComponent(
 		application,
 		graphConfig,
-		sensor,
 	)
 
 	values := &[]float64{}

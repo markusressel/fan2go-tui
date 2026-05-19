@@ -21,7 +21,7 @@ type FanRpmCurveComponent struct {
 
 	layout         *tview.Flex
 	bmScatterPlot  *tvxwidgets.Plot
-	graphComponent *graph.GraphComponent[client.Fan]
+	graphComponent *graph.GraphComponent
 
 	xFunc1 func(i int) float64
 	fFunc  func(x float64) float64
@@ -73,7 +73,7 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 		fFunc:  fFunc,
 	}
 
-	graphConfig := graph.NewGraphComponentConfigFor(fan).
+	graphConfig := graph.NewGraphComponentConfig().
 		WithPlotColors(theme.Colors.Graph.Rpm, theme.Colors.Graph.Pwm).
 		WithYAxisAutoScaleMin(false).
 		WithYAxisAutoScaleMax(true).
@@ -81,7 +81,8 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 		WithYAxisLabelDataType(tvxwidgets.PlotYAxisLabelDataInt).
 		WithOverlays(
 			graph.VLine(
-				func(fan *client.Fan) float64 {
+				func() float64 {
+					fan := c.Fan
 					if fan == nil {
 						return math.NaN()
 					}
@@ -89,7 +90,8 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 				},
 			).WithColor(theme.Colors.Graph.CurrentPwmLine),
 			graph.Marker(
-				func(fan *client.Fan) graph.XY {
+				func() graph.XY {
+					fan := c.Fan
 					if fan == nil {
 						return graph.XY{X: math.NaN(), Y: math.NaN()}
 					}
@@ -98,10 +100,9 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 			).WithColor(theme.Colors.Graph.CurrentRpmMarker),
 		)
 
-	graphComponent := graph.NewGraphComponent[client.Fan](
+	graphComponent := graph.NewGraphComponent(
 		application,
 		graphConfig,
-		fan,
 	)
 
 	graphComponent.AddSeries(rpmGraphLine)
@@ -142,7 +143,6 @@ func (c *FanRpmCurveComponent) SetFan(fan *client.Fan) {
 		return
 	}
 	c.Fan = fan
-	c.graphComponent.Data = fan
 	c.refresh()
 }
 

@@ -12,7 +12,7 @@ type XY struct {
 	Y float64
 }
 
-type OverlayRenderContext[T any] struct {
+type OverlayRenderContext struct {
 	Plot          *tvxwidgets.Plot
 	XValueToIndex func(float64) int
 	// XValueToIndexFloat preserves the fractional sub-cell x position.
@@ -20,7 +20,6 @@ type OverlayRenderContext[T any] struct {
 	YMin               float64
 	YMax               float64
 	Background         tcell.Color
-	Data               *T
 	Bars               []*GraphBar
 	ValueBufferSize    int
 	Reversed           bool
@@ -28,22 +27,22 @@ type OverlayRenderContext[T any] struct {
 	SeriesColors       []tcell.Color
 }
 
-type GraphComponentOverlay[T any] interface {
-	draw(screen tcell.Screen, ctx OverlayRenderContext[T])
+type GraphComponentOverlay interface {
+	draw(screen tcell.Screen, ctx OverlayRenderContext)
 }
 
-type MarkerOverlay[T any] struct {
-	coord func(*T) XY
+type MarkerOverlay struct {
+	coord func() XY
 	color tcell.Color
 	rune  rune
 }
 
-func NewMarkerOverlay[T any](coord func(*T) XY) *MarkerOverlay[T] {
+func NewMarkerOverlay(coord func() XY) *MarkerOverlay {
 	if coord == nil {
 		panic("marker overlay requires a coord function")
 	}
 
-	return &MarkerOverlay[T]{
+	return &MarkerOverlay{
 		coord: coord,
 		color: tcell.ColorYellow,
 		rune:  rune(0x2836),
@@ -51,11 +50,11 @@ func NewMarkerOverlay[T any](coord func(*T) XY) *MarkerOverlay[T] {
 }
 
 // Marker is a concise alias for NewMarkerOverlay.
-func Marker[T any](coord func(*T) XY) *MarkerOverlay[T] {
+func Marker(coord func() XY) *MarkerOverlay {
 	return NewMarkerOverlay(coord)
 }
 
-func (o *MarkerOverlay[T]) WithCoord(coord func(*T) XY) *MarkerOverlay[T] {
+func (o *MarkerOverlay) WithCoord(coord func() XY) *MarkerOverlay {
 	if coord == nil {
 		panic("marker overlay requires a coord function")
 	}
@@ -64,22 +63,22 @@ func (o *MarkerOverlay[T]) WithCoord(coord func(*T) XY) *MarkerOverlay[T] {
 	return o
 }
 
-func (o *MarkerOverlay[T]) WithColor(color tcell.Color) *MarkerOverlay[T] {
+func (o *MarkerOverlay) WithColor(color tcell.Color) *MarkerOverlay {
 	o.color = color
 	return o
 }
 
-func (o *MarkerOverlay[T]) WithRune(r rune) *MarkerOverlay[T] {
+func (o *MarkerOverlay) WithRune(r rune) *MarkerOverlay {
 	o.rune = r
 	return o
 }
 
-func (o *MarkerOverlay[T]) draw(screen tcell.Screen, ctx OverlayRenderContext[T]) {
+func (o *MarkerOverlay) draw(screen tcell.Screen, ctx OverlayRenderContext) {
 	if o.coord == nil || ctx.Plot == nil || ctx.XValueToIndex == nil || ctx.YMax <= ctx.YMin {
 		return
 	}
 
-	coord := o.coord(ctx.Data)
+	coord := o.coord()
 	if math.IsNaN(coord.X) || math.IsNaN(coord.Y) || math.IsInf(coord.X, 0) || math.IsInf(coord.Y, 0) {
 		return
 	}
@@ -118,18 +117,18 @@ func (o *MarkerOverlay[T]) draw(screen tcell.Screen, ctx OverlayRenderContext[T]
 	screen.SetContent(screenX, screenY, markerRune, currentCombc, pointStyle)
 }
 
-type VerticalLine[T any] struct {
-	x     func(*T) float64
+type VerticalLine struct {
+	x     func() float64
 	color tcell.Color
 	rune  rune
 }
 
-func NewVerticalLine[T any](x func(*T) float64) *VerticalLine[T] {
+func NewVerticalLine(x func() float64) *VerticalLine {
 	if x == nil {
 		panic("vertical line overlay requires an x function")
 	}
 
-	return &VerticalLine[T]{
+	return &VerticalLine{
 		x:     x,
 		color: tcell.ColorYellow,
 		rune:  rune(0x2830),
@@ -137,11 +136,11 @@ func NewVerticalLine[T any](x func(*T) float64) *VerticalLine[T] {
 }
 
 // VLine is a concise alias for NewVerticalLine.
-func VLine[T any](x func(*T) float64) *VerticalLine[T] {
+func VLine(x func() float64) *VerticalLine {
 	return NewVerticalLine(x)
 }
 
-func (o *VerticalLine[T]) WithX(x func(*T) float64) *VerticalLine[T] {
+func (o *VerticalLine) WithX(x func() float64) *VerticalLine {
 	if x == nil {
 		panic("vertical line overlay requires an x function")
 	}
@@ -150,22 +149,22 @@ func (o *VerticalLine[T]) WithX(x func(*T) float64) *VerticalLine[T] {
 	return o
 }
 
-func (o *VerticalLine[T]) WithColor(color tcell.Color) *VerticalLine[T] {
+func (o *VerticalLine) WithColor(color tcell.Color) *VerticalLine {
 	o.color = color
 	return o
 }
 
-func (o *VerticalLine[T]) WithRune(r rune) *VerticalLine[T] {
+func (o *VerticalLine) WithRune(r rune) *VerticalLine {
 	o.rune = r
 	return o
 }
 
-func (o *VerticalLine[T]) draw(screen tcell.Screen, ctx OverlayRenderContext[T]) {
+func (o *VerticalLine) draw(screen tcell.Screen, ctx OverlayRenderContext) {
 	if o.x == nil || ctx.Plot == nil || ctx.XValueToIndex == nil {
 		return
 	}
 
-	xValue := o.x(ctx.Data)
+	xValue := o.x()
 	if math.IsNaN(xValue) || math.IsInf(xValue, 0) {
 		return
 	}

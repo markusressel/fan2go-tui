@@ -48,10 +48,10 @@ func colorAtY(y float64, stops []GraphBarGradientStop, fallback tcell.Color) tce
 }
 
 // OverlayPlot extends tvxwidgets.Plot with lightweight overlay rendering.
-type OverlayPlot[T any] struct {
+type OverlayPlot struct {
 	*tvxwidgets.Plot
-	overlays   []GraphComponentOverlay[T]
-	overlayCtx OverlayRenderContext[T]
+	overlays   []GraphComponentOverlay
+	overlayCtx OverlayRenderContext
 }
 
 type brailleLineCell struct {
@@ -66,21 +66,21 @@ var brailleLineBit = [4][2]rune{
 	{rune(0x0040), rune(0x0080)},
 }
 
-func NewOverlayPlot[T any]() *OverlayPlot[T] {
-	return &OverlayPlot[T]{
+func NewOverlayPlot() *OverlayPlot {
+	return &OverlayPlot{
 		Plot: tvxwidgets.NewPlot(),
 	}
 }
 
-func (p *OverlayPlot[T]) SetOverlays(overlays []GraphComponentOverlay[T]) {
-	p.overlays = append([]GraphComponentOverlay[T]{}, overlays...)
+func (p *OverlayPlot) SetOverlays(overlays []GraphComponentOverlay) {
+	p.overlays = append([]GraphComponentOverlay{}, overlays...)
 }
 
-func (p *OverlayPlot[T]) SetOverlayContext(ctx OverlayRenderContext[T]) {
+func (p *OverlayPlot) SetOverlayContext(ctx OverlayRenderContext) {
 	p.overlayCtx = ctx
 }
 
-func (p *OverlayPlot[T]) Draw(screen tcell.Screen) {
+func (p *OverlayPlot) Draw(screen tcell.Screen) {
 	p.Plot.Draw(screen)
 	ctx := p.overlayCtx
 	ctx.Plot = p.Plot
@@ -92,7 +92,7 @@ func (p *OverlayPlot[T]) Draw(screen tcell.Screen) {
 	}
 }
 
-func (p *OverlayPlot[T]) drawLineSeries(screen tcell.Screen, ctx OverlayRenderContext[T]) {
+func (p *OverlayPlot) drawLineSeries(screen tcell.Screen, ctx OverlayRenderContext) {
 	if len(ctx.SeriesData) == 0 || ctx.YMax <= ctx.YMin {
 		return
 	}
@@ -184,7 +184,7 @@ func (p *OverlayPlot[T]) drawLineSeries(screen tcell.Screen, ctx OverlayRenderCo
 	}
 }
 
-func (p *OverlayPlot[T]) drawLineSegment(cells map[[2]int]brailleLineCell, x0, y0, x1, y1, height int, color tcell.Color) {
+func (p *OverlayPlot) drawLineSegment(cells map[[2]int]brailleLineCell, x0, y0, x1, y1, height int, color tcell.Color) {
 	sx0 := x0 * 2
 	sy0 := (height - 1 - y0) * 4
 	sx1 := x1 * 2
@@ -220,7 +220,7 @@ func (p *OverlayPlot[T]) drawLineSegment(cells map[[2]int]brailleLineCell, x0, y
 	}
 }
 
-func (p *OverlayPlot[T]) setLinePoint(cells map[[2]int]brailleLineCell, sx, sy int, color tcell.Color) {
+func (p *OverlayPlot) setLinePoint(cells map[[2]int]brailleLineCell, sx, sy int, color tcell.Color) {
 	if sx < 0 || sy < 0 {
 		return
 	}
@@ -251,7 +251,7 @@ func barFillRune(level int) rune {
 	}
 }
 
-func (p *OverlayPlot[T]) drawBars(screen tcell.Screen, ctx OverlayRenderContext[T]) {
+func (p *OverlayPlot) drawBars(screen tcell.Screen, ctx OverlayRenderContext) {
 	if len(ctx.Bars) == 0 || ctx.ValueBufferSize <= 0 || ctx.YMax <= ctx.YMin || ctx.XValueToIndex == nil {
 		return
 	}

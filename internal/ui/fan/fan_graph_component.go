@@ -18,23 +18,22 @@ type FanGraphComponent struct {
 
 	layout         *tview.Flex
 	bmScatterPlot  *tvxwidgets.Plot
-	graphComponent *graph.GraphComponent[client.Fan]
+	graphComponent *graph.GraphComponent
 	rpmValues      *[]float64
 	pwmValues      *[]float64
 }
 
 func NewFanGraphComponent(application *tview.Application, fan *client.Fan) *FanGraphComponent {
-	graphConfig := graph.NewGraphComponentConfigFor(fan).
+	graphConfig := graph.NewGraphComponentConfig().
 		WithReversedOrder().
 		WithPlotColors(theme.Colors.Graph.Rpm, theme.Colors.Graph.Pwm).
 		WithYAxisAutoScaleMin(false).
 		WithYAxisAutoScaleMax(true).
 		WithYAxisLabelDataType(tvxwidgets.PlotYAxisLabelDataInt)
 
-	graphComponent := graph.NewGraphComponent[client.Fan](
+	graphComponent := graph.NewGraphComponent(
 		application,
 		graphConfig,
-		fan,
 	)
 
 	rpmValues := &[]float64{}
