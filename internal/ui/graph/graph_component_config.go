@@ -26,7 +26,7 @@ type GraphComponentConfig struct {
 	// PlotColors is a list of colors to use for the plot lines
 	PlotColors []tcell.Color
 
-	// Reversed determines if the graph should be drawn from left tp right instead of right to left
+	// Reversed determines if the graph should be drawn from left to right instead of right to left
 	// Default: false
 	Reversed bool
 
