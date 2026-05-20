@@ -11,14 +11,16 @@ import (
 )
 
 const (
-	fanRpmCurveMinX = 0.0
-	fanRpmCurveMaxX = 255.0
+	fanRpmCurveMinX               = 0.0
+	fanRpmCurveMaxX               = 255.0
+	fanRpmCurveHeatmapHistorySize = 200
 )
 
 type FanRpmCurveComponent struct {
 	application *tview.Application
 
-	Fan *client.Fan
+	Fan     *client.Fan
+	history []graph.XY
 
 	layout         *tview.Flex
 	graphComponent *graph.GraphComponent
@@ -36,6 +38,7 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 	c := &FanRpmCurveComponent{
 		application: application,
 		Fan:         fan,
+		history:     make([]graph.XY, 0, fanRpmCurveHeatmapHistorySize),
 	}
 
 	graphConfig := graph.NewGraphComponentConfig().
@@ -66,6 +69,9 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 					return graph.XY{X: float64(fan.Pwm), Y: float64(fan.Rpm)}
 				},
 			).WithColor(theme.Colors.Graph.CurrentRpmMarker),
+			graph.Heatmap(c.getHistory).
+				WithColor(theme.Colors.Graph.HeatmapBase).
+				WithMaxPoints(fanRpmCurveHeatmapHistorySize),
 		)
 
 	graphComponent := graph.NewGraphComponent(
@@ -96,6 +102,22 @@ func (c *FanRpmCurveComponent) getFan() *client.Fan {
 	return c.Fan
 }
 
+func (c *FanRpmCurveComponent) getHistory() []graph.XY {
+	if c == nil || len(c.history) == 0 {
+		return nil
+	}
+	historyCopy := make([]graph.XY, len(c.history))
+	copy(historyCopy, c.history)
+	return historyCopy
+}
+
+func (c *FanRpmCurveComponent) appendHistory(pwm, rpm float64) {
+	c.history = append(c.history, graph.XY{X: pwm, Y: rpm})
+	if len(c.history) > fanRpmCurveHeatmapHistorySize {
+		c.history = c.history[len(c.history)-fanRpmCurveHeatmapHistorySize:]
+	}
+}
+
 func (c *FanRpmCurveComponent) refresh() {
 	fan := c.Fan
 	if fan == nil {
@@ -104,6 +126,7 @@ func (c *FanRpmCurveComponent) refresh() {
 	if c.graphComponent == nil {
 		return
 	}
+	c.appendHistory(float64(fan.Pwm), float64(fan.Rpm))
 
 	// First refresh updates buffer/layout, second uses fixed x-range zoom for final draw.
 	c.graphComponent.Refresh()

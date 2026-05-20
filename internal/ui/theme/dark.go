@@ -48,7 +48,8 @@ var (
 			Rpm:              tcell.ColorBlue,
 			Pwm:              PrimaryVariantColor,
 			CurrentPwmLine:   PrimaryVariantColor,
-			CurrentRpmMarker: tcell.ColorGold,
+			CurrentRpmMarker: SecondaryColor,
+			HeatmapBase:      tcell.ColorGold,
 
 			Curve:    tcell.ColorBlue,
 			CurveMin: tcell.ColorGray,

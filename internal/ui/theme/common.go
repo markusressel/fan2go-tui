@@ -55,6 +55,7 @@ type GraphsColors struct {
 	Pwm              tcell.Color
 	CurrentPwmLine   tcell.Color
 	CurrentRpmMarker tcell.Color
+	HeatmapBase      tcell.Color
 
 	// Curve
 	Curve    tcell.Color
