@@ -38,7 +38,7 @@ func NewSensorGraphComponent(application *tview.Application, sensor *client.Sens
 		WithYAxisAutoScaleMin(false).
 		WithYAxisAutoScaleMax(false).
 		WithOverlays(
-			newCurrentSensorYAxisLabelOverlay(func() *client.Sensor { return c.Sensor }),
+			newCurrentSensorYAxisLabelOverlay(c.getSensor),
 		)
 
 	graphComponent := graph.NewGraphComponent(
@@ -78,6 +78,13 @@ func NewSensorGraphComponent(application *tview.Application, sensor *client.Sens
 func (c *SensorGraphComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 	return layout
+}
+
+func (c *SensorGraphComponent) getSensor() *client.Sensor {
+	if c == nil {
+		return nil
+	}
+	return c.Sensor
 }
 
 func (c *SensorGraphComponent) refresh() {

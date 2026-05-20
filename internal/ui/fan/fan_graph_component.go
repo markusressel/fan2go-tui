@@ -37,7 +37,7 @@ func NewFanGraphComponent(application *tview.Application, fan *client.Fan) *FanG
 		WithYAxisAutoScaleMax(true).
 		WithYAxisLabelDataType(tvxwidgets.PlotYAxisLabelDataInt).
 		WithOverlays(
-			newCurrentRpmYAxisLabelOverlay(func() *client.Fan { return c.Fan }),
+			newCurrentRpmYAxisLabelOverlay(c.getFan),
 		)
 
 	graphComponent := graph.NewGraphComponent(
@@ -69,6 +69,13 @@ func (c *FanGraphComponent) createLayout() *tview.Flex {
 	layout.SetBorder(false)
 
 	return layout
+}
+
+func (c *FanGraphComponent) getFan() *client.Fan {
+	if c == nil {
+		return nil
+	}
+	return c.Fan
 }
 
 func (c *FanGraphComponent) refresh() {

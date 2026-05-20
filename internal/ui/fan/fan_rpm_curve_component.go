@@ -45,8 +45,8 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 		WithDrawXAxisLabel(true).
 		WithYAxisLabelDataType(tvxwidgets.PlotYAxisLabelDataInt).
 		WithOverlays(
-			newCurrentRpmYAxisLabelOverlay(func() *client.Fan { return c.Fan }),
-			newCurrentPwmXAxisLabelOverlay(func() *client.Fan { return c.Fan }),
+			newCurrentRpmYAxisLabelOverlay(c.getFan),
+			newCurrentPwmXAxisLabelOverlay(c.getFan),
 			graph.VLine(
 				func() float64 {
 					fan := c.Fan
@@ -86,6 +86,13 @@ func (c *FanRpmCurveComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 	layout.SetBorder(false)
 	return layout
+}
+
+func (c *FanRpmCurveComponent) getFan() *client.Fan {
+	if c == nil {
+		return nil
+	}
+	return c.Fan
 }
 
 func (c *FanRpmCurveComponent) refresh() {

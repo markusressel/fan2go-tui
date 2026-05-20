@@ -38,7 +38,7 @@ func NewCurveGraphComponent(application *tview.Application, curve *client.Curve)
 		WithYAxisAutoScaleMax(false).
 		WithYAxisLabelDataType(tvxwidgets.PlotYAxisLabelDataInt).
 		WithOverlays(
-			newCurrentCurveYAxisLabelOverlay(func() *client.Curve { return c.Curve }),
+			newCurrentCurveYAxisLabelOverlay(c.getCurve),
 		)
 
 	graphComponent := graph.NewGraphComponent(
@@ -66,6 +66,13 @@ func (c *CurveGraphComponent) createLayout() *tview.Flex {
 	layout.SetBorder(false)
 
 	return layout
+}
+
+func (c *CurveGraphComponent) getCurve() *client.Curve {
+	if c == nil {
+		return nil
+	}
+	return c.Curve
 }
 
 func (c *CurveGraphComponent) refresh() {
