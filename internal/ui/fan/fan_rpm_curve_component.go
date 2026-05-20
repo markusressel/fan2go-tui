@@ -10,6 +10,11 @@ import (
 	"github.com/rivo/tview"
 )
 
+const (
+	fanRpmCurveMinX = 0.0
+	fanRpmCurveMaxX = 255.0
+)
+
 type FanRpmCurveComponent struct {
 	application *tview.Application
 
@@ -66,7 +71,7 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 	)
 
 	graphComponent.AddSeries(rpmGraphLine)
-	graphComponent.SetXRange(0, 255)
+	graphComponent.SetXRange(fanRpmCurveMinX, fanRpmCurveMaxX)
 	c.graphComponent = graphComponent
 
 	c.layout = c.createLayout()
@@ -90,8 +95,9 @@ func (c *FanRpmCurveComponent) refresh() {
 		return
 	}
 
+	// First refresh updates buffer/layout, second uses fixed x-range zoom for final draw.
 	c.graphComponent.Refresh()
-	c.graphComponent.ZoomToRangeX(0, 255)
+	c.graphComponent.ZoomToRangeX(fanRpmCurveMinX, fanRpmCurveMaxX)
 	c.graphComponent.Refresh()
 }
 
