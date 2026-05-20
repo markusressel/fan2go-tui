@@ -14,7 +14,7 @@ type GraphTestPage struct {
 
 	layout *tview.Flex
 
-	graphComponent *graph.GraphComponent[graph.GraphDataSource]
+	graphComponent *graph.GraphComponent
 }
 
 func NewGraphTestPage(application *tview.Application) GraphTestPage {
@@ -32,7 +32,7 @@ func (c *GraphTestPage) createLayout() *tview.Flex {
 	graphTestPageLayout := tview.NewFlex()
 	c.layout = graphTestPageLayout
 
-	graphComponent := graph.NewGraphComponent[graph.GraphDataSource](
+	graphComponent := graph.NewGraphComponent(
 		c.application,
 		graph.NewGraphComponentConfig().
 			WithYAxisAutoScaleMin(false).
