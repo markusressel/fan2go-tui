@@ -2,7 +2,6 @@ package sensor
 
 import (
 	"fan2go-tui/internal/client"
-	"fan2go-tui/internal/ui/theme"
 	"fmt"
 
 	"github.com/rivo/tview"
@@ -16,7 +15,6 @@ type SensorInfoComponent struct {
 	layout *tview.Flex
 
 	configTextView *tview.TextView
-	valueTextView  *tview.TextView
 }
 
 func NewSensorInfoComponent(application *tview.Application, sensor *client.Sensor) *SensorInfoComponent {
@@ -37,10 +35,6 @@ func (c *SensorInfoComponent) createLayout() *tview.Flex {
 	layout.AddItem(configTextView, 0, 1, false)
 	c.configTextView = configTextView
 
-	curveValueTextView := tview.NewTextView().SetTextColor(theme.Colors.Graph.Sensor)
-	layout.AddItem(curveValueTextView, 1, 0, false)
-	c.valueTextView = curveValueTextView
-
 	return layout
 }
 
@@ -54,9 +48,6 @@ func (c *SensorInfoComponent) SetSensor(sensor *client.Sensor) {
 }
 
 func (c *SensorInfoComponent) refresh() {
-	// print basic info
-	valueText := fmt.Sprintf("Avg: %.2f", c.Sensor.MovingAvg/1000)
-	c.valueTextView.SetText(valueText)
 
 	// print config
 	config := c.Sensor.Config

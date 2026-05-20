@@ -2,7 +2,6 @@ package fan
 
 import (
 	"fan2go-tui/internal/client"
-	"fan2go-tui/internal/ui/theme"
 	"fmt"
 
 	"github.com/rivo/tview"
@@ -15,9 +14,7 @@ type FanInfoComponent struct {
 
 	layout *tview.Flex
 
-	configTextView   *tview.TextView
-	pwmValueTextView *tview.TextView
-	rpmValueTextView *tview.TextView
+	configTextView *tview.TextView
 }
 
 func NewFanInfoComponent(application *tview.Application, fan *client.Fan) *FanInfoComponent {
@@ -38,14 +35,6 @@ func (c *FanInfoComponent) createLayout() *tview.Flex {
 	layout.AddItem(configTextView, 0, 1, false)
 	c.configTextView = configTextView
 
-	rpmValueTextView := tview.NewTextView().SetTextColor(theme.Colors.Graph.Rpm)
-	layout.AddItem(rpmValueTextView, 1, 0, false)
-	c.rpmValueTextView = rpmValueTextView
-
-	pwmValueTextView := tview.NewTextView().SetTextColor(theme.Colors.Graph.Pwm)
-	layout.AddItem(pwmValueTextView, 1, 0, false)
-	c.pwmValueTextView = pwmValueTextView
-
 	return layout
 }
 
@@ -59,12 +48,6 @@ func (c *FanInfoComponent) SetFan(fan *client.Fan) {
 }
 
 func (c *FanInfoComponent) refresh() {
-	// print basic info
-	pwmText := fmt.Sprintf("PWM: %d", c.Fan.Pwm)
-	c.pwmValueTextView.SetText(pwmText)
-
-	rpmText := fmt.Sprintf("RPM: %d", c.Fan.Rpm)
-	c.rpmValueTextView.SetText(rpmText)
 
 	// print config
 	config := c.Fan.Config

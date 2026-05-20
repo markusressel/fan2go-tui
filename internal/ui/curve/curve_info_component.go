@@ -2,7 +2,6 @@ package curve
 
 import (
 	"fan2go-tui/internal/client"
-	"fan2go-tui/internal/ui/theme"
 	"fmt"
 
 	"github.com/rivo/tview"
@@ -16,7 +15,6 @@ type CurveInfoComponent struct {
 	layout *tview.Flex
 
 	configTextView *tview.TextView
-	valueTextView  *tview.TextView
 }
 
 func NewCurveInfoComponent(application *tview.Application, curve *client.Curve) *CurveInfoComponent {
@@ -37,10 +35,6 @@ func (c *CurveInfoComponent) createLayout() *tview.Flex {
 	layout.AddItem(configTextView, 0, 1, false)
 	c.configTextView = configTextView
 
-	curveValueTextView := tview.NewTextView().SetTextColor(theme.Colors.Graph.Curve)
-	layout.AddItem(curveValueTextView, 1, 0, false)
-	c.valueTextView = curveValueTextView
-
 	return layout
 }
 
@@ -54,9 +48,6 @@ func (c *CurveInfoComponent) SetCurve(curve *client.Curve) {
 }
 
 func (c *CurveInfoComponent) refresh() {
-	// print basic info
-	valueText := fmt.Sprintf("Value: %d", int(c.Curve.Value))
-	c.valueTextView.SetText(valueText)
 
 	// print config
 	config := c.Curve.Config
