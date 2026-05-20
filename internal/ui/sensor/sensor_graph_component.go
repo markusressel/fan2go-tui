@@ -4,8 +4,6 @@ import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/ui/graph"
 	"fan2go-tui/internal/ui/theme"
-	"math"
-	"strconv"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -39,21 +37,8 @@ func NewSensorGraphComponent(application *tview.Application, sensor *client.Sens
 	)
 
 	values := &[]float64{}
-	xFunc := func(i int) float64 {
-		return float64(i)
-	}
-	fFunc := func(x float64) float64 {
-		idx := int(math.Round(x))
-		if idx < 0 || idx >= len(*values) {
-			return math.NaN()
-		}
-		return (*values)[idx]
-	}
-	xLabelFunc := func(i int, x float64) string {
-		return strconv.Itoa(int(math.Round(x)))
-	}
-
-	bar := graph.NewGraphBar("Sensor", xFunc, fFunc, xLabelFunc)
+	seriesValueProvider := graph.NewRoundedSliceSeriesValueProvider(values)
+	bar := graph.NewGraphBarFromSeriesValueProvider("Sensor", seriesValueProvider)
 	bar.SetColor(theme.Colors.Graph.Sensor)
 	bar.WithGradient(func(yMin, yMax float64) []graph.GraphBarGradientStop {
 		rangeY := yMax - yMin

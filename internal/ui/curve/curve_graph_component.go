@@ -4,8 +4,6 @@ import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/ui/graph"
 	"fan2go-tui/internal/ui/theme"
-	"math"
-	"strconv"
 
 	"github.com/rivo/tview"
 )
@@ -37,20 +35,8 @@ func NewCurveGraphComponent(application *tview.Application, curve *client.Curve)
 	)
 
 	values := &[]float64{}
-	xFunc := func(i int) float64 { return float64(i) }
-	xLabelFunc := func(i int, x float64) string { return strconv.Itoa(int(math.Round(x))) }
-	line := graph.NewGraphLine(
-		"Curve",
-		xFunc,
-		func(x float64) float64 {
-			idx := int(math.Round(x))
-			if idx < 0 || idx >= len(*values) {
-				return math.NaN()
-			}
-			return (*values)[idx]
-		},
-		xLabelFunc,
-	)
+	seriesValueProvider := graph.NewRoundedSliceSeriesValueProvider(values)
+	line := graph.NewGraphLineFromSeriesValueProvider("Curve", seriesValueProvider)
 	graphComponent.AddSeries(line)
 
 	graphComponent.SetYRange(0, 255)

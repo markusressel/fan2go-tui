@@ -5,19 +5,15 @@ import (
 	"fan2go-tui/internal/ui/graph"
 	"fan2go-tui/internal/ui/theme"
 	"math"
-	"slices"
-	"strconv"
 
 	"github.com/navidys/tvxwidgets"
 	"github.com/rivo/tview"
-	"golang.org/x/exp/maps"
 )
 
 type FanRpmCurveComponent struct {
 	application *tview.Application
 
-	Fan     *client.Fan
-	pwmKeys []int
+	Fan *client.Fan
 
 	layout         *tview.Flex
 	graphComponent *graph.GraphComponent
@@ -28,42 +24,13 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 	if fan.FanCurveData != nil {
 		fanCurveData = *fan.FanCurveData
 	}
-	pwmKeys := maps.Keys(fanCurveData)
-	slices.Sort(pwmKeys)
 
-	xFunc1 := func(i int) float64 {
-		if i < 0 || i >= len(pwmKeys) {
-			return math.NaN()
-		}
-		return float64(pwmKeys[i])
-	}
-	fFunc := func(x float64) float64 {
-		val, ok := fanCurveData[int(math.Floor(x))]
-		if !ok {
-			return math.NaN()
-		} else {
-			return val
-		}
-	}
-
-	xLabelFunc1 := func(i int, x float64) string {
-		labelVal := int(math.Round(x))
-		label := strconv.Itoa(labelVal)
-		return label
-	}
-
-	rpmGraphLine := graph.NewGraphLine(
-		"RPM",
-		xFunc1,
-		fFunc,
-		xLabelFunc1,
-	)
+	seriesValueProvider := graph.NewDiscreteIntSeriesValueProvider(fanCurveData)
+	rpmGraphLine := graph.NewGraphLineFromSeriesValueProvider("RPM", seriesValueProvider)
 
 	c := &FanRpmCurveComponent{
 		application: application,
 		Fan:         fan,
-
-		pwmKeys: pwmKeys,
 	}
 
 	graphConfig := graph.NewGraphComponentConfig().

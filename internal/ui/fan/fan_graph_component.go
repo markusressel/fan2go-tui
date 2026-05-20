@@ -4,8 +4,6 @@ import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/ui/graph"
 	"fan2go-tui/internal/ui/theme"
-	"math"
-	"strconv"
 
 	"github.com/navidys/tvxwidgets"
 	"github.com/rivo/tview"
@@ -37,32 +35,10 @@ func NewFanGraphComponent(application *tview.Application, fan *client.Fan) *FanG
 
 	rpmValues := &[]float64{}
 	pwmValues := &[]float64{}
-	xFunc := func(i int) float64 { return float64(i) }
-	xLabelFunc := func(i int, x float64) string { return strconv.Itoa(int(math.Round(x))) }
-	rpmLine := graph.NewGraphLine(
-		"RPM",
-		xFunc,
-		func(x float64) float64 {
-			idx := int(math.Round(x))
-			if idx < 0 || idx >= len(*rpmValues) {
-				return math.NaN()
-			}
-			return (*rpmValues)[idx]
-		},
-		xLabelFunc,
-	)
-	pwmLine := graph.NewGraphLine(
-		"PWM",
-		xFunc,
-		func(x float64) float64 {
-			idx := int(math.Round(x))
-			if idx < 0 || idx >= len(*pwmValues) {
-				return math.NaN()
-			}
-			return (*pwmValues)[idx]
-		},
-		xLabelFunc,
-	)
+	rpmProvider := graph.NewRoundedSliceSeriesValueProvider(rpmValues)
+	pwmProvider := graph.NewRoundedSliceSeriesValueProvider(pwmValues)
+	rpmLine := graph.NewGraphLineFromSeriesValueProvider("RPM", rpmProvider)
+	pwmLine := graph.NewGraphLineFromSeriesValueProvider("PWM", pwmProvider)
 	graphComponent.AddSeries(rpmLine)
 	graphComponent.AddSeries(pwmLine)
 
