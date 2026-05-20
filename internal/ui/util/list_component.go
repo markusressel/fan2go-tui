@@ -426,15 +426,24 @@ func (c *ListComponent[T]) showScrollbar() {
 
 func (c *ListComponent[T]) GetMaxVisibleItems() int {
 	configValue := c.config.MaxVisibleItems
-	if c.layout != nil {
-		if configValue <= 0 {
-			// compute the max visible items based on the available height
-			_, _, _, height := c.entriesLayout.GetRect()
-			dynamicMaxVisibleItems := util.Coerce(float64(height/c.config.MinHeightPerEntry), 1, float64(1000))
-			return int(dynamicMaxVisibleItems)
-		}
+	if configValue > 0 {
+		return configValue
 	}
-	return configValue
+	if c.layout == nil || c.entriesLayout == nil {
+		return 1
+	}
+
+	_, _, width, height := c.entriesLayout.GetRect()
+	// During startup, primitives may report a placeholder 1x1 rect before real layout is applied.
+	if height <= 1 || width <= 1 || (len(c.entryVisibilityMap) == 0 && height < c.config.MinHeightPerEntry) {
+		if len(c.entries) > 0 {
+			return len(c.entries)
+		}
+		return 1
+	}
+
+	dynamicMaxVisibleItems := util.Coerce(float64(height/c.config.MinHeightPerEntry), 1, float64(1000))
+	return int(dynamicMaxVisibleItems)
 }
 
 func (c *ListComponent[T]) insertEntryIntoVisibilityMap(entry *T, maxVisibleItems int) {
