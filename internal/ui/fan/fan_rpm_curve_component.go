@@ -22,9 +22,6 @@ type FanRpmCurveComponent struct {
 	layout         *tview.Flex
 	bmScatterPlot  *tvxwidgets.Plot
 	graphComponent *graph.GraphComponent
-
-	xFunc1 func(i int) float64
-	fFunc  func(x float64) float64
 }
 
 func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *FanRpmCurveComponent {
@@ -68,9 +65,6 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 		Fan:         fan,
 
 		pwmKeys: pwmKeys,
-
-		xFunc1: xFunc1,
-		fFunc:  fFunc,
 	}
 
 	graphConfig := graph.NewGraphComponentConfig().
