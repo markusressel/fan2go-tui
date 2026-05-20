@@ -7,7 +7,7 @@
 [![Latest Release](https://img.shields.io/github/release/markusressel/fan2go-tui.svg)](https://github.com/markusressel/fan2go-tui/releases)
 [![License](https://img.shields.io/badge/license-AGPLv3-blue.svg)](/LICENSE)
 
-[![asciicast](https://asciinema.org/a/612087.svg)](https://asciinema.org/a/612087)
+[![asciicast](https://asciinema.org/a/1098273.svg)](https://asciinema.org/a/1098273)
 
 </div>
 
