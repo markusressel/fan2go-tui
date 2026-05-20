@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/navidys/tvxwidgets"
 	"github.com/rivo/tview"
 )
 
@@ -37,6 +38,7 @@ func NewCurveGraphComponent(application *tview.Application, curve *client.Curve)
 		).
 		WithYAxisAutoScaleMin(false).
 		WithYAxisAutoScaleMax(false).
+		WithYAxisLabelDataType(tvxwidgets.PlotYAxisLabelDataInt).
 		WithOverlays(
 			graph.YLabel(
 				func() float64 {

@@ -25,6 +25,7 @@ type OverlayRenderContext struct {
 	Reversed           bool
 	SeriesData         [][]float64
 	SeriesColors       []tcell.Color
+	YAxisLabelsAreInts bool
 }
 
 type GraphComponentOverlay interface {

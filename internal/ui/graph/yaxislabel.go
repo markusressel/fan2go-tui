@@ -11,6 +11,7 @@ type YAxisLabelOverlay struct {
 	text      AxisLabelTextFunc
 	textColor tcell.Color
 	bgColor   *tcell.Color
+	xOffset   int
 }
 
 func NewYAxisLabelOverlay(y func() float64, text AxisLabelTextFunc) *YAxisLabelOverlay {
@@ -81,6 +82,27 @@ func (o *YAxisLabelOverlay) WithBackgroundColor(color tcell.Color) *YAxisLabelOv
 	return o
 }
 
+// WithXOffset shifts the label horizontally after auto alignment. Negative values move left.
+func (o *YAxisLabelOverlay) WithXOffset(offset int) *YAxisLabelOverlay {
+	o.xOffset = offset
+	return o
+}
+
+func countIntegerDigits(v float64) int {
+	value := math.Abs(math.Trunc(v))
+	if value < 1 {
+		return 1
+	}
+
+	digits := 0
+	for value >= 1 {
+		value /= 10
+		digits++
+	}
+
+	return digits
+}
+
 func (o *YAxisLabelOverlay) draw(screen tcell.Screen, ctx OverlayRenderContext) {
 	if o.y == nil || o.text == nil || ctx.Plot == nil || ctx.YMax <= ctx.YMin {
 		return
@@ -118,7 +140,26 @@ func (o *YAxisLabelOverlay) draw(screen tcell.Screen, ctx OverlayRenderContext) 
 		return
 	}
 
-	maxXExclusive := plotX - 2
+	maxRangeDigits := countIntegerDigits(ctx.YMax)
+	if minDigits := countIntegerDigits(ctx.YMin); minDigits > maxRangeDigits {
+		maxRangeDigits = minDigits
+	}
+
+	currentDigits := countIntegerDigits(yValue)
+	dynamicOffset := maxRangeDigits - currentDigits
+	if dynamicOffset < 0 {
+		dynamicOffset = 0
+	}
+
+	constantOffset := 1
+	if ctx.YAxisLabelsAreInts {
+		// tvxwidgets still reserves width for "%.2f" even in int mode,
+		// so int ticks need an additional 2-column left shift.
+		constantOffset = 4
+	}
+
+	totalLeftOffset := constantOffset + dynamicOffset
+	maxXExclusive := plotX - totalLeftOffset + o.xOffset
 	if maxXExclusive <= innerX {
 		return
 	}

@@ -7,6 +7,7 @@ import (
 	"math"
 
 	"github.com/gdamore/tcell/v2"
+	"github.com/navidys/tvxwidgets"
 	"github.com/qdm12/reprint"
 	"github.com/rivo/tview"
 )
@@ -161,6 +162,7 @@ func (c *GraphComponent) Refresh() {
 		Reversed:           c.config.Reversed,
 		SeriesData:         combinedData,
 		SeriesColors:       c.getPlotColors(len(combinedData)),
+		YAxisLabelsAreInts: c.config.YAxisLabelDataType == tvxwidgets.PlotYAxisLabelDataInt,
 	})
 
 	// TODO: think about what to do with multiple lines
