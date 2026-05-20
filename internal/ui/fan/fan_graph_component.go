@@ -21,20 +21,30 @@ type FanGraphComponent struct {
 }
 
 func NewFanGraphComponent(application *tview.Application, fan *client.Fan) *FanGraphComponent {
+	rpmValues := &[]float64{}
+	pwmValues := &[]float64{}
+	c := &FanGraphComponent{
+		application: application,
+		Fan:         fan,
+		rpmValues:   rpmValues,
+		pwmValues:   pwmValues,
+	}
+
 	graphConfig := graph.NewGraphComponentConfig().
 		WithReversedOrder().
 		WithPlotColors(theme.Colors.Graph.Rpm, theme.Colors.Graph.Pwm).
 		WithYAxisAutoScaleMin(false).
 		WithYAxisAutoScaleMax(true).
-		WithYAxisLabelDataType(tvxwidgets.PlotYAxisLabelDataInt)
+		WithYAxisLabelDataType(tvxwidgets.PlotYAxisLabelDataInt).
+		WithOverlays(
+			newCurrentRpmYAxisLabelOverlay(func() *client.Fan { return c.Fan }),
+		)
 
 	graphComponent := graph.NewGraphComponent(
 		application,
 		graphConfig,
 	)
 
-	rpmValues := &[]float64{}
-	pwmValues := &[]float64{}
 	rpmProvider := graph.NewRoundedSliceSeriesValueProvider(rpmValues)
 	pwmProvider := graph.NewRoundedSliceSeriesValueProvider(pwmValues)
 	rpmLine := graph.NewGraphLineFromSeriesValueProvider("RPM", rpmProvider)
@@ -45,13 +55,7 @@ func NewFanGraphComponent(application *tview.Application, fan *client.Fan) *FanG
 	minVal := 0.0
 	graphComponent.SetYMinValue(&minVal)
 
-	c := &FanGraphComponent{
-		application:    application,
-		graphComponent: graphComponent,
-		Fan:            fan,
-		rpmValues:      rpmValues,
-		pwmValues:      pwmValues,
-	}
+	c.graphComponent = graphComponent
 
 	c.layout = c.createLayout()
 	c.layout.AddItem(graphComponent.GetLayout(), 0, 1, false)

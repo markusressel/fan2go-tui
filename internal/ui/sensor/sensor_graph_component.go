@@ -4,8 +4,6 @@ import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/ui/graph"
 	"fan2go-tui/internal/ui/theme"
-	"fmt"
-	"math"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -40,30 +38,7 @@ func NewSensorGraphComponent(application *tview.Application, sensor *client.Sens
 		WithYAxisAutoScaleMin(false).
 		WithYAxisAutoScaleMax(false).
 		WithOverlays(
-			graph.YLabel(
-				func() float64 {
-					sensor := c.Sensor
-					if sensor == nil {
-						return math.NaN()
-					}
-					return sensor.MovingAvg / 1000
-				},
-				func(_ graph.OverlayRenderContext) string {
-					sensor := c.Sensor
-					if sensor == nil {
-						return ""
-					}
-
-					value := sensor.MovingAvg / 1000
-					if math.IsNaN(value) || math.IsInf(value, 0) {
-						return ""
-					}
-
-					return fmt.Sprintf("%.2f", value)
-				},
-			).
-				WithTextColor(theme.Colors.Graph.YAxisValueLabelText).
-				WithBackgroundColor(theme.Colors.Graph.YAxisValueLabelBackground),
+			newCurrentSensorYAxisLabelOverlay(func() *client.Sensor { return c.Sensor }),
 		)
 
 	graphComponent := graph.NewGraphComponent(

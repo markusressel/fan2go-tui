@@ -4,8 +4,6 @@ import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/ui/graph"
 	"fan2go-tui/internal/ui/theme"
-	"fmt"
-	"math"
 
 	"github.com/navidys/tvxwidgets"
 	"github.com/rivo/tview"
@@ -40,30 +38,7 @@ func NewCurveGraphComponent(application *tview.Application, curve *client.Curve)
 		WithYAxisAutoScaleMax(false).
 		WithYAxisLabelDataType(tvxwidgets.PlotYAxisLabelDataInt).
 		WithOverlays(
-			graph.YLabel(
-				func() float64 {
-					curve := c.Curve
-					if curve == nil {
-						return math.NaN()
-					}
-					return curve.Value
-				},
-				func(_ graph.OverlayRenderContext) string {
-					curve := c.Curve
-					if curve == nil {
-						return ""
-					}
-
-					value := curve.Value
-					if math.IsNaN(value) || math.IsInf(value, 0) {
-						return ""
-					}
-
-					return fmt.Sprintf("%d", int(value))
-				},
-			).
-				WithTextColor(theme.Colors.Graph.YAxisValueLabelText).
-				WithBackgroundColor(theme.Colors.Graph.YAxisValueLabelBackground),
+			newCurrentCurveYAxisLabelOverlay(func() *client.Curve { return c.Curve }),
 		)
 
 	graphComponent := graph.NewGraphComponent(
