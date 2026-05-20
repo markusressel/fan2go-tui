@@ -44,6 +44,9 @@ type Color struct {
 type GraphsColors struct {
 	Default tcell.Color
 
+	YAxisValueLabelText       tcell.Color
+	YAxisValueLabelBackground tcell.Color
+
 	// Fan
 	Rpm              tcell.Color
 	Pwm              tcell.Color

@@ -4,6 +4,8 @@ import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/ui/graph"
 	"fan2go-tui/internal/ui/theme"
+	"fmt"
+	"math"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -21,6 +23,13 @@ type SensorGraphComponent struct {
 }
 
 func NewSensorGraphComponent(application *tview.Application, sensor *client.Sensor) *SensorGraphComponent {
+	values := &[]float64{}
+	c := &SensorGraphComponent{
+		application: application,
+		Sensor:      sensor,
+		values:      values,
+	}
+
 	graphConfig := graph.NewGraphComponentConfig().
 		WithReversedOrder().
 		WithPlotColors(
@@ -29,14 +38,39 @@ func NewSensorGraphComponent(application *tview.Application, sensor *client.Sens
 			theme.Colors.Graph.SensorMax,
 		).
 		WithYAxisAutoScaleMin(false).
-		WithYAxisAutoScaleMax(false)
+		WithYAxisAutoScaleMax(false).
+		WithOverlays(
+			graph.YLabel(
+				func() float64 {
+					sensor := c.Sensor
+					if sensor == nil {
+						return math.NaN()
+					}
+					return sensor.MovingAvg / 1000
+				},
+				func(_ graph.OverlayRenderContext) string {
+					sensor := c.Sensor
+					if sensor == nil {
+						return ""
+					}
+
+					value := sensor.MovingAvg / 1000
+					if math.IsNaN(value) || math.IsInf(value, 0) {
+						return ""
+					}
+
+					return fmt.Sprintf("%.2f", value)
+				},
+			).
+				WithTextColor(theme.Colors.Graph.YAxisValueLabelText).
+				WithBackgroundColor(theme.Colors.Graph.YAxisValueLabelBackground),
+		)
 
 	graphComponent := graph.NewGraphComponent(
 		application,
 		graphConfig,
 	)
 
-	values := &[]float64{}
 	seriesValueProvider := graph.NewRoundedSliceSeriesValueProvider(values)
 	bar := graph.NewGraphBarFromSeriesValueProvider("Sensor", seriesValueProvider)
 	bar.SetColor(theme.Colors.Graph.Sensor)
@@ -57,13 +91,8 @@ func NewSensorGraphComponent(application *tview.Application, sensor *client.Sens
 
 	graphComponent.SetYRange(0, 100)
 
-	c := &SensorGraphComponent{
-		application:    application,
-		graphComponent: graphComponent,
-		graphBar:       bar,
-		Sensor:         sensor,
-		values:         values,
-	}
+	c.graphComponent = graphComponent
+	c.graphBar = bar
 
 	c.layout = c.createLayout()
 	c.layout.AddItem(graphComponent.GetLayout(), 0, 1, false)

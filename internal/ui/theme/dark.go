@@ -39,6 +39,9 @@ var (
 		Graph: GraphsColors{
 			Default: tcell.ColorBlue,
 
+			YAxisValueLabelText:       SecondaryColor,
+			YAxisValueLabelBackground: OnSecondary,
+
 			Rpm:              tcell.ColorBlue,
 			Pwm:              PrimaryVariantColor,
 			CurrentPwmLine:   PrimaryVariantColor,
