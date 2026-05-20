@@ -1,6 +1,9 @@
 package fan
 
-import "testing"
+import (
+	"fan2go-tui/internal/client"
+	"testing"
+)
 
 func TestFanListItemComponentSetFanWithNilSubcomponentsDoesNotPanic(t *testing.T) {
 	c := &FanListItemComponent{}
@@ -24,4 +27,20 @@ func TestFanRpmCurveComponentSetFanOnNilReceiverDoesNotPanic(t *testing.T) {
 	}()
 
 	c.SetFan(nil)
+}
+
+func TestHasFanCurveData(t *testing.T) {
+	if hasFanCurveData(nil) {
+		t.Fatalf("expected no curve data for nil fan")
+	}
+
+	empty := map[int]float64{}
+	if hasFanCurveData(&client.Fan{FanCurveData: &empty}) {
+		t.Fatalf("expected no curve data for empty map")
+	}
+
+	withData := map[int]float64{42: 1700}
+	if !hasFanCurveData(&client.Fan{FanCurveData: &withData}) {
+		t.Fatalf("expected curve data when map is non-empty")
+	}
 }

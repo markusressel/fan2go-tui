@@ -19,6 +19,13 @@ type FanListItemComponent struct {
 	fanRpmCurveComponent *FanRpmCurveComponent
 }
 
+func hasFanCurveData(fan *client.Fan) bool {
+	if fan == nil || fan.FanCurveData == nil {
+		return false
+	}
+	return len(*fan.FanCurveData) > 0
+}
+
 func NewFanListItemComponent(application *tview.Application, fan *client.Fan) *FanListItemComponent {
 	c := &FanListItemComponent{
 		application: application,
@@ -50,17 +57,19 @@ func (c *FanListItemComponent) createLayout() *tview.Flex {
 	fanColumnLayout.AddItem(fanGraphsRowLayout, 0, 3, true)
 
 	{
-		fanGraphComponent := NewFanGraphComponent(c.application, f)
-		c.fanGraphComponent = fanGraphComponent
-		fanGraphComponent.SetFan(f)
-		layout = fanGraphComponent.GetLayout()
-		fanGraphsRowLayout.AddItem(layout, 0, 1, true)
-
-		fanRpmCurveComponent := NewFanRpmCurveComponent(c.application, f)
-		c.fanRpmCurveComponent = fanRpmCurveComponent
-		fanRpmCurveComponent.SetFan(f)
-		layout = fanRpmCurveComponent.GetLayout()
-		fanGraphsRowLayout.AddItem(layout, 0, 1, true)
+		if hasFanCurveData(f) {
+			fanRpmCurveComponent := NewFanRpmCurveComponent(c.application, f)
+			c.fanRpmCurveComponent = fanRpmCurveComponent
+			fanRpmCurveComponent.SetFan(f)
+			layout = fanRpmCurveComponent.GetLayout()
+			fanGraphsRowLayout.AddItem(layout, 0, 1, true)
+		} else {
+			fanGraphComponent := NewFanGraphComponent(c.application, f)
+			c.fanGraphComponent = fanGraphComponent
+			fanGraphComponent.SetFan(f)
+			layout = fanGraphComponent.GetLayout()
+			fanGraphsRowLayout.AddItem(layout, 0, 1, true)
+		}
 	}
 
 	return rootLayout
