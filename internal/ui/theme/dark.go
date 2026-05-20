@@ -39,6 +39,9 @@ var (
 		Graph: GraphsColors{
 			Default: tcell.ColorBlue,
 
+			XAxisValueLabelText:       SecondaryColor,
+			XAxisValueLabelBackground: OnSecondary,
+
 			YAxisValueLabelText:       SecondaryColor,
 			YAxisValueLabelBackground: OnSecondary,
 

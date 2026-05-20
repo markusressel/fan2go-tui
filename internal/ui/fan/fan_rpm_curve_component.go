@@ -46,6 +46,7 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 		WithYAxisLabelDataType(tvxwidgets.PlotYAxisLabelDataInt).
 		WithOverlays(
 			newCurrentRpmYAxisLabelOverlay(func() *client.Fan { return c.Fan }),
+			newCurrentPwmXAxisLabelOverlay(func() *client.Fan { return c.Fan }),
 			graph.VLine(
 				func() float64 {
 					fan := c.Fan

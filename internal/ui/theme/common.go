@@ -44,6 +44,9 @@ type Color struct {
 type GraphsColors struct {
 	Default tcell.Color
 
+	XAxisValueLabelText       tcell.Color
+	XAxisValueLabelBackground tcell.Color
+
 	YAxisValueLabelText       tcell.Color
 	YAxisValueLabelBackground tcell.Color
 
