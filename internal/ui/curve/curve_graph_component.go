@@ -4,6 +4,8 @@ import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/ui/graph"
 	"fan2go-tui/internal/ui/theme"
+	"fmt"
+	"math"
 
 	"github.com/rivo/tview"
 )
@@ -19,6 +21,13 @@ type CurveGraphComponent struct {
 }
 
 func NewCurveGraphComponent(application *tview.Application, curve *client.Curve) *CurveGraphComponent {
+	values := &[]float64{}
+	c := &CurveGraphComponent{
+		application: application,
+		Curve:       curve,
+		values:      values,
+	}
+
 	graphConfig := graph.NewGraphComponentConfig().
 		WithReversedOrder().
 		WithPlotColors(
@@ -27,26 +36,46 @@ func NewCurveGraphComponent(application *tview.Application, curve *client.Curve)
 			theme.Colors.Graph.CurveMax,
 		).
 		WithYAxisAutoScaleMin(false).
-		WithYAxisAutoScaleMax(false)
+		WithYAxisAutoScaleMax(false).
+		WithOverlays(
+			graph.YLabel(
+				func() float64 {
+					curve := c.Curve
+					if curve == nil {
+						return math.NaN()
+					}
+					return curve.Value
+				},
+				func(_ graph.OverlayRenderContext) string {
+					curve := c.Curve
+					if curve == nil {
+						return ""
+					}
+
+					value := curve.Value
+					if math.IsNaN(value) || math.IsInf(value, 0) {
+						return ""
+					}
+
+					return fmt.Sprintf("%d", int(value))
+				},
+			).
+				WithTextColor(theme.Colors.Graph.YAxisValueLabelText).
+				WithBackgroundColor(theme.Colors.Graph.YAxisValueLabelBackground),
+		)
 
 	graphComponent := graph.NewGraphComponent(
 		application,
 		graphConfig,
 	)
 
-	values := &[]float64{}
 	seriesValueProvider := graph.NewRoundedSliceSeriesValueProvider(values)
 	line := graph.NewGraphLineFromSeriesValueProvider("Curve", seriesValueProvider)
 	graphComponent.AddSeries(line)
 
 	graphComponent.SetYRange(0, 255)
 
-	c := &CurveGraphComponent{
-		application:    application,
-		graphComponent: graphComponent,
-		Curve:          curve,
-		values:         values,
-	}
+	c.graphComponent = graphComponent
 
 	c.layout = c.createLayout()
 	c.layout.AddItem(graphComponent.GetLayout(), 0, 1, false)
