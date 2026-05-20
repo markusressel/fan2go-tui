@@ -49,8 +49,8 @@ func NewFanGraphComponent(application *tview.Application, fan *client.Fan) *FanG
 	pwmProvider := graph.NewRoundedSliceSeriesValueProvider(pwmValues)
 	rpmLine := graph.NewGraphLineFromSeriesValueProvider("RPM", rpmProvider)
 	pwmLine := graph.NewGraphLineFromSeriesValueProvider("PWM", pwmProvider)
-	graphComponent.AddSeries(rpmLine)
-	graphComponent.AddSeries(pwmLine)
+	graphComponent.AddSeries(rpmLine, graph.WithLegend(graph.NewGraphSeriesLegend("RPM")))
+	graphComponent.AddSeries(pwmLine, graph.WithLegend(graph.NewGraphSeriesLegend("PWM")))
 
 	minVal := 0.0
 	graphComponent.SetYMinValue(&minVal)

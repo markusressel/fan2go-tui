@@ -62,7 +62,7 @@ func NewSensorGraphComponent(application *tview.Application, sensor *client.Sens
 			{YValue: yMax, Color: tcell.NewRGBColor(220, 40, 30)},
 		}
 	})
-	graphComponent.AddSeries(bar)
+	graphComponent.AddSeries(bar, graph.WithLegend(graph.NewGraphSeriesLegend("Temperature").WithUnit("°C")))
 
 	graphComponent.SetYRange(0, 100)
 

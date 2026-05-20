@@ -18,6 +18,7 @@ type GraphComponent struct {
 	config *GraphComponentConfig
 
 	series []GraphSeries
+	legend []*GraphSeriesLegend
 
 	yMinValue *float64
 	yMaxValue *float64
@@ -53,6 +54,18 @@ type GraphSeries interface {
 
 type GraphDataSource struct {
 	Value float64
+}
+
+type GraphSeriesOption func(*graphSeriesOptions)
+
+type graphSeriesOptions struct {
+	legend *GraphSeriesLegend
+}
+
+func WithLegend(legend *GraphSeriesLegend) GraphSeriesOption {
+	return func(opts *graphSeriesOptions) {
+		opts.legend = legend
+	}
 }
 
 func NewGraphComponent(
@@ -152,6 +165,8 @@ func (c *GraphComponent) Refresh() {
 	c.plotLayout.SetData(placeholderData)
 	c.applyAutoScaleFromData(combinedData)
 	overlayYMin, overlayYMax := c.computeOverlayPointYRange(combinedData)
+	lineColors := c.getPlotColors(len(combinedData))
+	legendOverlay := c.buildLegendOverlay(c.getPlotColors(len(c.series)))
 	c.plotLayout.SetOverlayContext(OverlayRenderContext{
 		XValueToIndex:      c.mapXValueToIndex,
 		XValueToIndexFloat: c.mapXValueToIndexFloat,
@@ -161,8 +176,9 @@ func (c *GraphComponent) Refresh() {
 		ValueBufferSize:    c.GetValueBufferSize(),
 		Reversed:           c.config.Reversed,
 		SeriesData:         combinedData,
-		SeriesColors:       c.getPlotColors(len(combinedData)),
+		SeriesColors:       lineColors,
 		YAxisLabelsAreInts: c.config.YAxisLabelDataType == tvxwidgets.PlotYAxisLabelDataInt,
+		LegendOverlay:      legendOverlay,
 	})
 
 	// TODO: think about what to do with multiple lines
@@ -443,15 +459,116 @@ func (c *GraphComponent) GetValueBufferSize() int {
 	return c.valueBufferSize
 }
 
-func (c *GraphComponent) AddSeries(series GraphSeries) {
+func (c *GraphComponent) AddSeries(series GraphSeries, options ...GraphSeriesOption) {
+	opts := graphSeriesOptions{}
+	for _, option := range options {
+		if option != nil {
+			option(&opts)
+		}
+	}
+
 	switch series.(type) {
 	case *GraphLine, *GraphBar:
 		c.series = append(c.series, series)
+		c.legend = append(c.legend, opts.legend)
 	default:
 		panic("unsupported graph series type")
 	}
 
 	c.setXAxisLabelFunc(series)
+}
+
+func (c *GraphComponent) AddSeriesWithLegend(series GraphSeries, legend *GraphSeriesLegend) {
+	c.AddSeries(series, WithLegend(legend))
+}
+
+func (c *GraphComponent) buildLegendOverlay(seriesColors []tcell.Color) *LegendOverlay {
+	if len(c.legend) == 0 {
+		return nil
+	}
+
+	entries := make([]LegendOverlayEntry, 0, len(c.legend))
+	for i, legend := range c.legend {
+		if legend == nil {
+			continue
+		}
+
+		text := legend.displayText()
+		if text == "" {
+			continue
+		}
+
+		bgColor := tcell.ColorWhite
+		if i < len(seriesColors) {
+			bgColor = seriesColors[i]
+		}
+		if legend.backgroundColor != nil {
+			bgColor = *legend.backgroundColor
+		}
+
+		glyph := rune(0x25CF) // ●
+		if legend.glyph != nil {
+			glyph = *legend.glyph
+		}
+
+		textColor := tcell.ColorDefault
+		autoTextColor := true
+		if legend.textColor != nil {
+			textColor = *legend.textColor
+			autoTextColor = false
+		}
+
+		entries = append(entries, LegendOverlayEntry{
+			Text:            text,
+			TextColor:       textColor,
+			AutoTextColor:   autoTextColor,
+			BackgroundColor: bgColor,
+			Glyph:           glyph,
+		})
+	}
+
+	if len(entries) == 0 {
+		return nil
+	}
+
+	return &LegendOverlay{
+		Corner:  c.config.LegendCorner,
+		Entries: entries,
+	}
+}
+
+func pickReadableTextColor(bg tcell.Color) tcell.Color {
+	r, g, b := bg.RGB()
+	bgLum := relativeLuminance(r, g, b)
+
+	// Choose the better contrast between pure black and pure white text.
+	blackContrast := contrastRatio(bgLum, 0.0)
+	whiteContrast := contrastRatio(bgLum, 1.0)
+	if whiteContrast > blackContrast {
+		return tcell.ColorWhite
+	}
+	return tcell.ColorBlack
+}
+
+func relativeLuminance(r, g, b int32) float64 {
+	rf := linearizedSrgb(float64(r) / 255.0)
+	gf := linearizedSrgb(float64(g) / 255.0)
+	bf := linearizedSrgb(float64(b) / 255.0)
+	return (0.2126 * rf) + (0.7152 * gf) + (0.0722 * bf)
+}
+
+func linearizedSrgb(v float64) float64 {
+	if v <= 0.04045 {
+		return v / 12.92
+	}
+	return math.Pow((v+0.055)/1.055, 2.4)
+}
+
+func contrastRatio(a, b float64) float64 {
+	if a < b {
+		a, b = b, a
+	}
+	return (a + 0.05) / (b + 0.05)
 }
 
 func (c *GraphComponent) setXAxisLabelFunc(series GraphSeries) {

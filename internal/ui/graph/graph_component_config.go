@@ -35,6 +35,8 @@ type GraphComponentConfig struct {
 
 	// Overlays are rendered in declaration order, later overlays are drawn on top.
 	Overlays []GraphComponentOverlay
+
+	LegendCorner LegendCorner
 }
 
 // NewGraphComponentConfig creates a new GraphComponentConfig with default values
@@ -49,6 +51,7 @@ func NewGraphComponentConfig() *GraphComponentConfig {
 		YAxisLabelDataType: tvxwidgets.PlotYAxisLabelDataFloat,
 		PlotColors:         []tcell.Color{tcell.ColorWhite, tcell.ColorWhite, tcell.ColorWhite, tcell.ColorWhite, tcell.ColorWhite},
 		Reversed:           false,
+		LegendCorner:       LegendCornerTopRight,
 	}
 }
 
@@ -109,4 +112,9 @@ func (c *GraphComponentConfig) WithOverlays(overlays ...GraphComponentOverlay) *
 // WithOverlay is a backward-compatible alias for WithOverlays.
 func (c *GraphComponentConfig) WithOverlay(overlays ...GraphComponentOverlay) *GraphComponentConfig {
 	return c.WithOverlays(overlays...)
+}
+
+func (c *GraphComponentConfig) WithLegendCorner(corner LegendCorner) *GraphComponentConfig {
+	c.LegendCorner = corner
+	return c
 }

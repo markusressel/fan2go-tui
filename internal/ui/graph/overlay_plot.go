@@ -90,6 +90,9 @@ func (p *OverlayPlot) Draw(screen tcell.Screen) {
 	for _, overlay := range p.overlays {
 		overlay.draw(screen, ctx)
 	}
+	if ctx.LegendOverlay != nil {
+		ctx.LegendOverlay.draw(screen, ctx)
+	}
 }
 
 func (p *OverlayPlot) drawLineSeries(screen tcell.Screen, ctx OverlayRenderContext) {

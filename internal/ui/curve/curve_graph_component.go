@@ -48,7 +48,7 @@ func NewCurveGraphComponent(application *tview.Application, curve *client.Curve)
 
 	seriesValueProvider := graph.NewRoundedSliceSeriesValueProvider(values)
 	line := graph.NewGraphLineFromSeriesValueProvider("Curve", seriesValueProvider)
-	graphComponent.AddSeries(line)
+	graphComponent.AddSeries(line, graph.WithLegend(graph.NewGraphSeriesLegend("Value")))
 
 	graphComponent.SetYRange(0, 255)
 

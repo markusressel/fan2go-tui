@@ -43,6 +43,7 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 		WithYAxisAutoScaleMin(false).
 		WithYAxisAutoScaleMax(true).
 		WithDrawXAxisLabel(true).
+		WithLegendCorner(graph.LegendCornerBottomRight).
 		WithYAxisLabelDataType(tvxwidgets.PlotYAxisLabelDataInt).
 		WithOverlays(
 			newCurrentRpmYAxisLabelOverlay(c.getFan),
@@ -72,7 +73,7 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 		graphConfig,
 	)
 
-	graphComponent.AddSeries(rpmGraphLine)
+	graphComponent.AddSeries(rpmGraphLine, graph.WithLegend(graph.NewGraphSeriesLegend("RPM / PWM")))
 	graphComponent.SetXRange(fanRpmCurveMinX, fanRpmCurveMaxX)
 	c.graphComponent = graphComponent
 

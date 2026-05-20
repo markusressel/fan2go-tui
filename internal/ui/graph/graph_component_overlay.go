@@ -26,6 +26,7 @@ type OverlayRenderContext struct {
 	SeriesData         [][]float64
 	SeriesColors       []tcell.Color
 	YAxisLabelsAreInts bool
+	LegendOverlay      *LegendOverlay
 }
 
 type GraphComponentOverlay interface {
