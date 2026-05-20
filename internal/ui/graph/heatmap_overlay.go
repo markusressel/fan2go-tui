@@ -1,8 +1,6 @@
 package graph
 
 import (
-	"math"
-
 	"github.com/gdamore/tcell/v2"
 )
 
@@ -48,7 +46,7 @@ func (o *HeatmapOverlay) WithMaxPoints(maxPoints int) *HeatmapOverlay {
 }
 
 func (o *HeatmapOverlay) draw(screen tcell.Screen, ctx OverlayRenderContext) {
-	if o.points == nil || ctx.Plot == nil || ctx.XValueToIndex == nil || ctx.YMax <= ctx.YMin {
+	if o.points == nil || !hasValidXYOverlayContext(ctx) {
 		return
 	}
 
@@ -70,7 +68,7 @@ func (o *HeatmapOverlay) draw(screen tcell.Screen, ctx OverlayRenderContext) {
 	count := float64(len(points))
 
 	for i, point := range points {
-		if math.IsNaN(point.X) || math.IsNaN(point.Y) || math.IsInf(point.X, 0) || math.IsInf(point.Y, 0) {
+		if !isFiniteXY(point) {
 			continue
 		}
 

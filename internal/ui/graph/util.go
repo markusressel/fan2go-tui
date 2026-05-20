@@ -1,10 +1,20 @@
 package graph
 
 import (
+	"math"
+
 	"github.com/gdamore/tcell/v2"
 )
 
 type AxisLabelTextFunc func(ctx OverlayRenderContext) string
+
+func hasValidXYOverlayContext(ctx OverlayRenderContext) bool {
+	return ctx.Plot != nil && ctx.XValueToIndex != nil && ctx.YMax > ctx.YMin
+}
+
+func isFiniteXY(point XY) bool {
+	return !math.IsNaN(point.X) && !math.IsNaN(point.Y) && !math.IsInf(point.X, 0) && !math.IsInf(point.Y, 0)
+}
 
 func drawOverlayText(
 	screen tcell.Screen,

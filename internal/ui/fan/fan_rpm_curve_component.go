@@ -11,9 +11,9 @@ import (
 )
 
 const (
-	fanRpmCurveMinX               = 0.0
-	fanRpmCurveMaxX               = 255.0
-	fanRpmCurveHeatmapHistorySize = 200
+	fanRpmCurveMinX             = 0.0
+	fanRpmCurveMaxX             = 255.0
+	fanRpmCurveTrailHistorySize = 200
 )
 
 type FanRpmCurveComponent struct {
@@ -38,7 +38,7 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 	c := &FanRpmCurveComponent{
 		application: application,
 		Fan:         fan,
-		history:     make([]graph.XY, 0, fanRpmCurveHeatmapHistorySize),
+		history:     make([]graph.XY, 0, fanRpmCurveTrailHistorySize),
 	}
 
 	graphConfig := graph.NewGraphComponentConfig().
@@ -69,9 +69,9 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 					return graph.XY{X: float64(fan.Pwm), Y: float64(fan.Rpm)}
 				},
 			).WithColor(theme.Colors.Graph.CurrentRpmMarker),
-			graph.Heatmap(c.getHistory).
-				WithColor(theme.Colors.Graph.HeatmapBase).
-				WithMaxPoints(fanRpmCurveHeatmapHistorySize),
+			graph.Trail(c.getHistory).
+				WithColor(theme.Colors.Graph.CurrentPwmLine).
+				WithMaxPoints(fanRpmCurveTrailHistorySize),
 		)
 
 	graphComponent := graph.NewGraphComponent(
@@ -113,8 +113,8 @@ func (c *FanRpmCurveComponent) getHistory() []graph.XY {
 
 func (c *FanRpmCurveComponent) appendHistory(pwm, rpm float64) {
 	c.history = append(c.history, graph.XY{X: pwm, Y: rpm})
-	if len(c.history) > fanRpmCurveHeatmapHistorySize {
-		c.history = c.history[len(c.history)-fanRpmCurveHeatmapHistorySize:]
+	if len(c.history) > fanRpmCurveTrailHistorySize {
+		c.history = c.history[len(c.history)-fanRpmCurveTrailHistorySize:]
 	}
 }
 
