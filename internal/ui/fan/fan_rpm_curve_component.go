@@ -20,7 +20,6 @@ type FanRpmCurveComponent struct {
 	pwmKeys []int
 
 	layout         *tview.Flex
-	bmScatterPlot  *tvxwidgets.Plot
 	graphComponent *graph.GraphComponent
 }
 

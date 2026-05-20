@@ -17,7 +17,6 @@ type FanGraphComponent struct {
 	Fan *client.Fan
 
 	layout         *tview.Flex
-	bmScatterPlot  *tvxwidgets.Plot
 	graphComponent *graph.GraphComponent
 	rpmValues      *[]float64
 	pwmValues      *[]float64

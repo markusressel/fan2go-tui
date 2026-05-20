@@ -7,7 +7,6 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/navidys/tvxwidgets"
 	"github.com/rivo/tview"
 )
 
@@ -17,7 +16,6 @@ type CurveGraphComponent struct {
 	Curve *client.Curve
 
 	layout         *tview.Flex
-	bmScatterPlot  *tvxwidgets.Plot
 	graphComponent *graph.GraphComponent
 	values         *[]float64
 }
