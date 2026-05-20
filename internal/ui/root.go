@@ -77,7 +77,11 @@ func CreateUi(fullscreen bool) *tview.Application {
 		return event
 	})
 
-	mainPage.Init()
+	go func() {
+		application.QueueUpdateDraw(func() {
+			mainPage.Init()
+		})
+	}()
 
 	go func() {
 		for {

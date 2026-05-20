@@ -12,7 +12,7 @@ func IsTxViewVisible(view tview.Primitive) bool {
 	case *tview.Box:
 		box := view.(*tview.Box)
 		_, _, width, height := box.GetInnerRect()
-		return width <= 0 && height <= 0
+		return width > 0 && height > 0
 	case *tview.Flex:
 		viewToCheck = view.(*tview.Flex).Box
 	case *tview.Grid:
@@ -27,5 +27,5 @@ func IsTxViewVisible(view tview.Primitive) bool {
 
 	innerWidth := reflect.ValueOf(viewToCheck).Elem().FieldByName("innerWidth").Int()
 	innerHeight := reflect.ValueOf(viewToCheck).Elem().FieldByName("innerHeight").Int()
-	return innerWidth <= 0 && innerHeight <= 0
+	return innerWidth > 0 && innerHeight > 0
 }

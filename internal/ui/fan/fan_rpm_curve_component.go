@@ -90,6 +90,7 @@ func (c *FanRpmCurveComponent) refresh() {
 		return
 	}
 
+	c.graphComponent.Refresh()
 	c.graphComponent.ZoomToRangeX(0, 255)
 	c.graphComponent.Refresh()
 }

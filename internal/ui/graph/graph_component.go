@@ -379,15 +379,23 @@ func (c *GraphComponent) computePlotSeriesData() [][]float64 {
 }
 
 func (c *GraphComponent) ZoomToRangeX(minX, maxX float64) {
+	span := maxX - minX
+	if span <= 0 {
+		return
+	}
+
+	_, _, width, _ := c.plotLayout.GetInnerRect()
+	availableSlots := width - 10
+	if availableSlots <= 0 {
+		return
+	}
+
+	newFactor := span / float64(availableSlots)
+	if math.IsNaN(newFactor) || math.IsInf(newFactor, 0) || newFactor <= 0 {
+		return
+	}
+
 	for _, series := range c.GetSeries() {
-		iAtXMin := series.MapXtoI(minX)
-		iAtXMax := series.MapXtoI(maxX)
-
-		_, _, width, _ := c.plotLayout.GetRect()
-		availableSlots := width - 10
-
-		xScaleFactorToGetXMaxAtEndOfBuffer := float64(1) / (float64(availableSlots) / float64(iAtXMax-iAtXMin))
-		newFactor := series.GetXAxisZoomFactor() * xScaleFactorToGetXMaxAtEndOfBuffer
 		series.SetXAxisZoomFactor(newFactor)
 	}
 }
@@ -403,11 +411,13 @@ func (c *GraphComponent) SetTitle(title string) {
 
 func (c *GraphComponent) UpdateValueBufferSize() {
 	if !c.isVisible() {
-		c.setValueBufferSize(500)
 		return
 	}
 
 	_, _, width, _ := c.plotLayout.GetInnerRect()
+	if width <= 0 {
+		return
+	}
 	c.setValueBufferSize(width)
 }
 
