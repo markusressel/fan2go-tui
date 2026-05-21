@@ -237,22 +237,77 @@ func (c *ListComponent[T]) scrollByPage(direction int) {
 	if len(c.entries) == 0 {
 		return
 	}
-	rowsPerPage := c.GetMaxVisibleItems() - 1
-	if rowsPerPage < 1 {
-		rowsPerPage = 1
-	}
-	rows := rowsPerPage * direction
 
-	c.scroll(rows)
-	if c.GetSelectedItem() == nil {
-		c.SelectFirst()
+	data := c.GetData()
+	pageSize := c.GetMaxVisibleItems()
+	if pageSize < 1 {
+		pageSize = 1
+	}
+
+	selected := c.GetSelectedItem()
+	currentIndex := slices.Index(data, selected)
+	if currentIndex < 0 {
+		currentIndex = 0
+	}
+
+	visibleMin, visibleMax := c.GetVisibleRange()
+	if visibleMin < 0 || visibleMin >= len(data) || visibleMax < visibleMin {
+		visibleMin = 0
+		visibleMax = int(math.Min(float64(len(data)-1), float64(pageSize-1)))
+	}
+
+	if direction > 0 && visibleMax < len(data)-1 {
+		c.setVisibleWindow(visibleMax+1, pageSize)
+	} else if direction < 0 && visibleMin > 0 {
+		c.setVisibleWindow(int(math.Max(0, float64(visibleMin-pageSize))), pageSize)
+	}
+
+	targetIndex := currentIndex + (direction * pageSize)
+	targetIndex = int(math.Max(0, math.Min(float64(targetIndex), float64(len(data)-1))))
+	c.selectAtDataIndex(data, targetIndex)
+	c.application.ForceDraw()
+}
+
+func (c *ListComponent[T]) setVisibleWindow(startIndex int, pageSize int) {
+	if pageSize < 1 {
+		pageSize = 1
+	}
+	if startIndex < 0 {
+		startIndex = 0
+	}
+
+	data := c.GetData()
+	if len(data) == 0 {
 		return
 	}
-	newSelection := c.shiftSelection(rows)
-	if newSelection != nil {
-		c.scrollTo(newSelection)
+	if startIndex >= len(data) {
+		startIndex = len(data) - 1
 	}
-	c.application.ForceDraw()
+
+	endIndex := int(math.Min(float64(len(data)-1), float64(startIndex+pageSize-1)))
+	c.entryVisibilityMap = map[*T]bool{}
+	for index, entry := range data {
+		c.entryVisibilityMap[entry] = index >= startIndex && index <= endIndex
+	}
+	c.updateLayout()
+}
+
+func (c *ListComponent[T]) selectAtDataIndex(data []*T, targetIndex int) {
+	if len(data) == 0 {
+		return
+	}
+	if targetIndex < 0 {
+		targetIndex = 0
+	}
+	if targetIndex >= len(data) {
+		targetIndex = len(data) - 1
+	}
+
+	target := data[targetIndex]
+	targetLayout := c.getLayout(target)
+	c.selectedIndex = slices.Index(c.entries, target)
+	c.application.SetFocus(targetLayout)
+	c.selectionChangedCallback(target)
 }
 
 func (c *ListComponent[T]) scrollSelectedEntryHorizontal(delta int) bool {
