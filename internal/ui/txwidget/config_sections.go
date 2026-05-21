@@ -172,11 +172,12 @@ func curveType(config client.CurveConfig) ([]ConfigInfoField, string) {
 		return fields, "Curve"
 	}
 	if config.Function != nil {
-		return []ConfigInfoField{
+		fields := []ConfigInfoField{
 			{Label: "Type", Value: "Function"},
 			{Label: "Function", Value: config.Function.Type},
-			{Label: "Curves", Value: strings.Join(config.Function.Curves, ", ")},
-		}, "Curve"
+		}
+		fields = append(fields, functionCurveFields(config.Function.Curves)...)
+		return fields, "Curve"
 	}
 
 	return []ConfigInfoField{{Label: "Type", Value: "N/A"}}, "Curve"
@@ -235,4 +236,23 @@ func execText(config *client.ExecConfig) string {
 
 func floatText(value float64) string {
 	return strconv.FormatFloat(value, 'f', 2, 64)
+}
+
+func functionCurveFields(curves []string) []ConfigInfoField {
+	if len(curves) == 0 {
+		return []ConfigInfoField{{Label: "Curves", Value: "N/A"}}
+	}
+
+	fields := make([]ConfigInfoField, 0, len(curves))
+	for index, curve := range curves {
+		label := ""
+		if index == 0 {
+			label = "Curves"
+		}
+		fields = append(fields, ConfigInfoField{
+			Label: label,
+			Value: fmt.Sprintf("- %s", curve),
+		})
+	}
+	return fields
 }
