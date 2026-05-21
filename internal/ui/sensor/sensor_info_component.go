@@ -2,7 +2,7 @@ package sensor
 
 import (
 	"fan2go-tui/internal/client"
-	"fmt"
+	"fan2go-tui/internal/ui/txwidget"
 
 	"github.com/rivo/tview"
 )
@@ -14,7 +14,7 @@ type SensorInfoComponent struct {
 
 	layout *tview.Flex
 
-	configTextView *tview.TextView
+	configComponent *txwidget.ConfigInfoComponent
 }
 
 func NewSensorInfoComponent(application *tview.Application, sensor *client.Sensor) *SensorInfoComponent {
@@ -31,9 +31,9 @@ func NewSensorInfoComponent(application *tview.Application, sensor *client.Senso
 func (c *SensorInfoComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 
-	configTextView := tview.NewTextView()
-	layout.AddItem(configTextView, 0, 1, false)
-	c.configTextView = configTextView
+	configComponent := txwidget.NewConfigInfoComponent()
+	layout.AddItem(configComponent.GetPrimitive(), 0, 1, false)
+	c.configComponent = configComponent
 
 	return layout
 }
@@ -48,27 +48,11 @@ func (c *SensorInfoComponent) SetSensor(sensor *client.Sensor) {
 }
 
 func (c *SensorInfoComponent) refresh() {
-
-	// print config
-	config := c.Sensor.Config
-
-	configText := ""
-	// configText += fmt.Sprintf("ID: %s\n", config.ID)
-	configText += fmt.Sprintf("Sensor: %s\n", config.ID)
-	// value = strconv.FormatFloat(config.MinPwm, 'f', -1, 64)
-
-	if config.HwMon != nil {
-		configText += fmt.Sprintf("Type: HwMon\n")
-		configText += fmt.Sprintf("  Index: %d\n", config.HwMon.Index)
-		configText += fmt.Sprintf("  Platform: %s\n", config.HwMon.Platform)
-		configText += fmt.Sprintf("  TempInput: %s\n", config.HwMon.TempInput)
-	} else if config.File != nil {
-		configText += fmt.Sprintf("Type: File\n")
-		configText += fmt.Sprintf("  Path: %s\n", config.File.Path)
-	} else if config.Cmd != nil {
-		configText += fmt.Sprintf("Type: Cmd\n")
-		configText += fmt.Sprintf("  Exec: %s\n", config.Cmd.Exec)
-		configText += fmt.Sprintf("  Args: %s\n", config.Cmd.Args)
+	if c.Sensor == nil {
+		c.configComponent.SetSections(nil)
+		return
 	}
-	c.configTextView.SetText(configText)
+
+	config := c.Sensor.Config
+	c.configComponent.SetSections(txwidget.SensorConfigSections(config))
 }

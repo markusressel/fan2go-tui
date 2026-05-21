@@ -113,6 +113,12 @@ func (c *ListComponent[T]) createLayout() {
 		} else if key == tcell.KeyDown {
 			c.selectNextEntry()
 			return event
+		} else if key == tcell.KeyPgUp {
+			c.scrollByPage(-1)
+			return nil
+		} else if key == tcell.KeyPgDn {
+			c.scrollByPage(1)
+			return nil
 		} else if key == tcell.KeyLeft {
 			return nil
 		} else if key == tcell.KeyRight {
@@ -203,6 +209,28 @@ func (c *ListComponent[T]) scrollUp() {
 func (c *ListComponent[T]) scrollDown() {
 	c.scroll(+1)
 	c.selectNextEntry()
+	c.application.ForceDraw()
+}
+
+func (c *ListComponent[T]) scrollByPage(direction int) {
+	if len(c.entries) == 0 {
+		return
+	}
+	rowsPerPage := c.GetMaxVisibleItems() - 1
+	if rowsPerPage < 1 {
+		rowsPerPage = 1
+	}
+	rows := rowsPerPage * direction
+
+	c.scroll(rows)
+	if c.GetSelectedItem() == nil {
+		c.SelectFirst()
+		return
+	}
+	newSelection := c.shiftSelection(rows)
+	if newSelection != nil {
+		c.scrollTo(newSelection)
+	}
 	c.application.ForceDraw()
 }
 
