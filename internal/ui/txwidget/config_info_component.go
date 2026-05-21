@@ -108,7 +108,8 @@ func (w *ConfigInfoComponent) SetSections(sections []ConfigInfoSection) {
 			out.WriteString("\n")
 		}
 		accentTag := colorTag(resolveAccentColor(section.accent))
-		out.WriteString(fmt.Sprintf("%s[%s][-]\n", accentTag, tview.Escape(section.headerTitle)))
+		headerText := tview.Escape(fmt.Sprintf("[%s]", section.headerTitle))
+		out.WriteString(fmt.Sprintf("%s%s[-]\n", accentTag, headerText))
 		for _, field := range section.fields {
 			valueColor := resolveValueColor(field.Label, field.Value, section.typeValue)
 			valueColorTag := colorTag(valueColor)
