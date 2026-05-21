@@ -77,7 +77,7 @@ var (
 			FieldKey:           tcell.ColorSilver,
 			ValueText:          tcell.ColorWhite,
 			ValueNumber:        tcell.ColorLightSkyBlue,
-			ValueBool:          tcell.ColorWhite,
+			ValueBool:          tcell.ColorMediumPurple,
 			ValuePath:          tcell.ColorTan,
 			ValueSpecial:       tcell.ColorDarkGray,
 		},

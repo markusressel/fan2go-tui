@@ -44,6 +44,7 @@ func (c *SensorListItemComponent) createLayout() *tview.Flex {
 	sensorInfoComponent.SetSensor(f)
 	layout := sensorInfoComponent.GetLayout()
 	sensorColumnLayout.AddItem(layout, 0, 1, true)
+	sensorColumnLayout.AddItem(tview.NewBox(), 1, 0, false)
 
 	sensorGraphComponent := NewSensorGraphComponent(c.application, f)
 	c.sensorGraphComponent = sensorGraphComponent

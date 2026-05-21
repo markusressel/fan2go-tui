@@ -165,7 +165,7 @@ func resolveValueColor(label, value, typeValue string) tcell.Color {
 		return theme.Colors.ConfigInfoComponent.ValueNumber
 	}
 	if strings.EqualFold(value, "true") || strings.EqualFold(value, "false") {
-		return theme.Colors.ConfigInfoComponent.ValueText
+		return theme.Colors.ConfigInfoComponent.ValueBool
 	}
 	return theme.Colors.ConfigInfoComponent.ValueText
 }
