@@ -121,11 +121,22 @@ func fanSource(config client.FanConfig) ([]ConfigInfoField, string) {
 
 func sensorSource(config client.SensorConfig) ([]ConfigInfoField, string) {
 	if config.HwMon != nil {
-		return []ConfigInfoField{
+		fields := []ConfigInfoField{
 			{Label: "Type", Value: "HwMon"},
 			{Label: "Platform", Value: config.HwMon.Platform},
 			{Label: "Index", Value: strconv.Itoa(config.HwMon.Index)},
 			{Label: "Temp Input", Value: config.HwMon.TempInput},
+		}
+		if config.HwMon.Channel > 0 {
+			fields = append(fields, ConfigInfoField{Label: "Channel", Value: strconv.Itoa(config.HwMon.Channel)})
+		}
+		return fields, "Source"
+	}
+	if config.Nvidia != nil {
+		return []ConfigInfoField{
+			{Label: "Type", Value: "Nvidia"},
+			{Label: "Device", Value: config.Nvidia.Device},
+			{Label: "Index", Value: strconv.Itoa(config.Nvidia.Index)},
 		}, "Source"
 	}
 	if config.File != nil {
@@ -139,6 +150,24 @@ func sensorSource(config client.SensorConfig) ([]ConfigInfoField, string) {
 			{Label: "Type", Value: "Command"},
 			{Label: "Exec", Value: config.Cmd.Exec},
 			{Label: "Args", Value: strings.Join(config.Cmd.Args, " ")},
+		}, "Source"
+	}
+	if config.Disk != nil {
+		return []ConfigInfoField{
+			{Label: "Type", Value: "Disk"},
+			{Label: "Device", Value: config.Disk.Device},
+		}, "Source"
+	}
+	if config.Acpi != nil {
+		conversion := string(config.Acpi.Conversion)
+		if conversion == "" {
+			conversion = string(client.AcpiSensorConversionCelsius)
+		}
+		return []ConfigInfoField{
+			{Label: "Type", Value: "ACPI"},
+			{Label: "Method", Value: config.Acpi.Method},
+			{Label: "Args", Value: config.Acpi.Args},
+			{Label: "Conversion", Value: conversion},
 		}, "Source"
 	}
 

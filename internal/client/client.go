@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 )
 
 type Fan struct {
@@ -19,17 +20,97 @@ type Fan struct {
 }
 
 type FanConfig struct {
-	ID          string             `json:"id"`
-	NeverStop   bool               `json:"neverStop"`
-	MinPwm      *int               `json:"minPwm,omitempty"`
-	StartPwm    *int               `json:"startPwm,omitempty"`
-	PwmMap      *map[int]int       `json:"pwmMap,omitempty"`
-	MaxPwm      *int               `json:"maxPwm,omitempty"`
-	Curve       string             `json:"curve"`
-	HwMon       *HwMonFanConfig    `json:"hwMon,omitempty"`
-	File        *FileFanConfig     `json:"file,omitempty"`
-	Cmd         *CmdFanConfig      `json:"cmd,omitempty"`
-	ControlLoop *ControlLoopConfig `json:"controlLoop,omitempty"`
+	ID                     string                   `json:"id"`
+	NeverStop              bool                     `json:"neverStop"`
+	MinPwm                 *int                     `json:"minPwm,omitempty"`
+	StartPwm               *int                     `json:"startPwm,omitempty"`
+	PwmMap                 *PwmMapConfig            `json:"pwmMap,omitempty"`
+	MaxPwm                 *int                     `json:"maxPwm,omitempty"`
+	SetPwmToGetPwmMap      *SetPwmToGetPwmMapConfig `json:"setPwmToGetPwmMap,omitempty"`
+	ControlMode            *ControlModeConfig       `json:"controlMode,omitempty"`
+	Curve                  string                   `json:"curve"`
+	UseUnscaledCurveValues bool                     `json:"useUnscaledCurveValues"`
+	PwmSetDelay            *time.Duration           `json:"pwmSetDelay,omitempty"`
+	ControlAlgorithm       *ControlAlgorithmConfig  `json:"controlAlgorithm,omitempty"`
+	SanityCheck            *SanityCheckConfig       `json:"sanityCheck,omitempty"`
+	HwMon                  *HwMonFanConfig          `json:"hwMon,omitempty"`
+	Nvidia                 *NvidiaFanConfig         `json:"nvidia,omitempty"`
+	File                   *FileFanConfig           `json:"file,omitempty"`
+	Cmd                    *CmdFanConfig            `json:"cmd,omitempty"`
+	Acpi                   *AcpiFanConfig           `json:"acpi,omitempty"`
+	ControlLoop            *ControlLoopConfig       `json:"controlLoop,omitempty"`
+}
+
+type PwmMapConfig struct {
+	Autodetect *PwmMapAutodetectConfig `json:"autodetect,omitempty"`
+	Identity   *PwmMapIdentityConfig   `json:"identity,omitempty"`
+	Linear     *PwmMapLinearConfig     `json:"linear,omitempty"`
+	Values     *PwmMapValuesConfig     `json:"values,omitempty"`
+}
+
+type PwmMapAutodetectConfig struct{}
+type PwmMapIdentityConfig struct{}
+type PwmMapLinearConfig map[int]int
+type PwmMapValuesConfig map[int]int
+
+type SetPwmToGetPwmMapConfig struct {
+	Autodetect *SetPwmToGetPwmMapAutodetectConfig `json:"autodetect,omitempty"`
+	Identity   *SetPwmToGetPwmMapIdentityConfig   `json:"identity,omitempty"`
+	Linear     *SetPwmToGetPwmMapLinearConfig     `json:"linear,omitempty"`
+	Values     *SetPwmToGetPwmMapValuesConfig     `json:"values,omitempty"`
+}
+
+type SetPwmToGetPwmMapAutodetectConfig struct{}
+type SetPwmToGetPwmMapIdentityConfig struct{}
+type SetPwmToGetPwmMapLinearConfig map[int]int
+type SetPwmToGetPwmMapValuesConfig map[int]int
+
+type ControlModeConfig struct {
+	Active *ControlModeValue `json:"active,omitempty"`
+	OnExit *OnExitConfig     `json:"onExit,omitempty"`
+}
+
+type ControlModeValue string
+
+type OnExitConfig struct {
+	Restore     *OnExitRestoreConfig `json:"restore,omitempty"`
+	None        *OnExitNoneConfig    `json:"none,omitempty"`
+	ControlMode *ControlModeValue    `json:"mode,omitempty"`
+	Speed       *int                 `json:"speed,omitempty"`
+}
+
+type OnExitRestoreConfig struct{}
+type OnExitNoneConfig struct{}
+
+type ControlAlgorithmConfig struct {
+	Direct *DirectControlAlgorithmConfig `json:"direct,omitempty"`
+	Pid    *PidControlAlgorithmConfig    `json:"pid,omitempty"`
+}
+
+type DirectControlAlgorithmConfig struct {
+	MaxPwmChangePerCycle *int `json:"maxPwmChangePerCycle,omitempty"`
+}
+
+type PidControlAlgorithmConfig struct {
+	P float64 `json:"p"`
+	I float64 `json:"i"`
+	D float64 `json:"d"`
+}
+
+type DefaultTrueBool bool
+
+type SanityCheckConfig struct {
+	PwmValueChangedByThirdParty PwmValueChangedByThirdPartyConfig `json:"pwmValueChangedByThirdParty,omitempty"`
+	FanModeChangedByThirdParty  FanModeChangedByThirdPartyConfig  `json:"fanModeChangedByThirdParty,omitempty"`
+}
+
+type PwmValueChangedByThirdPartyConfig struct {
+	Enabled DefaultTrueBool `json:"enabled,omitempty"`
+}
+
+type FanModeChangedByThirdPartyConfig struct {
+	Enabled          DefaultTrueBool `json:"enabled,omitempty"`
+	ThrottleDuration time.Duration   `json:"throttleDuration,omitempty"`
 }
 
 type HwMonFanConfig struct {
@@ -41,6 +122,11 @@ type HwMonFanConfig struct {
 	RpmInputPath  string
 	PwmPath       string
 	PwmEnablePath string
+}
+
+type NvidiaFanConfig struct {
+	Device string `json:"device"`
+	Index  int    `json:"index"`
 }
 
 type FileFanConfig struct {
@@ -63,6 +149,25 @@ type ControlLoopConfig struct {
 	P float64 `json:"p"`
 	I float64 `json:"i"`
 	D float64 `json:"d"`
+}
+
+type AcpiFanConversion string
+
+const (
+	AcpiFanConversionPwm        AcpiFanConversion = "pwm"
+	AcpiFanConversionPercentage AcpiFanConversion = "percentage"
+)
+
+type AcpiFanCallConfig struct {
+	Method     string            `json:"method"`
+	Args       string            `json:"args,omitempty"`
+	Conversion AcpiFanConversion `json:"conversion,omitempty"`
+}
+
+type AcpiFanConfig struct {
+	SetPwm *AcpiFanCallConfig `json:"setPwm"`
+	GetPwm *AcpiFanCallConfig `json:"getPwm,omitempty"`
+	GetRpm *AcpiFanCallConfig `json:"getRpm,omitempty"`
 }
 
 type Curve struct {
@@ -121,16 +226,25 @@ type Sensor struct {
 }
 
 type SensorConfig struct {
-	ID    string             `json:"id"`
-	HwMon *HwMonSensorConfig `json:"hwMon,omitempty"`
-	File  *FileSensorConfig  `json:"file,omitempty"`
-	Cmd   *CmdSensorConfig   `json:"cmd,omitempty"`
+	ID     string              `json:"id"`
+	HwMon  *HwMonSensorConfig  `json:"hwMon,omitempty"`
+	Nvidia *NvidiaSensorConfig `json:"nvidia,omitempty"`
+	File   *FileSensorConfig   `json:"file,omitempty"`
+	Cmd    *CmdSensorConfig    `json:"cmd,omitempty"`
+	Disk   *DiskSensorConfig   `json:"disk,omitempty"`
+	Acpi   *AcpiSensorConfig   `json:"acpi,omitempty"`
 }
 
 type HwMonSensorConfig struct {
 	Platform  string `json:"platform"`
 	Index     int    `json:"index"`
-	TempInput string
+	Channel   int    `json:"channel"`
+	TempInput string `json:"tempInput"`
+}
+
+type NvidiaSensorConfig struct {
+	Device string `json:"device"`
+	Index  int    `json:"index"`
 }
 
 type FileSensorConfig struct {
@@ -140,6 +254,24 @@ type FileSensorConfig struct {
 type CmdSensorConfig struct {
 	Exec string   `json:"exec"`
 	Args []string `json:"args"`
+}
+
+type DiskSensorConfig struct {
+	Device string `json:"device"`
+}
+
+type AcpiSensorConversion string
+
+const (
+	AcpiSensorConversionCelsius      AcpiSensorConversion = "celsius"
+	AcpiSensorConversionMillicelsius AcpiSensorConversion = "millicelsius"
+	AcpiSensorConversionRaw          AcpiSensorConversion = "raw"
+)
+
+type AcpiSensorConfig struct {
+	Method     string               `json:"method"`
+	Args       string               `json:"args,omitempty"`
+	Conversion AcpiSensorConversion `json:"conversion,omitempty"`
 }
 
 type HwMonFan struct {
