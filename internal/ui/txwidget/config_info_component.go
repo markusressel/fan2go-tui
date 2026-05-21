@@ -3,6 +3,7 @@ package txwidget
 import (
 	"fan2go-tui/internal/ui/theme"
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -137,6 +138,25 @@ func (w *ConfigInfoComponent) SetSections(sections []ConfigInfoSection) {
 			fields:          fields,
 		})
 	}
+
+	priority := func(section renderSection) int {
+		if strings.EqualFold(section.headerTitle, "General") || strings.EqualFold(section.sectionTitle, "General") {
+			return 0
+		}
+		if strings.EqualFold(section.sectionTitle, "Source") || strings.EqualFold(section.sectionTitle, "Curve") {
+			return 1
+		}
+		return 2
+	}
+
+	sort.SliceStable(renderSections, func(i, j int) bool {
+		left := renderSections[i]
+		right := renderSections[j]
+
+		leftPriority := priority(left)
+		rightPriority := priority(right)
+		return leftPriority < rightPriority
+	})
 
 	keyColorTag := colorTag(theme.Colors.ConfigInfoComponent.FieldKey)
 	var out strings.Builder
