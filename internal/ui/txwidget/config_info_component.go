@@ -27,9 +27,10 @@ type ConfigInfoField struct {
 }
 
 type ConfigInfoSection struct {
-	Title  string
-	Fields []ConfigInfoField
-	Accent ConfigInfoAccent
+	Title           string
+	Fields          []ConfigInfoField
+	Accent          ConfigInfoAccent
+	PreserveTypeRow bool
 }
 
 type ConfigInfoComponent struct {
@@ -103,33 +104,37 @@ func (w *ConfigInfoComponent) SetSections(sections []ConfigInfoSection) {
 	w.fieldClickByID = map[string]clickableConfigField{}
 
 	type renderSection struct {
-		headerTitle  string
-		typeValue    string
-		accent       ConfigInfoAccent
-		sectionTitle string
-		fields       []ConfigInfoField
+		headerTitle     string
+		typeValue       string
+		accent          ConfigInfoAccent
+		sectionTitle    string
+		preserveTypeRow bool
+		maxKeyLen       int
+		fields          []ConfigInfoField
 	}
 
 	renderSections := make([]renderSection, 0, len(sections))
-	maxKeyLen := 0
 	for _, section := range sections {
 		headerTitle, typeValue := sectionHeadline(section)
 		fields := make([]ConfigInfoField, 0, len(section.Fields))
+		sectionMaxKeyLen := 0
 		for _, field := range section.Fields {
-			if strings.EqualFold(field.Label, "Type") {
+			if strings.EqualFold(field.Label, "Type") && !section.PreserveTypeRow {
 				continue
 			}
 			fields = append(fields, field)
-			if len(field.Label) > maxKeyLen {
-				maxKeyLen = len(field.Label)
+			if len(field.Label) > sectionMaxKeyLen {
+				sectionMaxKeyLen = len(field.Label)
 			}
 		}
 		renderSections = append(renderSections, renderSection{
-			headerTitle:  headerTitle,
-			typeValue:    typeValue,
-			accent:       section.Accent,
-			sectionTitle: section.Title,
-			fields:       fields,
+			headerTitle:     headerTitle,
+			typeValue:       typeValue,
+			accent:          section.Accent,
+			sectionTitle:    section.Title,
+			preserveTypeRow: section.PreserveTypeRow,
+			maxKeyLen:       sectionMaxKeyLen,
+			fields:          fields,
 		})
 	}
 
@@ -156,7 +161,7 @@ func (w *ConfigInfoComponent) SetSections(sections []ConfigInfoSection) {
 			}
 			out.WriteString(fmt.Sprintf("%s%-*s[-] %s%s[-]\n",
 				keyColorTag,
-				maxKeyLen,
+				section.maxKeyLen,
 				tview.Escape(field.Label),
 				valueColorTag,
 				valueText,
@@ -168,6 +173,9 @@ func (w *ConfigInfoComponent) SetSections(sections []ConfigInfoSection) {
 }
 
 func sectionHeadline(section ConfigInfoSection) (string, string) {
+	if section.PreserveTypeRow {
+		return section.Title, ""
+	}
 	for _, field := range section.Fields {
 		if strings.EqualFold(field.Label, "Type") {
 			if field.Value == "" || strings.EqualFold(field.Value, "N/A") {

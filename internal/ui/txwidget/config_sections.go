@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func FanConfigSections(config client.FanConfig) []ConfigInfoSection {
@@ -18,18 +19,55 @@ func FanConfigSections(config client.FanConfig) []ConfigInfoSection {
 				{Label: "ID", Value: config.ID},
 				{Label: "Curve", Value: config.Curve},
 				{Label: "NeverStop", Value: fmt.Sprintf("%v", config.NeverStop)},
+				{Label: "Use Unscaled Curve", Value: fmt.Sprintf("%v", config.UseUnscaledCurveValues)},
 				{Label: "Min PWM", Value: intPointer(config.MinPwm)},
 				{Label: "Start PWM", Value: intPointer(config.StartPwm)},
 				{Label: "Max PWM", Value: intPointer(config.MaxPwm)},
+				{Label: "PWM Set Delay", Value: durationPointer(config.PwmSetDelay)},
 			},
 		},
 	}
 
-	if config.PwmMap != nil && len(*config.PwmMap) > 0 {
+	if config.PwmMap != nil {
+		pwmMapFields := pwmMapConfigFields(config.PwmMap)
 		sections = append(sections, ConfigInfoSection{
-			Title:  "PWM Map",
-			Accent: ConfigInfoAccentMap,
-			Fields: sortedPwmMap(*config.PwmMap),
+			Title:           "PwmMap",
+			Accent:          ConfigInfoAccentMap,
+			Fields:          pwmMapFields,
+			PreserveTypeRow: true,
+		})
+	}
+
+	if config.SetPwmToGetPwmMap != nil {
+		sections = append(sections, ConfigInfoSection{
+			Title:           "SetPwmToGetPwmMap",
+			Accent:          ConfigInfoAccentMap,
+			Fields:          setPwmToGetPwmMapFields(config.SetPwmToGetPwmMap),
+			PreserveTypeRow: true,
+		})
+	}
+
+	if config.ControlMode != nil {
+		sections = append(sections, ConfigInfoSection{
+			Title:  "Control Mode",
+			Accent: ConfigInfoAccentControlLoop,
+			Fields: controlModeFields(config.ControlMode),
+		})
+	}
+
+	if config.ControlAlgorithm != nil {
+		sections = append(sections, ConfigInfoSection{
+			Title:  "Control Algorithm",
+			Accent: ConfigInfoAccentControlLoop,
+			Fields: controlAlgorithmFields(config.ControlAlgorithm),
+		})
+	}
+
+	if config.SanityCheck != nil {
+		sections = append(sections, ConfigInfoSection{
+			Title:  "Sanity Check",
+			Accent: ConfigInfoAccentControlLoop,
+			Fields: sanityCheckFields(config.SanityCheck),
 		})
 	}
 
@@ -94,6 +132,13 @@ func fanSource(config client.FanConfig) ([]ConfigInfoField, string) {
 			{Label: "RPM Path", Value: config.File.RpmPath},
 		}, "Source"
 	}
+	if config.Nvidia != nil {
+		return []ConfigInfoField{
+			{Label: "Type", Value: "Nvidia"},
+			{Label: "Device", Value: config.Nvidia.Device},
+			{Label: "Index", Value: strconv.Itoa(config.Nvidia.Index)},
+		}, "Source"
+	}
 	if config.HwMon != nil {
 		return []ConfigInfoField{
 			{Label: "Type", Value: "HwMon"},
@@ -114,6 +159,13 @@ func fanSource(config client.FanConfig) ([]ConfigInfoField, string) {
 			{Label: "Get PWM", Value: execText(config.Cmd.GetPwm)},
 			{Label: "Get RPM", Value: execText(config.Cmd.GetRpm)},
 		}, "Source"
+	}
+	if config.Acpi != nil {
+		fields := []ConfigInfoField{{Label: "Type", Value: "ACPI"}}
+		fields = append(fields, acpiFanCallFields("Set PWM", config.Acpi.SetPwm)...)
+		fields = append(fields, acpiFanCallFields("Get PWM", config.Acpi.GetPwm)...)
+		fields = append(fields, acpiFanCallFields("Get RPM", config.Acpi.GetRpm)...)
+		return fields, "Source"
 	}
 
 	return []ConfigInfoField{{Label: "Type", Value: "N/A"}}, "Source"
@@ -265,6 +317,129 @@ func execText(config *client.ExecConfig) string {
 
 func floatText(value float64) string {
 	return strconv.FormatFloat(value, 'f', 2, 64)
+}
+
+func durationPointer(value *time.Duration) string {
+	if value == nil {
+		return "N/A"
+	}
+	return value.String()
+}
+
+func pwmMapConfigFields(config *client.PwmMapConfig) []ConfigInfoField {
+	if config.Autodetect != nil {
+		return []ConfigInfoField{{Label: "Type", Value: "Autodetect"}}
+	}
+	if config.Identity != nil {
+		return []ConfigInfoField{{Label: "Type", Value: "Identity"}}
+	}
+	if config.Linear != nil {
+		return []ConfigInfoField{{Label: "Type", Value: "Linear"}}
+	}
+	if config.Values != nil {
+		return []ConfigInfoField{{Label: "Type", Value: "Values"}}
+	}
+	return []ConfigInfoField{{Label: "Type", Value: "N/A"}}
+}
+
+func setPwmToGetPwmMapFields(config *client.SetPwmToGetPwmMapConfig) []ConfigInfoField {
+	if config.Autodetect != nil {
+		return []ConfigInfoField{{Label: "Type", Value: "Autodetect"}}
+	}
+	if config.Identity != nil {
+		return []ConfigInfoField{{Label: "Type", Value: "Identity"}}
+	}
+	if config.Linear != nil {
+		return []ConfigInfoField{{Label: "Type", Value: "Linear"}}
+	}
+	if config.Values != nil {
+		return []ConfigInfoField{{Label: "Type", Value: "Values"}}
+	}
+	return []ConfigInfoField{{Label: "Type", Value: "N/A"}}
+}
+
+func controlModeFields(config *client.ControlModeConfig) []ConfigInfoField {
+	fields := []ConfigInfoField{}
+	if config.Active != nil {
+		fields = append(fields, ConfigInfoField{Label: "Active", Value: string(*config.Active)})
+	}
+	if config.OnExit != nil {
+		onExit := config.OnExit
+		onExitMode := "Custom"
+		if onExit.Restore != nil {
+			onExitMode = "Restore"
+		} else if onExit.None != nil {
+			onExitMode = "None"
+		}
+		fields = append(fields, ConfigInfoField{Label: "On Exit", Value: onExitMode})
+		if onExit.ControlMode != nil {
+			fields = append(fields, ConfigInfoField{Label: "Exit Mode", Value: string(*onExit.ControlMode)})
+		}
+		if onExit.Speed != nil {
+			fields = append(fields, ConfigInfoField{Label: "Exit Speed", Value: strconv.Itoa(*onExit.Speed)})
+		}
+	}
+	if len(fields) == 0 {
+		return []ConfigInfoField{{Label: "Type", Value: "N/A"}}
+	}
+	return fields
+}
+
+func controlAlgorithmFields(config *client.ControlAlgorithmConfig) []ConfigInfoField {
+	if config.Direct != nil {
+		fields := []ConfigInfoField{{Label: "Type", Value: "Direct"}}
+		fields = append(fields, ConfigInfoField{Label: "Max PWM Change/Cycle", Value: intPointer(config.Direct.MaxPwmChangePerCycle)})
+		return fields
+	}
+	if config.Pid != nil {
+		return []ConfigInfoField{
+			{Label: "Type", Value: "PID"},
+			{Label: "P", Value: floatText(config.Pid.P)},
+			{Label: "I", Value: floatText(config.Pid.I)},
+			{Label: "D", Value: floatText(config.Pid.D)},
+		}
+	}
+	return []ConfigInfoField{{Label: "Type", Value: "N/A"}}
+}
+
+func sanityCheckFields(config *client.SanityCheckConfig) []ConfigInfoField {
+	return []ConfigInfoField{
+		{Label: "PWM Changed 3rd Party", Value: fmt.Sprintf("%v", bool(config.PwmValueChangedByThirdParty.Enabled))},
+		{Label: "Mode Changed 3rd Party", Value: fmt.Sprintf("%v", bool(config.FanModeChangedByThirdParty.Enabled))},
+		{Label: "Mode Check Throttle", Value: config.FanModeChangedByThirdParty.ThrottleDuration.String()},
+	}
+}
+
+func acpiFanCallFields(prefix string, call *client.AcpiFanCallConfig) []ConfigInfoField {
+	if call == nil {
+		return nil
+	}
+	conversion := string(call.Conversion)
+	if conversion == "" {
+		conversion = string(client.AcpiFanConversionPwm)
+	}
+	return []ConfigInfoField{
+		{Label: fmt.Sprintf("%s Method", prefix), Value: call.Method},
+		{Label: fmt.Sprintf("%s Args", prefix), Value: call.Args},
+		{Label: fmt.Sprintf("%s Conversion", prefix), Value: conversion},
+	}
+}
+
+func sortedIntMap(labelPrefix string, values map[int]int) []ConfigInfoField {
+	keys := make([]int, 0, len(values))
+	for key := range maps.Keys(values) {
+		keys = append(keys, key)
+	}
+	sort.Ints(keys)
+
+	fields := make([]ConfigInfoField, 0, len(keys))
+	for _, key := range keys {
+		fields = append(fields, ConfigInfoField{
+			Label: fmt.Sprintf("%s %d", labelPrefix, key),
+			Value: strconv.Itoa(values[key]),
+		})
+	}
+	return fields
 }
 
 func functionCurveFields(curves []string) []ConfigInfoField {
