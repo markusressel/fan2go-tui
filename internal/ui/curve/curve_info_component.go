@@ -3,6 +3,7 @@ package curve
 import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/ui/txwidget"
+	"strings"
 
 	"github.com/rivo/tview"
 )
@@ -15,12 +16,16 @@ type CurveInfoComponent struct {
 	layout *tview.Flex
 
 	configComponent *txwidget.ConfigInfoComponent
+	onOpenSensor    func(sensorID string)
+	onOpenCurve     func(curveID string)
 }
 
-func NewCurveInfoComponent(application *tview.Application, curve *client.Curve) *CurveInfoComponent {
+func NewCurveInfoComponent(application *tview.Application, curve *client.Curve, onOpenSensor func(sensorID string), onOpenCurve func(curveID string)) *CurveInfoComponent {
 	c := &CurveInfoComponent{
-		application: application,
-		Curve:       curve,
+		application:  application,
+		Curve:        curve,
+		onOpenSensor: onOpenSensor,
+		onOpenCurve:  onOpenCurve,
 	}
 
 	c.layout = c.createLayout()
@@ -32,6 +37,28 @@ func (c *CurveInfoComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 
 	configComponent := txwidget.NewConfigInfoComponent()
+	configComponent.SetFieldClickablePredicate(func(sectionTitle, label, value string) bool {
+		isSensor := strings.EqualFold(sectionTitle, "Curve") && strings.EqualFold(label, "Sensor") && value != ""
+		isCurveRef := strings.EqualFold(sectionTitle, "Curve") && (strings.EqualFold(label, "Curves") || label == "") && strings.HasPrefix(value, "- ")
+		return isSensor || isCurveRef
+	})
+	configComponent.SetFieldClickHandler(func(sectionTitle, label, value string) {
+		if !strings.EqualFold(sectionTitle, "Curve") {
+			return
+		}
+		if strings.EqualFold(label, "Sensor") {
+			if c.onOpenSensor != nil {
+				c.onOpenSensor(value)
+			}
+			return
+		}
+		if (strings.EqualFold(label, "Curves") || label == "") && strings.HasPrefix(value, "- ") {
+			curveID := strings.TrimSpace(strings.TrimPrefix(value, "- "))
+			if curveID != "" && c.onOpenCurve != nil {
+				c.onOpenCurve(curveID)
+			}
+		}
+	})
 	layout.AddItem(configComponent.GetPrimitive(), 0, 1, false)
 	c.configComponent = configComponent
 

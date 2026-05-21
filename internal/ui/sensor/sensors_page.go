@@ -149,3 +149,12 @@ func (c *SensorsPage) Refresh() error {
 func (c *SensorsPage) ScrollToItem() {
 	c.sensorList.SelectEntry(c.sensorList.GetSelectedItem())
 }
+
+func (c *SensorsPage) SelectSensorByID(sensorID string) bool {
+	sensorListItem, ok := c.sensorListItemComponents[sensorID]
+	if !ok {
+		return false
+	}
+	c.sensorList.SelectEntry(sensorListItem)
+	return true
+}

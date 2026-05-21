@@ -80,7 +80,7 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 
 	//graphTestPage := graph_test.NewGraphTestPage(mainPage.application)
 	fansPage := fan.NewFansPage(mainPage.application, mainPage.client, mainPage.OpenCurveByID)
-	curvesPage := curve.NewCurvesPage(mainPage.application, mainPage.client)
+	curvesPage := curve.NewCurvesPage(mainPage.application, mainPage.client, mainPage.OpenSensorByID, mainPage.OpenCurveByID)
 	sensorsPage := sensor.NewSensorsPage(mainPage.application, mainPage.client)
 
 	//mainPage.AddPage(GraphTestPage, &graphTestPage, true)
@@ -186,6 +186,16 @@ func (mainPage *MainPage) OpenCurveByID(curveID string) {
 	curveSelectablePage, ok := pagesPage.(interface{ SelectCurveByID(curveID string) bool })
 	if ok {
 		curveSelectablePage.SelectCurveByID(curveID)
+	}
+}
+
+func (mainPage *MainPage) OpenSensorByID(sensorID string) {
+	mainPage.SetPage(SensorsPage)
+
+	pagesPage, _ := mainPage.pagesMap.Get(SensorsPage)
+	sensorSelectablePage, ok := pagesPage.(interface{ SelectSensorByID(sensorID string) bool })
+	if ok {
+		sensorSelectablePage.SelectSensorByID(sensorID)
 	}
 }
 

@@ -18,18 +18,18 @@ type CurveListItemComponent struct {
 	curveGraphComponent *CurveGraphComponent
 }
 
-func NewCurveListItemComponent(application *tview.Application, curve *client.Curve) *CurveListItemComponent {
+func NewCurveListItemComponent(application *tview.Application, curve *client.Curve, onOpenSensor func(sensorID string), onOpenCurve func(curveID string)) *CurveListItemComponent {
 	c := &CurveListItemComponent{
 		application: application,
 		Curve:       curve,
 	}
 
-	c.layout = c.createLayout()
+	c.layout = c.createLayout(onOpenSensor, onOpenCurve)
 
 	return c
 }
 
-func (c *CurveListItemComponent) createLayout() *tview.Flex {
+func (c *CurveListItemComponent) createLayout(onOpenSensor func(sensorID string), onOpenCurve func(curveID string)) *tview.Flex {
 	rootLayout := tview.NewFlex().SetDirection(tview.FlexRow)
 
 	curveColumnLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
@@ -39,7 +39,7 @@ func (c *CurveListItemComponent) createLayout() *tview.Flex {
 	rootLayout.AddItem(curveColumnLayout, 0, 1, true)
 
 	f := c.Curve
-	curveInfoComponent := NewCurveInfoComponent(c.application, f)
+	curveInfoComponent := NewCurveInfoComponent(c.application, f, onOpenSensor, onOpenCurve)
 	c.curveInfoComponent = curveInfoComponent
 	curveInfoComponent.SetCurve(f)
 	layout := curveInfoComponent.GetLayout()
