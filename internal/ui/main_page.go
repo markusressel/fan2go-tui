@@ -115,6 +115,7 @@ func (mainPage *MainPage) AddPage(s Page, pagesPage util.PagesPage) {
 
 func (mainPage *MainPage) Init() {
 	mainPage.Refresh()
+	mainPage.scrollCurrentPageToItem()
 }
 
 func (mainPage *MainPage) Refresh() {
@@ -158,11 +159,14 @@ func (mainPage *MainPage) SetPage(page Page) {
 	mainPage.mainPagePagerLayout.SwitchToPage(string(page))
 	mainPage.Refresh()
 
-	pagesPages, _ := mainPage.pagesMap.Get(mainPage.page)
+	mainPage.scrollCurrentPageToItem()
+}
 
-	switch pagesPages.(type) {
-	case util.CanScrollToItem:
-		pagesPages.(util.CanScrollToItem).ScrollToItem()
+func (mainPage *MainPage) scrollCurrentPageToItem() {
+	pagesPage, _ := mainPage.pagesMap.Get(mainPage.page)
+	scrollablePage, ok := pagesPage.(util.CanScrollToItem)
+	if ok {
+		scrollablePage.ScrollToItem()
 	}
 }
 

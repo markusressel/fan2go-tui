@@ -183,15 +183,36 @@ func (c *ListComponent[T]) GetData() []*T {
 }
 
 func (c *ListComponent[T]) SetData(entries []*T) {
+	selectedEntryBefore := c.GetSelectedItem()
+
 	c.entriesMutex.Lock()
-	selectFirst := c.entries == nil
 	c.entries = entries
 	c.entriesMutex.Unlock()
-	c.updateLayout()
-	c.application.ForceDraw()
-	if selectFirst {
-		c.SelectFirst()
+
+	if len(entries) == 0 {
+		c.selectedIndex = -1
 	}
+
+	c.updateLayout()
+
+	if len(entries) == 0 {
+		c.application.ForceDraw()
+		return
+	}
+
+	if selectedEntryBefore != nil && slices.Contains(entries, selectedEntryBefore) {
+		c.selectedIndex = slices.Index(entries, selectedEntryBefore)
+		c.scrollTo(selectedEntryBefore)
+		c.application.ForceDraw()
+		return
+	}
+
+	if c.selectedIndex < 0 || c.selectedIndex >= len(entries) {
+		c.SelectFirst()
+		return
+	}
+
+	c.application.ForceDraw()
 }
 
 func (c *ListComponent[comparable]) SortBy(inverted bool) {
