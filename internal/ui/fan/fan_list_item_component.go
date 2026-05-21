@@ -26,18 +26,18 @@ func hasFanCurveData(fan *client.Fan) bool {
 	return len(*fan.FanCurveData) > 0
 }
 
-func NewFanListItemComponent(application *tview.Application, fan *client.Fan) *FanListItemComponent {
+func NewFanListItemComponent(application *tview.Application, fan *client.Fan, onOpenCurve func(curveID string)) *FanListItemComponent {
 	c := &FanListItemComponent{
 		application: application,
 		Fan:         fan,
 	}
 
-	c.layout = c.createLayout()
+	c.layout = c.createLayout(onOpenCurve)
 
 	return c
 }
 
-func (c *FanListItemComponent) createLayout() *tview.Flex {
+func (c *FanListItemComponent) createLayout(onOpenCurve func(curveID string)) *tview.Flex {
 	rootLayout := tview.NewFlex().SetDirection(tview.FlexRow)
 
 	fanColumnLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
@@ -47,7 +47,7 @@ func (c *FanListItemComponent) createLayout() *tview.Flex {
 	rootLayout.AddItem(fanColumnLayout, 0, 1, true)
 
 	f := c.Fan
-	fanInfoComponent := NewFanInfoComponent(c.application, f)
+	fanInfoComponent := NewFanInfoComponent(c.application, f, onOpenCurve)
 	c.fanInfoComponent = fanInfoComponent
 	fanInfoComponent.SetFan(f)
 	layout := fanInfoComponent.GetLayout()

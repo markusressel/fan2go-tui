@@ -21,14 +21,16 @@ type FansPage struct {
 	fanList *util.ListComponent[FanListItemComponent]
 
 	fanListItemComponents map[string]*FanListItemComponent
+	onOpenCurve           func(curveID string)
 }
 
-func NewFansPage(application *tview.Application, c client.Fan2goApiClient) FansPage {
+func NewFansPage(application *tview.Application, c client.Fan2goApiClient, onOpenCurve func(curveID string)) FansPage {
 
 	fansPage := FansPage{
 		application:           application,
 		client:                c,
 		fanListItemComponents: map[string]*FanListItemComponent{},
+		onOpenCurve:           onOpenCurve,
 	}
 
 	fansPage.layout = fansPage.createLayout()
@@ -134,7 +136,7 @@ func (c *FansPage) Refresh() error {
 			fanListItemComponent.SetFan(fan)
 			fanListItemsComponents = append(fanListItemsComponents, fanListItemComponent)
 		} else {
-			fanListItemComponent = NewFanListItemComponent(c.application, fan)
+			fanListItemComponent = NewFanListItemComponent(c.application, fan, c.onOpenCurve)
 			c.fanListItemComponents[fId] = fanListItemComponent
 			fanListItemComponent.SetFan(fan)
 			fanListItemsComponents = append(fanListItemsComponents, fanListItemComponent)

@@ -79,7 +79,7 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 	mainPage.mainPagePagerLayout = mainPagePagerLayout
 
 	//graphTestPage := graph_test.NewGraphTestPage(mainPage.application)
-	fansPage := fan.NewFansPage(mainPage.application, mainPage.client)
+	fansPage := fan.NewFansPage(mainPage.application, mainPage.client, mainPage.OpenCurveByID)
 	curvesPage := curve.NewCurvesPage(mainPage.application, mainPage.client)
 	sensorsPage := sensor.NewSensorsPage(mainPage.application, mainPage.client)
 
@@ -177,6 +177,16 @@ func (mainPage *MainPage) NextPage() {
 	currentIndex := slices.Index(keys, mainPage.page)
 	nextIndex := (currentIndex + 1) % len(keys)
 	mainPage.SetPage(keys[nextIndex])
+}
+
+func (mainPage *MainPage) OpenCurveByID(curveID string) {
+	mainPage.SetPage(CurvesPage)
+
+	pagesPage, _ := mainPage.pagesMap.Get(CurvesPage)
+	curveSelectablePage, ok := pagesPage.(interface{ SelectCurveByID(curveID string) bool })
+	if ok {
+		curveSelectablePage.SelectCurveByID(curveID)
+	}
 }
 
 func (mainPage *MainPage) clearStatusMessage() {

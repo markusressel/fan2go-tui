@@ -150,3 +150,12 @@ func (c *CurvesPage) Refresh() error {
 func (c *CurvesPage) ScrollToItem() {
 	c.curveList.SelectEntry(c.curveList.GetSelectedItem())
 }
+
+func (c *CurvesPage) SelectCurveByID(curveID string) bool {
+	curveListItem, ok := c.curveListItemComponents[curveID]
+	if !ok {
+		return false
+	}
+	c.curveList.SelectEntry(curveListItem)
+	return true
+}
