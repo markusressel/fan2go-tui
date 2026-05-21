@@ -44,6 +44,7 @@ func (c *SensorListItemComponent) createLayout() *tview.Flex {
 	sensorInfoComponent.SetSensor(f)
 	layout := sensorInfoComponent.GetLayout()
 	sensorColumnLayout.AddItem(layout, 0, 1, true)
+	sensorColumnLayout.AddItem(tview.NewBox(), 1, 0, false)
 
 	sensorGraphComponent := NewSensorGraphComponent(c.application, f)
 	c.sensorGraphComponent = sensorGraphComponent
@@ -66,4 +67,10 @@ func (c *SensorListItemComponent) SetSensor(sensor *client.Sensor) {
 func (c *SensorListItemComponent) refresh() {
 	c.sensorInfoComponent.SetSensor(c.Sensor)
 	c.sensorGraphComponent.SetSensor(c.Sensor)
+}
+
+func (c *SensorListItemComponent) ScrollHorizontal(delta int) {
+	if c.sensorInfoComponent != nil {
+		c.sensorInfoComponent.ScrollHorizontal(delta)
+	}
 }

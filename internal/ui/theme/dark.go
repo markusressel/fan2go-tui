@@ -67,6 +67,20 @@ var (
 				Background:        tcell.ColorBlack,
 			},
 		},
+		ConfigInfoComponent: ConfigInfoComponentColors{
+			SectionDefault:     tcell.ColorSteelBlue,
+			SectionGeneral:     tcell.ColorSkyblue,
+			SectionSource:      tcell.ColorMediumTurquoise,
+			SectionCurve:       tcell.ColorMediumPurple,
+			SectionMap:         tcell.ColorKhaki,
+			SectionControlLoop: tcell.ColorLightSeaGreen,
+			FieldKey:           tcell.ColorSilver,
+			ValueText:          tcell.ColorWhite,
+			ValueNumber:        tcell.ColorLightSkyBlue,
+			ValueBool:          tcell.ColorMediumPurple,
+			ValuePath:          tcell.ColorTan,
+			ValueSpecial:       tcell.ColorDarkGray,
+		},
 	}
 
 	Style = StyleStruct{

@@ -114,7 +114,9 @@ func (mainPage *MainPage) AddPage(s Page, pagesPage util.PagesPage) {
 }
 
 func (mainPage *MainPage) Init() {
+	mainPage.application.ForceDraw()
 	mainPage.Refresh()
+	mainPage.scrollCurrentPageToItem()
 }
 
 func (mainPage *MainPage) Refresh() {
@@ -126,16 +128,9 @@ func (mainPage *MainPage) Refresh() {
 
 	currentPage := mainPage.GetCurrentPage()
 	err := currentPage.Refresh()
-
-	for page, pagesPage := range mainPage.pagesMap.Iterator() {
-		if page == mainPage.page {
-			continue
-		}
-		err = pagesPage.Refresh()
-		if err != nil {
-			mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
-			return
-		}
+	if err != nil {
+		mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
+		return
 	}
 
 	mainPage.clearStatusMessage()
@@ -156,13 +151,17 @@ func (mainPage *MainPage) SetPage(page Page) {
 	mainPage.header.SetPage(page)
 
 	mainPage.mainPagePagerLayout.SwitchToPage(string(page))
+	mainPage.application.ForceDraw()
 	mainPage.Refresh()
 
-	pagesPages, _ := mainPage.pagesMap.Get(mainPage.page)
+	mainPage.scrollCurrentPageToItem()
+}
 
-	switch pagesPages.(type) {
-	case util.CanScrollToItem:
-		pagesPages.(util.CanScrollToItem).ScrollToItem()
+func (mainPage *MainPage) scrollCurrentPageToItem() {
+	pagesPage, _ := mainPage.pagesMap.Get(mainPage.page)
+	scrollablePage, ok := pagesPage.(util.CanScrollToItem)
+	if ok {
+		scrollablePage.ScrollToItem()
 	}
 }
 

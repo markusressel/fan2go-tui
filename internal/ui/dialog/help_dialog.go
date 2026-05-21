@@ -34,8 +34,9 @@ func (p *HelpPage) createLayout() {
 	helpTableEntries := []*TableEntry{
 		{Key: "F1, ?", Value: "Opens help dialog"},
 		{Key: "1, 2, 3", Value: "Switches to the given page"},
-		{Key: "Left/PgUp, Right/PgDw", Value: "Cycles backwards/forwards through all pages"},
-		{Key: "tab, shift+tab", Value: "Cycles window focus forwards/backwards"},
+		{Key: "Tab, Shift+Tab", Value: "Cycles forwards/backwards through all pages"},
+		{Key: "PgUp, PgDn", Value: "Scroll list views up/down"},
+		{Key: "Left/Right or h/l", Value: "Horizontal scroll in config info views"},
 		{Key: "Mousescroll", Value: "Scroll within scrollable views"},
 		{Key: "ctrl+r", Value: "Refreshes all data"},
 		emptyEntry,
@@ -68,7 +69,7 @@ func (p *HelpPage) createLayout() {
 		}
 	}
 
-	p.layout = createModal(" Help ", helpTable, 60, 13)
+	p.layout = createModal(" Help ", helpTable, 60, 14)
 }
 
 func (p *HelpPage) GetLayout() *tview.Flex {

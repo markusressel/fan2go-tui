@@ -44,6 +44,7 @@ func (c *CurveListItemComponent) createLayout() *tview.Flex {
 	curveInfoComponent.SetCurve(f)
 	layout := curveInfoComponent.GetLayout()
 	curveColumnLayout.AddItem(layout, 0, 1, true)
+	curveColumnLayout.AddItem(tview.NewBox(), 1, 0, false)
 
 	curveGraphComponent := NewCurveGraphComponent(c.application, f)
 	c.curveGraphComponent = curveGraphComponent
@@ -66,4 +67,10 @@ func (c *CurveListItemComponent) SetCurve(curve *client.Curve) {
 func (c *CurveListItemComponent) refresh() {
 	c.curveInfoComponent.SetCurve(c.Curve)
 	c.curveGraphComponent.SetCurve(c.Curve)
+}
+
+func (c *CurveListItemComponent) ScrollHorizontal(delta int) {
+	if c.curveInfoComponent != nil {
+		c.curveInfoComponent.ScrollHorizontal(delta)
+	}
 }

@@ -34,11 +34,27 @@ type LayoutStyle struct {
 }
 
 type Color struct {
-	Header HeaderColors
-	Dialog DialogColors
-	Layout LayoutColors
-	Graph  GraphsColors
-	List   ListsColors
+	Header              HeaderColors
+	Dialog              DialogColors
+	Layout              LayoutColors
+	Graph               GraphsColors
+	List                ListsColors
+	ConfigInfoComponent ConfigInfoComponentColors
+}
+
+type ConfigInfoComponentColors struct {
+	SectionDefault     tcell.Color
+	SectionGeneral     tcell.Color
+	SectionSource      tcell.Color
+	SectionCurve       tcell.Color
+	SectionMap         tcell.Color
+	SectionControlLoop tcell.Color
+	FieldKey           tcell.Color
+	ValueText          tcell.Color
+	ValueNumber        tcell.Color
+	ValueBool          tcell.Color
+	ValuePath          tcell.Color
+	ValueSpecial       tcell.Color
 }
 
 type GraphsColors struct {

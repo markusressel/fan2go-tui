@@ -52,6 +52,7 @@ func (c *FanListItemComponent) createLayout() *tview.Flex {
 	fanInfoComponent.SetFan(f)
 	layout := fanInfoComponent.GetLayout()
 	fanColumnLayout.AddItem(layout, 0, 1, true)
+	fanColumnLayout.AddItem(tview.NewBox(), 1, 0, false)
 
 	fanGraphsRowLayout := tview.NewFlex().SetDirection(tview.FlexRow)
 	fanColumnLayout.AddItem(fanGraphsRowLayout, 0, 3, true)
@@ -93,5 +94,11 @@ func (c *FanListItemComponent) refresh() {
 	}
 	if c.fanRpmCurveComponent != nil {
 		c.fanRpmCurveComponent.SetFan(c.Fan)
+	}
+}
+
+func (c *FanListItemComponent) ScrollHorizontal(delta int) {
+	if c.fanInfoComponent != nil {
+		c.fanInfoComponent.ScrollHorizontal(delta)
 	}
 }

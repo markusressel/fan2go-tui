@@ -59,10 +59,10 @@ func CreateUi(fullscreen bool) *tview.Application {
 		} else if event.Rune() == '-' {
 			speedUpUpdateInterval(mainPage)
 			return nil
-		} else if event.Modifiers() == tcell.ModNone && (event.Key() == tcell.KeyPgUp || event.Key() == tcell.KeyLeft) {
+		} else if event.Modifiers() == tcell.ModNone && event.Key() == tcell.KeyBacktab {
 			mainPage.PreviousPage()
 			return nil
-		} else if event.Modifiers() == tcell.ModNone && (event.Key() == tcell.KeyPgDn || event.Key() == tcell.KeyRight) {
+		} else if event.Modifiers() == tcell.ModNone && event.Key() == tcell.KeyTab {
 			mainPage.NextPage()
 			return nil
 		}

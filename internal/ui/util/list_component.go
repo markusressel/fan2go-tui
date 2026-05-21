@@ -36,6 +36,10 @@ type ListComponent[T comparable] struct {
 	scrollbarComponent *ScrollbarComponent
 }
 
+type HorizontalScrollable interface {
+	ScrollHorizontal(delta int)
+}
+
 // NewListComponent creates a new ListComponent.
 // The application is used to redraw the component.
 // The config is used to configure the component.
@@ -113,12 +117,35 @@ func (c *ListComponent[T]) createLayout() {
 		} else if key == tcell.KeyDown {
 			c.selectNextEntry()
 			return event
+		} else if key == tcell.KeyPgUp {
+			c.scrollByPage(-1)
+			return nil
+		} else if key == tcell.KeyPgDn {
+			c.scrollByPage(1)
+			return nil
 		} else if key == tcell.KeyLeft {
-			return nil
+			if c.scrollSelectedEntryHorizontal(-4) {
+				return nil
+			}
+			return event
 		} else if key == tcell.KeyRight {
-			return nil
+			if c.scrollSelectedEntryHorizontal(4) {
+				return nil
+			}
+			return event
 		} else if key == tcell.KeyEnter {
 			return nil
+		}
+
+		switch event.Rune() {
+		case 'h':
+			if c.scrollSelectedEntryHorizontal(-4) {
+				return nil
+			}
+		case 'l':
+			if c.scrollSelectedEntryHorizontal(4) {
+				return nil
+			}
 		}
 
 		return event
@@ -156,15 +183,36 @@ func (c *ListComponent[T]) GetData() []*T {
 }
 
 func (c *ListComponent[T]) SetData(entries []*T) {
+	selectedEntryBefore := c.GetSelectedItem()
+
 	c.entriesMutex.Lock()
-	selectFirst := c.entries == nil
 	c.entries = entries
 	c.entriesMutex.Unlock()
-	c.updateLayout()
-	c.application.ForceDraw()
-	if selectFirst {
-		c.SelectFirst()
+
+	if len(entries) == 0 {
+		c.selectedIndex = -1
 	}
+
+	c.updateLayout()
+
+	if len(entries) == 0 {
+		c.application.ForceDraw()
+		return
+	}
+
+	if selectedEntryBefore != nil && slices.Contains(entries, selectedEntryBefore) {
+		c.selectedIndex = slices.Index(entries, selectedEntryBefore)
+		c.scrollTo(selectedEntryBefore)
+		c.application.ForceDraw()
+		return
+	}
+
+	if c.selectedIndex < 0 || c.selectedIndex >= len(entries) {
+		c.SelectFirst()
+		return
+	}
+
+	c.application.ForceDraw()
 }
 
 func (c *ListComponent[comparable]) SortBy(inverted bool) {
@@ -204,6 +252,97 @@ func (c *ListComponent[T]) scrollDown() {
 	c.scroll(+1)
 	c.selectNextEntry()
 	c.application.ForceDraw()
+}
+
+func (c *ListComponent[T]) scrollByPage(direction int) {
+	if len(c.entries) == 0 {
+		return
+	}
+
+	data := c.GetData()
+	pageSize := c.GetMaxVisibleItems()
+	if pageSize < 1 {
+		pageSize = 1
+	}
+
+	selected := c.GetSelectedItem()
+	currentIndex := slices.Index(data, selected)
+	if currentIndex < 0 {
+		currentIndex = 0
+	}
+
+	visibleMin, visibleMax := c.GetVisibleRange()
+	if visibleMin < 0 || visibleMin >= len(data) || visibleMax < visibleMin {
+		visibleMin = 0
+		visibleMax = int(math.Min(float64(len(data)-1), float64(pageSize-1)))
+	}
+
+	if direction > 0 && visibleMax < len(data)-1 {
+		c.setVisibleWindow(visibleMax+1, pageSize)
+	} else if direction < 0 && visibleMin > 0 {
+		c.setVisibleWindow(int(math.Max(0, float64(visibleMin-pageSize))), pageSize)
+	}
+
+	targetIndex := currentIndex + (direction * pageSize)
+	targetIndex = int(math.Max(0, math.Min(float64(targetIndex), float64(len(data)-1))))
+	c.selectAtDataIndex(data, targetIndex)
+	c.application.ForceDraw()
+}
+
+func (c *ListComponent[T]) setVisibleWindow(startIndex int, pageSize int) {
+	if pageSize < 1 {
+		pageSize = 1
+	}
+	if startIndex < 0 {
+		startIndex = 0
+	}
+
+	data := c.GetData()
+	if len(data) == 0 {
+		return
+	}
+	if startIndex >= len(data) {
+		startIndex = len(data) - 1
+	}
+
+	endIndex := int(math.Min(float64(len(data)-1), float64(startIndex+pageSize-1)))
+	c.entryVisibilityMap = map[*T]bool{}
+	for index, entry := range data {
+		c.entryVisibilityMap[entry] = index >= startIndex && index <= endIndex
+	}
+	c.updateLayout()
+}
+
+func (c *ListComponent[T]) selectAtDataIndex(data []*T, targetIndex int) {
+	if len(data) == 0 {
+		return
+	}
+	if targetIndex < 0 {
+		targetIndex = 0
+	}
+	if targetIndex >= len(data) {
+		targetIndex = len(data) - 1
+	}
+
+	target := data[targetIndex]
+	targetLayout := c.getLayout(target)
+	c.selectedIndex = slices.Index(c.entries, target)
+	c.application.SetFocus(targetLayout)
+	c.selectionChangedCallback(target)
+}
+
+func (c *ListComponent[T]) scrollSelectedEntryHorizontal(delta int) bool {
+	selected := c.GetSelectedItem()
+	if selected == nil {
+		return false
+	}
+
+	scrollable, ok := any(selected).(HorizontalScrollable)
+	if !ok {
+		return false
+	}
+	scrollable.ScrollHorizontal(delta)
+	return true
 }
 
 func (c *ListComponent[T]) scroll(rows int) {

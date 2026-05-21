@@ -2,7 +2,7 @@ package curve
 
 import (
 	"fan2go-tui/internal/client"
-	"fmt"
+	"fan2go-tui/internal/ui/txwidget"
 
 	"github.com/rivo/tview"
 )
@@ -14,7 +14,7 @@ type CurveInfoComponent struct {
 
 	layout *tview.Flex
 
-	configTextView *tview.TextView
+	configComponent *txwidget.ConfigInfoComponent
 }
 
 func NewCurveInfoComponent(application *tview.Application, curve *client.Curve) *CurveInfoComponent {
@@ -31,9 +31,9 @@ func NewCurveInfoComponent(application *tview.Application, curve *client.Curve) 
 func (c *CurveInfoComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 
-	configTextView := tview.NewTextView()
-	layout.AddItem(configTextView, 0, 1, false)
-	c.configTextView = configTextView
+	configComponent := txwidget.NewConfigInfoComponent()
+	layout.AddItem(configComponent.GetPrimitive(), 0, 1, false)
+	c.configComponent = configComponent
 
 	return layout
 }
@@ -48,34 +48,17 @@ func (c *CurveInfoComponent) SetCurve(curve *client.Curve) {
 }
 
 func (c *CurveInfoComponent) refresh() {
-
-	// print config
-	config := c.Curve.Config
-
-	configText := ""
-	// configText += fmt.Sprintf("ID: %s\n", config.ID)
-	configText += fmt.Sprintf("Curve: %s\n", config.ID)
-	// value = strconv.FormatFloat(config.MinPwm, 'f', -1, 64)
-
-	if config.PID != nil {
-		configText += fmt.Sprintf("Type: PID\n")
-		configText += fmt.Sprintf("  Sensor: %s\n", config.PID.Sensor)
-		configText += fmt.Sprintf("  P: %f\n", config.PID.P)
-		configText += fmt.Sprintf("  I: %f\n", config.PID.I)
-		configText += fmt.Sprintf("  D: %f\n", config.PID.D)
-	} else if config.Linear != nil {
-		configText += fmt.Sprintf("Type: Linear\n")
-		configText += fmt.Sprintf("  Sensor: %s\n", config.Linear.Sensor)
-		if config.Linear.Steps != nil {
-			configText += fmt.Sprintf("  Steps: %v\n", config.Linear.Steps)
-		} else {
-			configText += fmt.Sprintf("  Min: %d\n", config.Linear.Min)
-			configText += fmt.Sprintf("  Max: %d\n", config.Linear.Max)
-		}
-	} else if config.Function != nil {
-		configText += fmt.Sprintf("Type: Function\n")
-		configText += fmt.Sprintf("  Type: %s\n", config.Function.Type)
-		configText += fmt.Sprintf("  Curves: %s\n", config.Function.Curves)
+	if c.Curve == nil {
+		c.configComponent.SetSections(nil)
+		return
 	}
-	c.configTextView.SetText(configText)
+
+	config := c.Curve.Config
+	c.configComponent.SetSections(txwidget.CurveConfigSections(config))
+}
+
+func (c *CurveInfoComponent) ScrollHorizontal(delta int) {
+	if c.configComponent != nil {
+		c.configComponent.ScrollHorizontal(delta)
+	}
 }
