@@ -67,3 +67,9 @@ func (c *CurveListItemComponent) refresh() {
 	c.curveInfoComponent.SetCurve(c.Curve)
 	c.curveGraphComponent.SetCurve(c.Curve)
 }
+
+func (c *CurveListItemComponent) ScrollHorizontal(delta int) {
+	if c.curveInfoComponent != nil {
+		c.curveInfoComponent.ScrollHorizontal(delta)
+	}
+}

@@ -47,18 +47,18 @@ func NewConfigInfoComponent() *ConfigInfoComponent {
 	textView.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
 		case tcell.KeyRight:
-			c.scrollHorizontal(4)
+			c.ScrollHorizontal(4)
 			return nil
 		case tcell.KeyLeft:
-			c.scrollHorizontal(-4)
+			c.ScrollHorizontal(-4)
 			return nil
 		}
 		switch event.Rune() {
 		case 'l':
-			c.scrollHorizontal(4)
+			c.ScrollHorizontal(4)
 			return nil
 		case 'h':
-			c.scrollHorizontal(-4)
+			c.ScrollHorizontal(-4)
 			return nil
 		}
 		return event
@@ -137,7 +137,7 @@ func sectionHeadline(section ConfigInfoSection) (string, string) {
 	return section.Title, ""
 }
 
-func (w *ConfigInfoComponent) scrollHorizontal(delta int) {
+func (w *ConfigInfoComponent) ScrollHorizontal(delta int) {
 	rowOffset, colOffset := w.layout.GetScrollOffset()
 	nextCol := colOffset + delta
 	if nextCol < 0 {

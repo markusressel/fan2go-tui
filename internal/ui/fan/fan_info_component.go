@@ -56,3 +56,9 @@ func (c *FanInfoComponent) refresh() {
 	config := c.Fan.Config
 	c.configComponent.SetSections(txwidget.FanConfigSections(config))
 }
+
+func (c *FanInfoComponent) ScrollHorizontal(delta int) {
+	if c.configComponent != nil {
+		c.configComponent.ScrollHorizontal(delta)
+	}
+}

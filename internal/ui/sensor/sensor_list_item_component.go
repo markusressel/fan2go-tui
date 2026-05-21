@@ -67,3 +67,9 @@ func (c *SensorListItemComponent) refresh() {
 	c.sensorInfoComponent.SetSensor(c.Sensor)
 	c.sensorGraphComponent.SetSensor(c.Sensor)
 }
+
+func (c *SensorListItemComponent) ScrollHorizontal(delta int) {
+	if c.sensorInfoComponent != nil {
+		c.sensorInfoComponent.ScrollHorizontal(delta)
+	}
+}

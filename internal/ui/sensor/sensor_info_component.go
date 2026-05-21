@@ -56,3 +56,9 @@ func (c *SensorInfoComponent) refresh() {
 	config := c.Sensor.Config
 	c.configComponent.SetSections(txwidget.SensorConfigSections(config))
 }
+
+func (c *SensorInfoComponent) ScrollHorizontal(delta int) {
+	if c.configComponent != nil {
+		c.configComponent.ScrollHorizontal(delta)
+	}
+}

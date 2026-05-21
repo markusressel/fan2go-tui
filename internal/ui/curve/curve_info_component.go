@@ -56,3 +56,9 @@ func (c *CurveInfoComponent) refresh() {
 	config := c.Curve.Config
 	c.configComponent.SetSections(txwidget.CurveConfigSections(config))
 }
+
+func (c *CurveInfoComponent) ScrollHorizontal(delta int) {
+	if c.configComponent != nil {
+		c.configComponent.ScrollHorizontal(delta)
+	}
+}

@@ -36,6 +36,10 @@ type ListComponent[T comparable] struct {
 	scrollbarComponent *ScrollbarComponent
 }
 
+type HorizontalScrollable interface {
+	ScrollHorizontal(delta int)
+}
+
 // NewListComponent creates a new ListComponent.
 // The application is used to redraw the component.
 // The config is used to configure the component.
@@ -120,11 +124,28 @@ func (c *ListComponent[T]) createLayout() {
 			c.scrollByPage(1)
 			return nil
 		} else if key == tcell.KeyLeft {
-			return nil
+			if c.scrollSelectedEntryHorizontal(-4) {
+				return nil
+			}
+			return event
 		} else if key == tcell.KeyRight {
-			return nil
+			if c.scrollSelectedEntryHorizontal(4) {
+				return nil
+			}
+			return event
 		} else if key == tcell.KeyEnter {
 			return nil
+		}
+
+		switch event.Rune() {
+		case 'h':
+			if c.scrollSelectedEntryHorizontal(-4) {
+				return nil
+			}
+		case 'l':
+			if c.scrollSelectedEntryHorizontal(4) {
+				return nil
+			}
 		}
 
 		return event
@@ -232,6 +253,20 @@ func (c *ListComponent[T]) scrollByPage(direction int) {
 		c.scrollTo(newSelection)
 	}
 	c.application.ForceDraw()
+}
+
+func (c *ListComponent[T]) scrollSelectedEntryHorizontal(delta int) bool {
+	selected := c.GetSelectedItem()
+	if selected == nil {
+		return false
+	}
+
+	scrollable, ok := any(selected).(HorizontalScrollable)
+	if !ok {
+		return false
+	}
+	scrollable.ScrollHorizontal(delta)
+	return true
 }
 
 func (c *ListComponent[T]) scroll(rows int) {

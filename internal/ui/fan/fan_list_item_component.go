@@ -95,3 +95,9 @@ func (c *FanListItemComponent) refresh() {
 		c.fanRpmCurveComponent.SetFan(c.Fan)
 	}
 }
+
+func (c *FanListItemComponent) ScrollHorizontal(delta int) {
+	if c.fanInfoComponent != nil {
+		c.fanInfoComponent.ScrollHorizontal(delta)
+	}
+}
