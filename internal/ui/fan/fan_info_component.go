@@ -3,6 +3,7 @@ package fan
 import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/ui/txwidget"
+	"strings"
 
 	"github.com/rivo/tview"
 )
@@ -15,12 +16,14 @@ type FanInfoComponent struct {
 	layout *tview.Flex
 
 	configComponent *txwidget.ConfigInfoComponent
+	onOpenCurve     func(curveID string)
 }
 
-func NewFanInfoComponent(application *tview.Application, fan *client.Fan) *FanInfoComponent {
+func NewFanInfoComponent(application *tview.Application, fan *client.Fan, onOpenCurve func(curveID string)) *FanInfoComponent {
 	c := &FanInfoComponent{
 		application: application,
 		Fan:         fan,
+		onOpenCurve: onOpenCurve,
 	}
 
 	c.layout = c.createLayout()
@@ -32,6 +35,14 @@ func (c *FanInfoComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 
 	configComponent := txwidget.NewConfigInfoComponent()
+	configComponent.SetFieldClickablePredicate(func(sectionTitle, label, value string) bool {
+		return strings.EqualFold(sectionTitle, "General") && strings.EqualFold(label, "Curve") && value != ""
+	})
+	configComponent.SetFieldClickHandler(func(sectionTitle, label, value string) {
+		if c.onOpenCurve != nil && strings.EqualFold(sectionTitle, "General") && strings.EqualFold(label, "Curve") {
+			c.onOpenCurve(value)
+		}
+	})
 	layout.AddItem(configComponent.GetPrimitive(), 0, 1, false)
 	c.configComponent = configComponent
 

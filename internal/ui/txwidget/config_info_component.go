@@ -34,16 +34,44 @@ type ConfigInfoSection struct {
 
 type ConfigInfoComponent struct {
 	layout *tview.TextView
+
+	isFieldClickable func(sectionTitle, label, value string) bool
+	onFieldClick     func(sectionTitle, label, value string)
+	fieldClickByID   map[string]clickableConfigField
+}
+
+type clickableConfigField struct {
+	sectionTitle string
+	field        ConfigInfoField
 }
 
 func NewConfigInfoComponent() *ConfigInfoComponent {
 	textView := tview.NewTextView().
 		SetDynamicColors(true).
 		SetWrap(false).
-		SetScrollable(true)
+		SetScrollable(true).
+		SetRegions(true)
 	textView.SetBorderPadding(0, 0, 0, 0)
 
-	c := &ConfigInfoComponent{layout: textView}
+	c := &ConfigInfoComponent{
+		layout: textView,
+		isFieldClickable: func(sectionTitle, label, value string) bool {
+			return false
+		},
+		onFieldClick:   func(sectionTitle, label, value string) {},
+		fieldClickByID: map[string]clickableConfigField{},
+	}
+	textView.SetHighlightedFunc(func(added, _, _ []string) {
+		if len(added) == 0 {
+			return
+		}
+		clickableField, ok := c.fieldClickByID[added[0]]
+		if !ok {
+			return
+		}
+		c.onFieldClick(clickableField.sectionTitle, clickableField.field.Label, clickableField.field.Value)
+		c.layout.Highlight()
+	})
 	textView.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
 		case tcell.KeyRight:
@@ -72,11 +100,14 @@ func (w *ConfigInfoComponent) GetPrimitive() tview.Primitive {
 }
 
 func (w *ConfigInfoComponent) SetSections(sections []ConfigInfoSection) {
+	w.fieldClickByID = map[string]clickableConfigField{}
+
 	type renderSection struct {
-		headerTitle string
-		typeValue   string
-		accent      ConfigInfoAccent
-		fields      []ConfigInfoField
+		headerTitle  string
+		typeValue    string
+		accent       ConfigInfoAccent
+		sectionTitle string
+		fields       []ConfigInfoField
 	}
 
 	renderSections := make([]renderSection, 0, len(sections))
@@ -94,10 +125,11 @@ func (w *ConfigInfoComponent) SetSections(sections []ConfigInfoSection) {
 			}
 		}
 		renderSections = append(renderSections, renderSection{
-			headerTitle: headerTitle,
-			typeValue:   typeValue,
-			accent:      section.Accent,
-			fields:      fields,
+			headerTitle:  headerTitle,
+			typeValue:    typeValue,
+			accent:       section.Accent,
+			sectionTitle: section.Title,
+			fields:       fields,
 		})
 	}
 
@@ -113,12 +145,21 @@ func (w *ConfigInfoComponent) SetSections(sections []ConfigInfoSection) {
 		for _, field := range section.fields {
 			valueColor := resolveValueColor(field.Label, field.Value, section.typeValue)
 			valueColorTag := colorTag(valueColor)
+			valueText := tview.Escape(field.Value)
+			if w.isFieldClickable(section.sectionTitle, field.Label, field.Value) {
+				regionID := fmt.Sprintf("field-%d", len(w.fieldClickByID))
+				w.fieldClickByID[regionID] = clickableConfigField{
+					sectionTitle: section.sectionTitle,
+					field:        field,
+				}
+				valueText = fmt.Sprintf("[\"%s\"]%s[\"\"]", regionID, valueText)
+			}
 			out.WriteString(fmt.Sprintf("%s%-*s[-] %s%s[-]\n",
 				keyColorTag,
 				maxKeyLen,
 				tview.Escape(field.Label),
 				valueColorTag,
-				tview.Escape(field.Value),
+				valueText,
 			))
 		}
 	}
@@ -145,6 +186,24 @@ func (w *ConfigInfoComponent) ScrollHorizontal(delta int) {
 		nextCol = 0
 	}
 	w.layout.ScrollTo(rowOffset, nextCol)
+}
+
+func (w *ConfigInfoComponent) SetFieldClickablePredicate(predicate func(sectionTitle, label, value string) bool) {
+	if predicate == nil {
+		w.isFieldClickable = func(sectionTitle, label, value string) bool {
+			return false
+		}
+		return
+	}
+	w.isFieldClickable = predicate
+}
+
+func (w *ConfigInfoComponent) SetFieldClickHandler(handler func(sectionTitle, label, value string)) {
+	if handler == nil {
+		w.onFieldClick = func(sectionTitle, label, value string) {}
+		return
+	}
+	w.onFieldClick = handler
 }
 
 func colorTag(color tcell.Color) string {

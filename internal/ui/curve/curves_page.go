@@ -25,14 +25,18 @@ type CurvesPage struct {
 	curveList *util.ListComponent[CurveListItemComponent]
 
 	curveListItemComponents map[string]*CurveListItemComponent
+	onOpenSensor            func(sensorID string)
+	onOpenCurve             func(curveID string)
 }
 
-func NewCurvesPage(application *tview.Application, client client.Fan2goApiClient) CurvesPage {
+func NewCurvesPage(application *tview.Application, client client.Fan2goApiClient, onOpenSensor func(sensorID string), onOpenCurve func(curveID string)) CurvesPage {
 
 	curvesPage := CurvesPage{
 		application:             application,
 		client:                  client,
 		curveListItemComponents: map[string]*CurveListItemComponent{},
+		onOpenSensor:            onOpenSensor,
+		onOpenCurve:             onOpenCurve,
 	}
 
 	curvesPage.layout = curvesPage.createLayout()
@@ -135,7 +139,7 @@ func (c *CurvesPage) Refresh() error {
 			curveListItemComponent.SetCurve(curve)
 			curveListItemsComponents = append(curveListItemsComponents, curveListItemComponent)
 		} else {
-			curveListItemComponent = NewCurveListItemComponent(c.application, curve)
+			curveListItemComponent = NewCurveListItemComponent(c.application, curve, c.onOpenSensor, c.onOpenCurve)
 			curveListItemComponent.SetCurve(curve)
 			c.curveListItemComponents[cId] = curveListItemComponent
 			curveListItemsComponents = append(curveListItemsComponents, curveListItemComponent)
@@ -149,4 +153,13 @@ func (c *CurvesPage) Refresh() error {
 
 func (c *CurvesPage) ScrollToItem() {
 	c.curveList.SelectEntry(c.curveList.GetSelectedItem())
+}
+
+func (c *CurvesPage) SelectCurveByID(curveID string) bool {
+	curveListItem, ok := c.curveListItemComponents[curveID]
+	if !ok {
+		return false
+	}
+	c.curveList.SelectEntry(curveListItem)
+	return true
 }
