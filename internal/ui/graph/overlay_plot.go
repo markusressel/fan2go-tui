@@ -59,6 +59,11 @@ type brailleLineCell struct {
 	color tcell.Color
 }
 
+type barBrailleCell struct {
+	bits  rune
+	color tcell.Color
+}
+
 var brailleLineBit = [4][2]rune{
 	{rune(0x0001), rune(0x0008)},
 	{rune(0x0002), rune(0x0010)},
@@ -284,18 +289,108 @@ func (p *OverlayPlot) setLinePoint(cells map[[2]int]brailleLineCell, sx, sy, tot
 	cells[key] = cell
 }
 
-func barFillRune(level int) rune {
-	switch {
-	case level <= 0:
-		return rune(0x2800)
-	case level == 1:
-		return rune(0x28C0) // bottom row, both columns
-	case level == 2:
-		return rune(0x28E4) // bottom two rows, both columns
-	case level == 3:
-		return rune(0x28F6) // bottom three rows, both columns
-	default:
-		return rune(0x28FF) // full cell
+func barFillBits(level, column int) rune {
+	if level <= 0 || column < 0 || column > 1 {
+		return 0
+	}
+	if level > 4 {
+		level = 4
+	}
+
+	bits := rune(0)
+	for i := 0; i < level; i++ {
+		rowFromTop := 3 - i // fill from bottom to top
+		bits |= brailleLineBit[rowFromTop][column]
+	}
+	return bits
+}
+
+func resolveBarSubX(ctx OverlayRenderContext, xVal float64, xIndex int) int {
+	if ctx.XValueToIndexFloat != nil {
+		xFloat := ctx.XValueToIndexFloat(xVal)
+		if !math.IsNaN(xFloat) && !math.IsInf(xFloat, 0) {
+			return int(math.Round(xFloat * 2))
+		}
+	}
+	return (xIndex * 2) + 1
+}
+
+func (p *OverlayPlot) fillBarAtSubX(
+	cells map[[2]int]barBrailleCell,
+	subX, filledSubRows, height, totalSubCols int,
+	ctx OverlayRenderContext,
+	stops []GraphBarGradientStop,
+	fallbackColor tcell.Color,
+) {
+	if subX < 0 || subX >= totalSubCols || height <= 0 || filledSubRows <= 0 {
+		return
+	}
+
+	totalSubRows := height * 4
+	if filledSubRows > totalSubRows {
+		filledSubRows = totalSubRows
+	}
+
+	cellX := subX / 2
+	column := subX % 2
+
+	for cellOffset := 0; cellOffset < height; cellOffset++ {
+		subRowsInCell := filledSubRows - cellOffset*4
+		if subRowsInCell <= 0 {
+			break
+		}
+		if subRowsInCell > 4 {
+			subRowsInCell = 4
+		}
+
+		bits := barFillBits(subRowsInCell, column)
+		if bits == 0 {
+			continue
+		}
+
+		normalizedVertical := 0.0
+		if height > 1 {
+			normalizedVertical = float64(cellOffset) / float64(height-1)
+		}
+		yAtCell := ctx.YMin + (normalizedVertical * (ctx.YMax - ctx.YMin))
+		gradientColor := colorAtY(yAtCell, stops, fallbackColor)
+
+		key := [2]int{cellX, height - 1 - cellOffset}
+		cell := cells[key]
+		cell.bits |= bits
+		cell.color = gradientColor
+		cells[key] = cell
+	}
+}
+
+func (p *OverlayPlot) fillBarSegment(
+	cells map[[2]int]barBrailleCell,
+	startSubX, startFilledSubRows, endSubX, endFilledSubRows, height, totalSubCols int,
+	ctx OverlayRenderContext,
+	stops []GraphBarGradientStop,
+	fallbackColor tcell.Color,
+) {
+	if startSubX == endSubX {
+		fill := startFilledSubRows
+		if endFilledSubRows > fill {
+			fill = endFilledSubRows
+		}
+		p.fillBarAtSubX(cells, startSubX, fill, height, totalSubCols, ctx, stops, fallbackColor)
+		return
+	}
+
+	deltaX := endSubX - startSubX
+	step := 1
+	if deltaX < 0 {
+		deltaX = -deltaX
+		step = -1
+	}
+
+	for offset := 0; offset <= deltaX; offset++ {
+		t := float64(offset) / float64(deltaX)
+		filled := int(math.Round(float64(startFilledSubRows) + (float64(endFilledSubRows-startFilledSubRows) * t)))
+		subX := startSubX + (offset * step)
+		p.fillBarAtSubX(cells, subX, filled, height, totalSubCols, ctx, stops, fallbackColor)
 	}
 }
 
@@ -306,9 +401,14 @@ func (p *OverlayPlot) drawBars(screen tcell.Screen, ctx OverlayRenderContext) {
 
 	x, y, width, height := p.Plot.GetPlotRect()
 	totalSubRows := height * 4
+	totalSubCols := width * 2
+	cells := map[[2]int]barBrailleCell{}
 
 	for _, bar := range ctx.Bars {
 		stops := bar.GetGradientStops(ctx.YMin, ctx.YMax)
+		hasPrevPoint := false
+		prevSubX := 0
+		prevFilledSubRows := 0
 
 		availableCount := 0
 		for sourceIdx := 0; sourceIdx < ctx.ValueBufferSize; sourceIdx++ {
@@ -359,32 +459,37 @@ func (p *OverlayPlot) drawBars(screen tcell.Screen, ctx OverlayRenderContext) {
 
 			filledSubRows := int(math.Round(((yVal - ctx.YMin) / (ctx.YMax - ctx.YMin)) * float64(totalSubRows)))
 			if filledSubRows <= 0 {
+				hasPrevPoint = false
 				continue
 			}
 
-			screenX := x + xIndex
-			for cellOffset := 0; cellOffset < height; cellOffset++ {
-				subRowsInCell := filledSubRows - cellOffset*4
-				if subRowsInCell <= 0 {
-					break
-				}
-
-				if subRowsInCell > 4 {
-					subRowsInCell = 4
-				}
-
-				r := barFillRune(subRowsInCell)
-				yPos := y + height - 1 - cellOffset
-				normalizedVertical := 0.0
-				if height > 1 {
-					normalizedVertical = float64(cellOffset) / float64(height-1)
-				}
-				yAtCell := ctx.YMin + (normalizedVertical * (ctx.YMax - ctx.YMin))
-				gradientColor := colorAtY(yAtCell, stops, bar.GetColor())
-				barStyle := tcell.StyleDefault.Background(ctx.Background).Foreground(gradientColor)
-				_, combc, _, _ := screen.GetContent(screenX, yPos)
-				screen.SetContent(screenX, yPos, r, combc, barStyle)
+			subX := resolveBarSubX(ctx, displayXVal, xIndex)
+			if subX < 0 || subX >= totalSubCols {
+				hasPrevPoint = false
+				continue
 			}
+
+			if hasPrevPoint {
+				p.fillBarSegment(cells, prevSubX, prevFilledSubRows, subX, filledSubRows, height, totalSubCols, ctx, stops, bar.GetColor())
+			} else {
+				p.fillBarAtSubX(cells, subX, filledSubRows, height, totalSubCols, ctx, stops, bar.GetColor())
+			}
+
+			hasPrevPoint = true
+			prevSubX = subX
+			prevFilledSubRows = filledSubRows
 		}
+	}
+
+	for point, cell := range cells {
+		screenX := x + point[0]
+		screenY := y + point[1]
+		if screenX < x || screenX >= x+width || screenY < y || screenY >= y+height {
+			continue
+		}
+
+		_, combc, _, _ := screen.GetContent(screenX, screenY)
+		barStyle := tcell.StyleDefault.Background(ctx.Background).Foreground(cell.color)
+		screen.SetContent(screenX, screenY, rune(0x2800)+cell.bits, combc, barStyle)
 	}
 }
