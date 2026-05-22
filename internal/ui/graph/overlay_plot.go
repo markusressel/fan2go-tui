@@ -105,6 +105,7 @@ func (p *OverlayPlot) drawLineSeries(screen tcell.Screen, ctx OverlayRenderConte
 		return
 	}
 	totalSubRows := height * 4
+	totalSubCols := width * 2
 
 	for seriesIdx, series := range ctx.SeriesData {
 		displaySlots := len(series)
@@ -131,7 +132,7 @@ func (p *OverlayPlot) drawLineSeries(screen tcell.Screen, ctx OverlayRenderConte
 
 		cells := map[[2]int]brailleLineCell{}
 		hasPrev := false
-		prevX := 0
+		prevSubX := 0
 		prevSubY := 0
 
 		for i := 0; i < displaySlots; i++ {
@@ -158,15 +159,16 @@ func (p *OverlayPlot) drawLineSeries(screen tcell.Screen, ctx OverlayRenderConte
 				hasPrev = false
 				continue
 			}
+			pointSubX := (i * 2) + 1 // Anchor samples at the center of each cell to leverage both braille columns.
 
 			if hasPrev {
-				p.drawLineSegment(cells, prevX, prevSubY, i, pointSubY, totalSubRows, seriesColor)
+				p.drawLineSegment(cells, prevSubX, prevSubY, pointSubX, pointSubY, totalSubCols, totalSubRows, seriesColor)
 			} else {
-				p.setLinePoint(cells, i*2, pointSubY, totalSubRows, seriesColor)
+				p.setLinePoint(cells, pointSubX, pointSubY, totalSubCols, totalSubRows, seriesColor)
 			}
 
 			hasPrev = true
-			prevX = i
+			prevSubX = pointSubX
 			prevSubY = pointSubY
 		}
 
@@ -204,12 +206,7 @@ func mapValueToBrailleSubRow(val, yMin, yMax float64, totalSubRows int) (int, bo
 	return (totalSubRows - 1) - subRowFromBottom, true
 }
 
-func (p *OverlayPlot) drawLineSegment(cells map[[2]int]brailleLineCell, x0, y0, x1, y1, totalSubRows int, color tcell.Color) {
-	sx0 := x0 * 2
-	sy0 := y0
-	sx1 := x1 * 2
-	sy1 := y1
-
+func (p *OverlayPlot) drawLineSegment(cells map[[2]int]brailleLineCell, sx0, sy0, sx1, sy1, totalSubCols, totalSubRows int, color tcell.Color) {
 	dx := int(math.Abs(float64(sx1 - sx0)))
 	dy := -int(math.Abs(float64(sy1 - sy0)))
 	sx := -1
@@ -223,7 +220,7 @@ func (p *OverlayPlot) drawLineSegment(cells map[[2]int]brailleLineCell, x0, y0, 
 	err := dx + dy
 
 	for {
-		p.setLinePoint(cells, sx0, sy0, totalSubRows, color)
+		p.setLinePoint(cells, sx0, sy0, totalSubCols, totalSubRows, color)
 		if sx0 == sx1 && sy0 == sy1 {
 			break
 		}
@@ -240,8 +237,8 @@ func (p *OverlayPlot) drawLineSegment(cells map[[2]int]brailleLineCell, x0, y0, 
 	}
 }
 
-func (p *OverlayPlot) setLinePoint(cells map[[2]int]brailleLineCell, sx, sy, totalSubRows int, color tcell.Color) {
-	if sx < 0 || sy < 0 || sy >= totalSubRows {
+func (p *OverlayPlot) setLinePoint(cells map[[2]int]brailleLineCell, sx, sy, totalSubCols, totalSubRows int, color tcell.Color) {
+	if sx < 0 || sx >= totalSubCols || sy < 0 || sy >= totalSubRows {
 		return
 	}
 
