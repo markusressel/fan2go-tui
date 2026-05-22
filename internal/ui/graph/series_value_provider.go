@@ -35,13 +35,29 @@ type DiscreteIntSeriesValueProvider struct {
 }
 
 func NewDiscreteIntSeriesValueProvider(values map[int]float64) *DiscreteIntSeriesValueProvider {
-	keys := maps.Keys(values)
+	p := &DiscreteIntSeriesValueProvider{}
+	p.SetValues(values)
+	return p
+}
+
+func (p *DiscreteIntSeriesValueProvider) SetValues(values map[int]float64) {
+	if p == nil {
+		return
+	}
+	if values == nil {
+		values = map[int]float64{}
+	}
+
+	updatedValues := make(map[int]float64, len(values))
+	for k, v := range values {
+		updatedValues[k] = v
+	}
+
+	keys := maps.Keys(updatedValues)
 	slices.Sort(keys)
 
-	return &DiscreteIntSeriesValueProvider{
-		keys:   keys,
-		values: values,
-	}
+	p.keys = keys
+	p.values = updatedValues
 }
 
 func (p *DiscreteIntSeriesValueProvider) X(i int) float64 {

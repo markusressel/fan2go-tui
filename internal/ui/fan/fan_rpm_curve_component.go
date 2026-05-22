@@ -22,13 +22,14 @@ type FanRpmCurveComponent struct {
 	Fan     *client.Fan
 	history []graph.XY
 
-	layout         *tview.Flex
-	graphComponent *graph.GraphComponent
+	layout              *tview.Flex
+	graphComponent      *graph.GraphComponent
+	seriesValueProvider *graph.DiscreteIntSeriesValueProvider
 }
 
 func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *FanRpmCurveComponent {
 	fanCurveData := map[int]float64{}
-	if fan.FanCurveData != nil {
+	if fan != nil && fan.FanCurveData != nil {
 		fanCurveData = *fan.FanCurveData
 	}
 
@@ -36,9 +37,10 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 	rpmGraphLine := graph.NewGraphLineFromSeriesValueProvider("RPM", seriesValueProvider)
 
 	c := &FanRpmCurveComponent{
-		application: application,
-		Fan:         fan,
-		history:     make([]graph.XY, 0, fanRpmCurveTrailHistorySize),
+		application:         application,
+		Fan:                 fan,
+		history:             make([]graph.XY, 0, fanRpmCurveTrailHistorySize),
+		seriesValueProvider: seriesValueProvider,
 	}
 
 	graphConfig := graph.NewGraphComponentConfig().
@@ -119,6 +121,8 @@ func (c *FanRpmCurveComponent) appendHistory(pwm, rpm float64) {
 }
 
 func (c *FanRpmCurveComponent) refresh() {
+	c.syncCurveData()
+
 	fan := c.Fan
 	if fan == nil {
 		return
@@ -132,6 +136,19 @@ func (c *FanRpmCurveComponent) refresh() {
 	c.graphComponent.Refresh()
 	c.graphComponent.ZoomToRangeX(fanRpmCurveMinX, fanRpmCurveMaxX)
 	c.graphComponent.Refresh()
+}
+
+func (c *FanRpmCurveComponent) syncCurveData() {
+	if c == nil || c.seriesValueProvider == nil {
+		return
+	}
+
+	curveData := map[int]float64{}
+	if c.Fan != nil && c.Fan.FanCurveData != nil {
+		curveData = *c.Fan.FanCurveData
+	}
+
+	c.seriesValueProvider.SetValues(curveData)
 }
 
 func (c *FanRpmCurveComponent) GetLayout() *tview.Flex {

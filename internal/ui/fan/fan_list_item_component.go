@@ -12,12 +12,23 @@ type FanListItemComponent struct {
 
 	Fan *client.Fan
 
-	layout *tview.Flex
+	layout          *tview.Flex
+	graphHostLayout *tview.Flex
+
+	activeGraphVariant fanGraphVariant
 
 	fanInfoComponent     *FanInfoComponent
 	fanGraphComponent    *FanGraphComponent
 	fanRpmCurveComponent *FanRpmCurveComponent
 }
+
+type fanGraphVariant int
+
+const (
+	fanGraphVariantNone fanGraphVariant = iota
+	fanGraphVariantHistory
+	fanGraphVariantCurve
+)
 
 func hasFanCurveData(fan *client.Fan) bool {
 	if fan == nil || fan.FanCurveData == nil {
@@ -54,26 +65,50 @@ func (c *FanListItemComponent) createLayout(onOpenCurve func(curveID string)) *t
 	fanColumnLayout.AddItem(layout, 0, 1, true)
 	fanColumnLayout.AddItem(tview.NewBox(), 1, 0, false)
 
-	fanGraphsRowLayout := tview.NewFlex().SetDirection(tview.FlexRow)
-	fanColumnLayout.AddItem(fanGraphsRowLayout, 0, 3, true)
+	c.graphHostLayout = tview.NewFlex().SetDirection(tview.FlexRow)
+	fanColumnLayout.AddItem(c.graphHostLayout, 0, 3, true)
 
-	{
-		if hasFanCurveData(f) {
-			fanRpmCurveComponent := NewFanRpmCurveComponent(c.application, f)
-			c.fanRpmCurveComponent = fanRpmCurveComponent
-			fanRpmCurveComponent.SetFan(f)
-			layout = fanRpmCurveComponent.GetLayout()
-			fanGraphsRowLayout.AddItem(layout, 0, 1, true)
-		} else {
-			fanGraphComponent := NewFanGraphComponent(c.application, f)
-			c.fanGraphComponent = fanGraphComponent
-			fanGraphComponent.SetFan(f)
-			layout = fanGraphComponent.GetLayout()
-			fanGraphsRowLayout.AddItem(layout, 0, 1, true)
-		}
-	}
+	c.ensureGraphVariant()
+	c.refresh()
 
 	return rootLayout
+}
+
+func (c *FanListItemComponent) desiredGraphVariant() fanGraphVariant {
+	if hasFanCurveData(c.Fan) {
+		return fanGraphVariantCurve
+	}
+	return fanGraphVariantHistory
+}
+
+func (c *FanListItemComponent) ensureGraphVariant() {
+	if c == nil || c.graphHostLayout == nil {
+		return
+	}
+
+	desiredVariant := c.desiredGraphVariant()
+	if desiredVariant == c.activeGraphVariant {
+		return
+	}
+
+	if c.fanGraphComponent != nil {
+		c.graphHostLayout.RemoveItem(c.fanGraphComponent.GetLayout())
+		c.fanGraphComponent = nil
+	}
+	if c.fanRpmCurveComponent != nil {
+		c.graphHostLayout.RemoveItem(c.fanRpmCurveComponent.GetLayout())
+		c.fanRpmCurveComponent = nil
+	}
+
+	if desiredVariant == fanGraphVariantCurve {
+		c.fanRpmCurveComponent = NewFanRpmCurveComponent(c.application, c.Fan)
+		c.graphHostLayout.AddItem(c.fanRpmCurveComponent.GetLayout(), 0, 1, true)
+	} else {
+		c.fanGraphComponent = NewFanGraphComponent(c.application, c.Fan)
+		c.graphHostLayout.AddItem(c.fanGraphComponent.GetLayout(), 0, 1, true)
+	}
+
+	c.activeGraphVariant = desiredVariant
 }
 
 func (c *FanListItemComponent) GetLayout() *tview.Flex {
@@ -82,6 +117,7 @@ func (c *FanListItemComponent) GetLayout() *tview.Flex {
 
 func (c *FanListItemComponent) SetFan(fan *client.Fan) {
 	c.Fan = fan
+	c.ensureGraphVariant()
 	c.refresh()
 }
 
