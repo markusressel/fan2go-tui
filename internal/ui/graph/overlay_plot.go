@@ -134,6 +134,7 @@ func (p *OverlayPlot) drawLineSeries(screen tcell.Screen, ctx OverlayRenderConte
 		hasPrev := false
 		prevSubX := 0
 		prevSubY := 0
+		runHasSegment := false
 
 		for i := 0; i < displaySlots; i++ {
 			sourceIndex := i
@@ -144,32 +145,50 @@ func (p *OverlayPlot) drawLineSeries(screen tcell.Screen, ctx OverlayRenderConte
 			}
 
 			if sourceIndex < 0 || sourceIndex >= displaySlots {
+				if hasPrev && !runHasSegment {
+					p.setLinePoint(cells, prevSubX, prevSubY, totalSubCols, totalSubRows, seriesColor)
+				}
 				hasPrev = false
+				runHasSegment = false
 				continue
 			}
 
 			val := series[sourceIndex]
 			if math.IsNaN(val) || math.IsInf(val, 0) {
+				if hasPrev && !runHasSegment {
+					p.setLinePoint(cells, prevSubX, prevSubY, totalSubCols, totalSubRows, seriesColor)
+				}
 				hasPrev = false
+				runHasSegment = false
 				continue
 			}
 
 			pointSubY, ok := mapValueToBrailleSubRow(val, ctx.YMin, ctx.YMax, totalSubRows)
 			if !ok {
+				if hasPrev && !runHasSegment {
+					p.setLinePoint(cells, prevSubX, prevSubY, totalSubCols, totalSubRows, seriesColor)
+				}
 				hasPrev = false
+				runHasSegment = false
 				continue
 			}
-			pointSubX := (i * 2) + 1 // Anchor samples at the center of each cell to leverage both braille columns.
+			pointSubX := (i * 2) + 1
 
 			if hasPrev {
-				p.drawLineSegment(cells, prevSubX, prevSubY, pointSubX, pointSubY, totalSubCols, totalSubRows, seriesColor)
+				startSubX, endSubX := segmentSubXEndpoints(i-1, prevSubY, i, pointSubY)
+				p.drawLineSegment(cells, startSubX, prevSubY, endSubX, pointSubY, totalSubCols, totalSubRows, seriesColor)
+				runHasSegment = true
 			} else {
-				p.setLinePoint(cells, pointSubX, pointSubY, totalSubCols, totalSubRows, seriesColor)
+				runHasSegment = false
 			}
 
 			hasPrev = true
 			prevSubX = pointSubX
 			prevSubY = pointSubY
+		}
+
+		if hasPrev && !runHasSegment {
+			p.setLinePoint(cells, prevSubX, prevSubY, totalSubCols, totalSubRows, seriesColor)
 		}
 
 		for point, cell := range cells {
@@ -184,6 +203,18 @@ func (p *OverlayPlot) drawLineSeries(screen tcell.Screen, ctx OverlayRenderConte
 			screen.SetContent(screenX, screenY, rune(0x2800)+cell.bits, combc, style)
 		}
 	}
+}
+
+func segmentSubXEndpoints(startCellX, startSubY, endCellX, endSubY int) (int, int) {
+	startLeft := startCellX * 2
+	startRight := startLeft + 1
+	endLeft := endCellX * 2
+	endRight := endLeft + 1
+
+	if endSubY > startSubY {
+		return startLeft, endRight
+	}
+	return startRight, endLeft
 }
 
 func mapValueToBrailleSubRow(val, yMin, yMax float64, totalSubRows int) (int, bool) {
