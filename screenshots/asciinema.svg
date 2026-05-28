@@ -1,0 +1,1838 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1448.81333276"
+     height="877.333114"
+     font-family="'Cascadia Code','Source Code Pro',Menlo,Consolas,'DejaVu Sans Mono',monospace,'Symbols Nerd Font'"
+     font-size="14px">
+    <style>
+        .br { font-weight: bold }
+        .fa { fill-opacity: 0.5 }
+        .it { font-style: italic }
+        .un { text-decoration: underline }
+        .term-text tspan tspan { white-space: pre }
+
+        @font-face {
+        font-family: "Symbols Nerd Font";
+        src: url("https://asciinema.org/fonts/SymbolsNerdFont-Regular-337b40fc23735cb78fbe3379fae18138.woff2?vsn=d")
+        format("woff2");
+        }
+
+    </style>
+
+    <rect width="100%" height="100%" style="fill: #000000" rx="4" ry="4"></rect>
+
+    <svg x="8.42333333" y="9.333331000000001" class="default-text-fill">
+        <image x="0" y="0" width="1431.9666661" height="858.666452"
+               href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABVAAAARQCAIAAACEa+2rAAAckElEQVR4XuzXsa0dRRhAYV4bDijAIqAQ5IQ2LJE5pAUTuBJLJHRB4kYowEQWM9KDTZh/dc/9vmhnVtr9Z6M9L9//9vU7/t3HX37895vAQ/r55c+HnBuAM9589D884Ye/fp94zdP749efnv4b8I8Xwf/fBD/0CH4AVoJ/huCfIfhZCf4Lgh96BD8AK8E/Q/DPEPysBP8FwQ89gh+AleCfIfhnCH5Wgv+C4IcewQ/ASvDPEPwzBD8rwX9B8EOP4AdgJfhnCP4Zgp+V4L8g+KFH8AOwEvwzBP8Mwc9K8F8Q/NAj+AFYCf4Zgn+G4Gcl+C8IfugR/ACsBP8MwT9D8LMS/BcEP/QIfgBWgn+G4J8h+FkJ/guCH3oEPwArwT9D8M8Q/KwE/wXBDz2CH4CV4J8h+GcIflaC/4Lghx7BD8BK8M8Q/DMEPyvBf0HwQ4/gB2Al+GcI/hmCn5XgvyD4oUfwA7AS/DME/wzBz0rwXxD80CP4AVgJ/hmCf4bgZyX4Lwh+6BH8AKwE/wzBP0PwsxL8FwQ/9Ah+AFaCf4bgnyH4WQn+C4IfegQ/ACvBP0PwzxD8rAT/BcEPPYIfgJXgnyH4Zwh+VoL/guCHHsEPwErwzxD8MwQ/K8F/QfBDj+AHYCX4Zwj+GYKfleC/IPihR/ADsBL8MwT/DMHPSvBfEPzQI/gBWAn+GYJ/huBn9bIuAAAAgAbBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAAOCBffjw4dXpBT8AAAA8MMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAADyRlyc6KwAAADwNwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAADwwN58/Prq9IIfAAAAHpjgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4ATji7bv3rz73y+dPr+4DAPD/EvwAHCH4AQDuJfgBOELwAwDcS/ADcITgBwC4l+AH4AjBDwBwL8EPwBGCHwDgXoIfgCMEPwDAvQQ/AEcIfgCAewl+AI4Q/AAA9xL8ABwh+AEA7iX4AThC8AMA3EvwA3CE4AcAuJfgB+AIwQ8AcC/BD8ARgh8A4F6CH4AjBD8AwL0EPwBHCH4AgHsJfgCOEPwAAPcS/AAcIfgBAO4l+AE4QvADANxL8ANwhOAHALiX4AfgCMEPAHAvwQ/AEYIfAOBegh+AIwQ/AMC9BD8ARwh+AIB7CX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAB4Ii9PdFYAAAB4GoIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAGDz9t37bf3Nl8+fvl0C8AAEPwAAG8EP0CD4AQDYCH6ABsEPAMBG8AM0CH4AADaCH6BB8AMAsBH8AA2CHwCAjeAHaBD8AABsBD9Ag+AHAGAj+AEaBD8AABvBD9Ag+AEA2Ah+gAbBDwDARvADNAh+AAA2gh+gQfADALAR/AANgh8AgI3gB2gQ/AAAbAQ/QIPgBwBgI/gBGgQ/AAAbwQ/QIPgBANgIfoAGwQ8AwEbwAzQIfgAANoIfoEHwAwCwEfwADYIfAICN4AdoEPwAAGwEP0CD4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAAAECX4AAAAIEvwAAAAQJPgBAAAgSPADAABAkOAHAACAIMEPAAAAQYIfAAAAggQ/AAAABAl+AAAACBL8AAAAECT4AQAAIEjwAwAAQJDgBwAAgCDBDwAAAEGCHwAAAIIEPwAAAAQJfgAAAAgS/AAAABAk+AEAACBI8AMAAECQ4AcAAIAgwQ8AAABBgh8AAACCBD8AAMDf7deBDAAAAMAgf+t7fGURDAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAk/AAAADAUuVL/lQajsOQAAAABJRU5ErkJggg=="
+               preserveAspectRatio="none" style="image-rendering: pixelated; image-rendering: crisp-edges;"></image>
+
+        <g style="shape-rendering: optimizeSpeed">
+
+        </g>
+
+        <text xml:space="preserve" class="term-text" style="fill: #dddddd">
+      <tspan y="0.0">
+        <tspan dy="1em" x="0.0" style="fill: #ffffff"> fan2go-tui </tspan>
+          <tspan x="101.07999996000001" style="fill: #000000">  0.3.0-(#7a2523e)-2026-05-21T01:14:08Z  </tspan>
+          <tspan x="446.43666649">                                                                 </tspan>
+          <tspan x="993.95333294">  </tspan>
+          <tspan x="1010.7999996" style="fill: #ffffff">FANS    1/3</tspan>
+          <tspan x="1103.45666623">  </tspan>
+          <tspan x="1120.30333289">  </tspan>
+          <tspan x="1137.14999955" style="fill: #ffffff">- 500 ms +</tspan>
+          <tspan x="1221.38333285">   </tspan>
+          <tspan x="1246.65333284" style="fill: #fffd00">  Press &#39;?&#39; for help  </tspan>
+      </tspan>
+            <tspan y="18.666662000000002">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">╔</tspan>
+                <tspan x="8.42333333" style="fill: #1a8fff"> gpu </tspan>
+                <tspan x="50.539999980000005" style="fill: #4682b4">═</tspan>
+                <tspan x="58.96333331" style="fill: #4682b4">═</tspan>
+                <tspan x="67.38666664" style="fill: #4682b4">═</tspan>
+                <tspan x="75.80999997" style="fill: #4682b4">═</tspan>
+                <tspan x="84.2333333" style="fill: #4682b4">═</tspan>
+                <tspan x="92.65666663" style="fill: #4682b4">═</tspan>
+                <tspan x="101.07999996000001" style="fill: #4682b4">═</tspan>
+                <tspan x="109.50333329" style="fill: #4682b4">═</tspan>
+                <tspan x="117.92666662" style="fill: #4682b4">═</tspan>
+                <tspan x="126.34999995" style="fill: #4682b4">═</tspan>
+                <tspan x="134.77333328" style="fill: #4682b4">═</tspan>
+                <tspan x="143.19666661" style="fill: #4682b4">═</tspan>
+                <tspan x="151.61999994" style="fill: #4682b4">═</tspan>
+                <tspan x="160.04333327" style="fill: #4682b4">═</tspan>
+                <tspan x="168.4666666" style="fill: #4682b4">═</tspan>
+                <tspan x="176.88999993000002" style="fill: #4682b4">═</tspan>
+                <tspan x="185.31333326" style="fill: #4682b4">═</tspan>
+                <tspan x="193.73666659" style="fill: #4682b4">═</tspan>
+                <tspan x="202.15999992000002" style="fill: #4682b4">═</tspan>
+                <tspan x="210.58333325" style="fill: #4682b4">═</tspan>
+                <tspan x="219.00666658" style="fill: #4682b4">═</tspan>
+                <tspan x="227.42999991" style="fill: #4682b4">═</tspan>
+                <tspan x="235.85333324" style="fill: #4682b4">═</tspan>
+                <tspan x="244.27666657" style="fill: #4682b4">═</tspan>
+                <tspan x="252.6999999" style="fill: #4682b4">═</tspan>
+                <tspan x="261.12333323" style="fill: #4682b4">═</tspan>
+                <tspan x="269.54666656" style="fill: #4682b4">═</tspan>
+                <tspan x="277.96999989" style="fill: #4682b4">═</tspan>
+                <tspan x="286.39333322" style="fill: #4682b4">═</tspan>
+                <tspan x="294.81666655" style="fill: #4682b4">═</tspan>
+                <tspan x="303.23999988" style="fill: #4682b4">═</tspan>
+                <tspan x="311.66333321" style="fill: #4682b4">═</tspan>
+                <tspan x="320.08666654" style="fill: #4682b4">═</tspan>
+                <tspan x="328.50999987" style="fill: #4682b4">═</tspan>
+                <tspan x="336.9333332" style="fill: #4682b4">═</tspan>
+                <tspan x="345.35666653" style="fill: #4682b4">═</tspan>
+                <tspan x="353.77999986000003" style="fill: #4682b4">═</tspan>
+                <tspan x="362.20333319" style="fill: #4682b4">═</tspan>
+                <tspan x="370.62666652" style="fill: #4682b4">═</tspan>
+                <tspan x="379.04999985" style="fill: #4682b4">═</tspan>
+                <tspan x="387.47333318" style="fill: #4682b4">═</tspan>
+                <tspan x="395.89666651" style="fill: #4682b4">═</tspan>
+                <tspan x="404.31999984000004" style="fill: #4682b4">═</tspan>
+                <tspan x="412.74333317" style="fill: #4682b4">═</tspan>
+                <tspan x="421.1666665" style="fill: #4682b4">═</tspan>
+                <tspan x="429.58999983" style="fill: #4682b4">═</tspan>
+                <tspan x="438.01333316" style="fill: #4682b4">═</tspan>
+                <tspan x="446.43666649" style="fill: #4682b4">═</tspan>
+                <tspan x="454.85999982" style="fill: #4682b4">═</tspan>
+                <tspan x="463.28333315000003" style="fill: #4682b4">═</tspan>
+                <tspan x="471.70666648" style="fill: #4682b4">═</tspan>
+                <tspan x="480.12999981" style="fill: #4682b4">═</tspan>
+                <tspan x="488.55333314" style="fill: #4682b4">═</tspan>
+                <tspan x="496.97666647" style="fill: #4682b4">═</tspan>
+                <tspan x="505.3999998" style="fill: #4682b4">═</tspan>
+                <tspan x="513.82333313" style="fill: #4682b4">═</tspan>
+                <tspan x="522.24666646" style="fill: #4682b4">═</tspan>
+                <tspan x="530.66999979" style="fill: #4682b4">═</tspan>
+                <tspan x="539.09333312" style="fill: #4682b4">═</tspan>
+                <tspan x="547.51666645" style="fill: #4682b4">═</tspan>
+                <tspan x="555.93999978" style="fill: #4682b4">═</tspan>
+                <tspan x="564.36333311" style="fill: #4682b4">═</tspan>
+                <tspan x="572.78666644" style="fill: #4682b4">═</tspan>
+                <tspan x="581.20999977" style="fill: #4682b4">═</tspan>
+                <tspan x="589.6333331" style="fill: #4682b4">═</tspan>
+                <tspan x="598.0566664300001" style="fill: #4682b4">═</tspan>
+                <tspan x="606.47999976" style="fill: #4682b4">═</tspan>
+                <tspan x="614.90333309" style="fill: #4682b4">═</tspan>
+                <tspan x="623.32666642" style="fill: #4682b4">═</tspan>
+                <tspan x="631.74999975" style="fill: #4682b4">═</tspan>
+                <tspan x="640.17333308" style="fill: #4682b4">═</tspan>
+                <tspan x="648.59666641" style="fill: #4682b4">═</tspan>
+                <tspan x="657.01999974" style="fill: #4682b4">═</tspan>
+                <tspan x="665.44333307" style="fill: #4682b4">═</tspan>
+                <tspan x="673.8666664" style="fill: #4682b4">═</tspan>
+                <tspan x="682.28999973" style="fill: #4682b4">═</tspan>
+                <tspan x="690.71333306" style="fill: #4682b4">═</tspan>
+                <tspan x="699.13666639" style="fill: #4682b4">═</tspan>
+                <tspan x="707.5599997200001" style="fill: #4682b4">═</tspan>
+                <tspan x="715.98333305" style="fill: #4682b4">═</tspan>
+                <tspan x="724.40666638" style="fill: #4682b4">═</tspan>
+                <tspan x="732.82999971" style="fill: #4682b4">═</tspan>
+                <tspan x="741.25333304" style="fill: #4682b4">═</tspan>
+                <tspan x="749.67666637" style="fill: #4682b4">═</tspan>
+                <tspan x="758.0999997" style="fill: #4682b4">═</tspan>
+                <tspan x="766.52333303" style="fill: #4682b4">═</tspan>
+                <tspan x="774.94666636" style="fill: #4682b4">═</tspan>
+                <tspan x="783.36999969" style="fill: #4682b4">═</tspan>
+                <tspan x="791.79333302" style="fill: #4682b4">═</tspan>
+                <tspan x="800.21666635" style="fill: #4682b4">═</tspan>
+                <tspan x="808.6399996800001" style="fill: #4682b4">═</tspan>
+                <tspan x="817.0633330100001" style="fill: #4682b4">═</tspan>
+                <tspan x="825.48666634" style="fill: #4682b4">═</tspan>
+                <tspan x="833.90999967" style="fill: #4682b4">═</tspan>
+                <tspan x="842.333333" style="fill: #4682b4">═</tspan>
+                <tspan x="850.75666633" style="fill: #4682b4">═</tspan>
+                <tspan x="859.17999966" style="fill: #4682b4">═</tspan>
+                <tspan x="867.60333299" style="fill: #4682b4">═</tspan>
+                <tspan x="876.02666632" style="fill: #4682b4">═</tspan>
+                <tspan x="884.44999965" style="fill: #4682b4">═</tspan>
+                <tspan x="892.87333298" style="fill: #4682b4">═</tspan>
+                <tspan x="901.29666631" style="fill: #4682b4">═</tspan>
+                <tspan x="909.71999964" style="fill: #4682b4">═</tspan>
+                <tspan x="918.1433329700001" style="fill: #4682b4">═</tspan>
+                <tspan x="926.5666663000001" style="fill: #4682b4">═</tspan>
+                <tspan x="934.98999963" style="fill: #4682b4">═</tspan>
+                <tspan x="943.41333296" style="fill: #4682b4">═</tspan>
+                <tspan x="951.83666629" style="fill: #4682b4">═</tspan>
+                <tspan x="960.25999962" style="fill: #4682b4">═</tspan>
+                <tspan x="968.68333295" style="fill: #4682b4">═</tspan>
+                <tspan x="977.10666628" style="fill: #4682b4">═</tspan>
+                <tspan x="985.52999961" style="fill: #4682b4">═</tspan>
+                <tspan x="993.95333294" style="fill: #4682b4">═</tspan>
+                <tspan x="1002.37666627" style="fill: #4682b4">═</tspan>
+                <tspan x="1010.7999996" style="fill: #4682b4">═</tspan>
+                <tspan x="1019.22333293" style="fill: #4682b4">═</tspan>
+                <tspan x="1027.64666626" style="fill: #4682b4">═</tspan>
+                <tspan x="1036.06999959" style="fill: #4682b4">═</tspan>
+                <tspan x="1044.49333292" style="fill: #4682b4">═</tspan>
+                <tspan x="1052.91666625" style="fill: #4682b4">═</tspan>
+                <tspan x="1061.33999958" style="fill: #4682b4">═</tspan>
+                <tspan x="1069.76333291" style="fill: #4682b4">═</tspan>
+                <tspan x="1078.18666624" style="fill: #4682b4">═</tspan>
+                <tspan x="1086.6099995700001" style="fill: #4682b4">═</tspan>
+                <tspan x="1095.0333329" style="fill: #4682b4">═</tspan>
+                <tspan x="1103.45666623" style="fill: #4682b4">═</tspan>
+                <tspan x="1111.87999956" style="fill: #4682b4">═</tspan>
+                <tspan x="1120.30333289" style="fill: #4682b4">═</tspan>
+                <tspan x="1128.72666622" style="fill: #4682b4">═</tspan>
+                <tspan x="1137.14999955" style="fill: #4682b4">═</tspan>
+                <tspan x="1145.57333288" style="fill: #4682b4">═</tspan>
+                <tspan x="1153.99666621" style="fill: #4682b4">═</tspan>
+                <tspan x="1162.41999954" style="fill: #4682b4">═</tspan>
+                <tspan x="1170.84333287" style="fill: #4682b4">═</tspan>
+                <tspan x="1179.2666662" style="fill: #4682b4">═</tspan>
+                <tspan x="1187.68999953" style="fill: #4682b4">═</tspan>
+                <tspan x="1196.1133328600001" style="fill: #4682b4">═</tspan>
+                <tspan x="1204.53666619" style="fill: #4682b4">═</tspan>
+                <tspan x="1212.95999952" style="fill: #4682b4">═</tspan>
+                <tspan x="1221.38333285" style="fill: #4682b4">═</tspan>
+                <tspan x="1229.80666618" style="fill: #4682b4">═</tspan>
+                <tspan x="1238.22999951" style="fill: #4682b4">═</tspan>
+                <tspan x="1246.65333284" style="fill: #4682b4">═</tspan>
+                <tspan x="1255.07666617" style="fill: #4682b4">═</tspan>
+                <tspan x="1263.4999995" style="fill: #4682b4">═</tspan>
+                <tspan x="1271.92333283" style="fill: #4682b4">═</tspan>
+                <tspan x="1280.34666616" style="fill: #4682b4">═</tspan>
+                <tspan x="1288.76999949" style="fill: #4682b4">═</tspan>
+                <tspan x="1297.19333282" style="fill: #4682b4">═</tspan>
+                <tspan x="1305.6166661500001" style="fill: #4682b4">═</tspan>
+                <tspan x="1314.03999948" style="fill: #4682b4">═</tspan>
+                <tspan x="1322.46333281" style="fill: #4682b4">═</tspan>
+                <tspan x="1330.88666614" style="fill: #4682b4">═</tspan>
+                <tspan x="1339.30999947" style="fill: #4682b4">═</tspan>
+                <tspan x="1347.7333328" style="fill: #4682b4">═</tspan>
+                <tspan x="1356.15666613" style="fill: #4682b4">═</tspan>
+                <tspan x="1364.57999946" style="fill: #4682b4">═</tspan>
+                <tspan x="1373.00333279" style="fill: #4682b4">═</tspan>
+                <tspan x="1381.42666612" style="fill: #4682b4">═</tspan>
+                <tspan x="1389.84999945" style="fill: #4682b4">═</tspan>
+                <tspan x="1398.27333278" style="fill: #4682b4">═</tspan>
+                <tspan x="1406.69666611" style="fill: #4682b4">═</tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">╗</tspan>
+      </tspan>
+            <tspan y="37.333324000000005">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">║</tspan>
+                <tspan x="8.42333333" style="fill: #87ceeb">[General]</tspan>
+                <tspan x="84.2333333">                                 </tspan>
+                <tspan x="362.20333319" style="fill: #696969">3544</tspan>
+                <tspan x="395.89666651">   </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                </tspan>
+                <tspan x="564.36333311" style="fill: #4682b4">⠆</tspan>
+                <tspan x="572.78666644">                                                                                         </tspan>
+                <tspan x="1322.46333281" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="1330.88666614" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="1339.30999947" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1347.7333328" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1356.15666613" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1364.57999946" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1373.00333279" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1381.42666612" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1389.84999945" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1398.27333278" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1406.69666611" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">║</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="55.99998600000001">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">║</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">ID                </tspan>
+                <tspan x="160.04333327" style="fill: #ffffff"> </tspan>
+                <tspan x="168.4666666" style="fill: #ffffff">gpu</tspan>
+                <tspan x="193.73666659">                           </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                </tspan>
+                <tspan x="564.36333311" style="fill: #4682b4">⠆</tspan>
+                <tspan x="572.78666644">                                                                                    </tspan>
+                <tspan x="1280.34666616" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="1288.76999949" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="1297.19333282" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1305.6166661500001" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1314.03999948" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1322.46333281" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="1330.88666614">          </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">║</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="74.66664800000001">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">║</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">Curve             </tspan>
+                <tspan x="160.04333327" style="fill: #ffffff"> </tspan>
+                <tspan x="168.4666666" style="fill: #ffffff">gpu_curve</tspan>
+                <tspan x="244.27666657">              </tspan>
+                <tspan x="362.20333319" style="fill: #696969">3150</tspan>
+                <tspan x="395.89666651">   </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                </tspan>
+                <tspan x="564.36333311" style="fill: #4682b4">⠆</tspan>
+                <tspan x="572.78666644">                                                                         </tspan>
+                <tspan x="1187.68999953" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="1196.1133328600001" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="1204.53666619" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1212.95999952" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1221.38333285" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1229.80666618" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1238.22999951" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1246.65333284" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1255.07666617" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1263.4999995" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1271.92333283" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1280.34666616" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="1288.76999949">               </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">║</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="93.33331000000001">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">║</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">NeverStop         </tspan>
+                <tspan x="160.04333327" style="fill: #ffffff"> </tspan>
+                <tspan x="168.4666666" style="fill: #9370db">false</tspan>
+                <tspan x="210.58333325">                         </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                </tspan>
+                <tspan x="564.36333311" style="fill: #4682b4">⠆</tspan>
+                <tspan x="572.78666644">                                                                </tspan>
+                <tspan x="1111.87999956" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="1120.30333289" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="1128.72666622" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1137.14999955" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1145.57333288" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1153.99666621" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1162.41999954" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1170.84333287" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1179.2666662" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1187.68999953" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="1196.1133328600001">                          </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">║</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="111.99997200000001">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">║</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">Use Unscaled Curve</tspan>
+                <tspan x="160.04333327" style="fill: #ffffff"> </tspan>
+                <tspan x="168.4666666" style="fill: #9370db">false</tspan>
+                <tspan x="210.58333325">                  </tspan>
+                <tspan x="362.20333319" style="fill: #696969">2756</tspan>
+                <tspan x="395.89666651">   </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                </tspan>
+                <tspan x="564.36333311" style="fill: #4682b4">⠆</tspan>
+                <tspan x="572.78666644">                                                        </tspan>
+                <tspan x="1044.49333292" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="1052.91666625" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="1061.33999958" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1069.76333291" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1078.18666624" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1086.6099995700001" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1095.0333329" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1103.45666623" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1111.87999956" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="1120.30333289">                                   </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">║</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="130.66663400000002">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">║</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">Min PWM           </tspan>
+                <tspan x="160.04333327" style="fill: #ffffff"> </tspan>
+                <tspan x="168.4666666" style="fill: #a9a9a9">N/A</tspan>
+                <tspan x="193.73666659">                           </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                </tspan>
+                <tspan x="564.36333311" style="fill: #4682b4">⠆</tspan>
+                <tspan x="572.78666644">                                                </tspan>
+                <tspan x="977.10666628" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="985.52999961" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="993.95333294" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1002.37666627" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1010.7999996" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1019.22333293" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1027.64666626" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1036.06999959" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1044.49333292" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="1052.91666625">                                           </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">║</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="149.33329600000002">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">║</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">Start PWM         </tspan>
+                <tspan x="160.04333327" style="fill: #ffffff"> </tspan>
+                <tspan x="168.4666666" style="fill: #87cefa">30</tspan>
+                <tspan x="185.31333326">                     </tspan>
+                <tspan x="362.20333319" style="fill: #696969">2362</tspan>
+                <tspan x="395.89666651">   </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                </tspan>
+                <tspan x="564.36333311" style="fill: #4682b4">⠆</tspan>
+                <tspan x="572.78666644">                                         </tspan>
+                <tspan x="918.1433329700001" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="926.5666663000001" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="934.98999963" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="943.41333296" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="951.83666629" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="960.25999962" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="968.68333295" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="977.10666628" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="985.52999961">                                                   </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">║</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="167.99995800000002">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">║</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">Max PWM           </tspan>
+                <tspan x="160.04333327" style="fill: #ffffff"> </tspan>
+                <tspan x="168.4666666" style="fill: #87cefa">255</tspan>
+                <tspan x="193.73666659">                           </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                </tspan>
+                <tspan x="564.36333311" style="fill: #4682b4">⠆</tspan>
+                <tspan x="572.78666644">                                  </tspan>
+                <tspan x="859.17999966" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="867.60333299" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="876.02666632" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="884.44999965" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="892.87333298" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="901.29666631" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="909.71999964" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="918.1433329700001" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="926.5666663000001">                                                          </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">║</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="186.66662000000002">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">║</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">PWM Set Delay     </tspan>
+                <tspan x="160.04333327" style="fill: #ffffff"> </tspan>
+                <tspan x="168.4666666" style="fill: #a9a9a9">N/A</tspan>
+                <tspan x="193.73666659">                    </tspan>
+                <tspan x="362.20333319" style="fill: #696969">1968</tspan>
+                <tspan x="395.89666651">   </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                </tspan>
+                <tspan x="564.36333311" style="fill: #4682b4">⠆</tspan>
+                <tspan x="572.78666644">                           </tspan>
+                <tspan x="800.21666635" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="808.6399996800001" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="817.0633330100001" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="825.48666634" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="833.90999967" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="842.333333" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="850.75666633" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="859.17999966" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="867.60333299">                                                                 </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">║</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="205.33328200000003">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">║</tspan>
+                <tspan x="8.42333333">                                                 </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                </tspan>
+                <tspan x="564.36333311" style="fill: #4682b4">⠆</tspan>
+                <tspan x="572.78666644">                      </tspan>
+                <tspan x="758.0999997" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="766.52333303" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="774.94666636" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="783.36999969" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="791.79333302" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="800.21666635" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="808.6399996800001">                                                                        </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">║</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="223.99994400000003">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">║</tspan>
+                <tspan x="8.42333333" style="fill: #48d1cc">[HwMon]</tspan>
+                <tspan x="67.38666664">                                   </tspan>
+                <tspan x="362.20333319" style="fill: #696969">1575</tspan>
+                <tspan x="395.89666651">   </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                </tspan>
+                <tspan x="564.36333311" style="fill: #4682b4">⠆</tspan>
+                <tspan x="572.78666644">                </tspan>
+                <tspan x="707.5599997200001" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="715.98333305" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="724.40666638" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="732.82999971" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="741.25333304" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="749.67666637" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="758.0999997" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="766.52333303">                                                                             </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">║</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="242.66660600000003">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">║</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">Platform   </tspan>
+                <tspan x="101.07999996000001" style="fill: #ffffff"> </tspan>
+                <tspan x="109.50333329" style="fill: #ffffff">amdgpu-pci*</tspan>
+                <tspan x="202.15999992000002">                          </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                </tspan>
+                <tspan x="564.36333311" style="fill: #4682b4">⠆</tspan>
+                <tspan x="572.78666644">           </tspan>
+                <tspan x="665.44333307" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="673.8666664" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="682.28999973" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="690.71333306" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="699.13666639" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="707.5599997200001" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="715.98333305">                                                                                   </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">║</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="261.33326800000003">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">║</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">Index      </tspan>
+                <tspan x="101.07999996000001" style="fill: #ffffff"> </tspan>
+                <tspan x="109.50333329" style="fill: #87cefa">1</tspan>
+                <tspan x="117.92666662">                             </tspan>
+                <tspan x="362.20333319" style="fill: #696969">1181</tspan>
+                <tspan x="395.89666651">   </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                </tspan>
+                <tspan x="564.36333311" style="fill: #4682b4">⠆</tspan>
+                <tspan x="572.78666644">       </tspan>
+                <tspan x="631.74999975" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="640.17333308" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="648.59666641" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="657.01999974" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="665.44333307" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="673.8666664">                                                                                        </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">║</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="279.99993">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">║</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">PWM Channel</tspan>
+                <tspan x="101.07999996000001" style="fill: #ffffff"> </tspan>
+                <tspan x="109.50333329" style="fill: #87cefa">1</tspan>
+                <tspan x="117.92666662">                                    </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                </tspan>
+                <tspan x="564.36333311" style="fill: #4682b4">⠆</tspan>
+                <tspan x="572.78666644">  </tspan>
+                <tspan x="589.6333331" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="598.0566664300001" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="606.47999976" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="614.90333309" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="623.32666642" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="631.74999975" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="640.17333308">                                                                                            </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">║</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="298.66659200000004">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">║</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">RPM Channel</tspan>
+                <tspan x="101.07999996000001" style="fill: #ffffff"> </tspan>
+                <tspan x="109.50333329" style="fill: #87cefa">1</tspan>
+                <tspan x="117.92666662">                             </tspan>
+                <tspan x="362.20333319" style="fill: #696969">787</tspan>
+                <tspan x="387.47333318">    </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                </tspan>
+                <tspan x="564.36333311" style="fill: #4682b4">⠆</tspan>
+                <tspan x="572.78666644" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="581.20999977" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="589.6333331" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="598.0566664300001">                                                                                                 </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">║</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="317.333254">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">║</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">Sysfs Path </tspan>
+                <tspan x="101.07999996000001" style="fill: #ffffff"> </tspan>
+                <tspan x="109.50333329" style="fill: #d2b48c">/sys/class/hwmon/hwmon16</tspan>
+                <tspan x="311.66333321">      </tspan>
+                <tspan x="362.20333319" style="fill: #adff2f">588</tspan>
+                <tspan x="387.47333318">    </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">             </tspan>
+                <tspan x="539.09333312" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="547.51666645" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="555.93999978" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="564.36333311" style="fill: #adff2f">⠛</tspan>
+                <tspan x="572.78666644" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="581.20999977">                                                                                                   </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">║</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="335.99991600000004">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">║</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">PWM Path   </tspan>
+                <tspan x="101.07999996000001" style="fill: #ffffff"> </tspan>
+                <tspan x="109.50333329" style="fill: #d2b48c">/sys/class/hwmon/hwmon16/pwm1</tspan>
+                <tspan x="353.77999986000003"> </tspan>
+                <tspan x="362.20333319" style="fill: #696969">393</tspan>
+                <tspan x="387.47333318">    </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">            </tspan>
+                <tspan x="530.66999979" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="539.09333312" style="fill: #1a8fff">⠃</tspan>
+                <tspan x="547.51666645">  </tspan>
+                <tspan x="564.36333311" style="fill: #4682b4">⠆</tspan>
+                <tspan x="572.78666644">                                                                                                    </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">║</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="354.666578">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">║</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">PWM Enable </tspan>
+                <tspan x="101.07999996000001" style="fill: #ffffff"> </tspan>
+                <tspan x="109.50333329" style="fill: #d2b48c">/sys/class/hwmon/hwmon16/pwm1</tspan>
+                <tspan x="353.77999986000003">        </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983"> </tspan>
+                <tspan x="438.01333316" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="446.43666649" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="454.85999982" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="463.28333315000003" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="471.70666648" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="480.12999981" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="488.55333314" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="496.97666647" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="505.3999998" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="513.82333313" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="522.24666646" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="530.66999979" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="539.09333312">   </tspan>
+                <tspan x="564.36333311" style="fill: #4682b4">⠆</tspan>
+                <tspan x="572.78666644">                                                                                         </tspan>
+                <tspan x="1322.46333281" style="fill: #1a8fff">●</tspan>
+                <tspan x="1330.88666614" style="fill: #000000"> </tspan>
+                <tspan x="1339.30999947" style="fill: #ffffff">RPM / PWM</tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">║</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="373.33324000000005">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">║</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">RPM Input  </tspan>
+                <tspan x="101.07999996000001" style="fill: #ffffff"> </tspan>
+                <tspan x="109.50333329" style="fill: #d2b48c">/sys/class/hwmon/hwmon16/fan1</tspan>
+                <tspan x="353.77999986000003"> </tspan>
+                <tspan x="362.20333319" style="fill: #696969">0</tspan>
+                <tspan x="370.62666652">      </tspan>
+                <tspan x="421.1666665" style="fill: #696969">└</tspan>
+                <tspan x="429.58999983" style="fill: #696969">┄</tspan>
+                <tspan x="438.01333316" style="fill: #696969">┄</tspan>
+                <tspan x="446.43666649" style="fill: #696969">┄</tspan>
+                <tspan x="454.85999982" style="fill: #696969">┄</tspan>
+                <tspan x="463.28333315000003" style="fill: #696969">┄</tspan>
+                <tspan x="471.70666648" style="fill: #696969">┄</tspan>
+                <tspan x="480.12999981" style="fill: #696969">┄</tspan>
+                <tspan x="488.55333314" style="fill: #696969">┄</tspan>
+                <tspan x="496.97666647" style="fill: #696969">┄</tspan>
+                <tspan x="505.3999998" style="fill: #696969">┄</tspan>
+                <tspan x="513.82333313" style="fill: #696969">┄</tspan>
+                <tspan x="522.24666646" style="fill: #696969">┄</tspan>
+                <tspan x="530.66999979" style="fill: #696969">┄</tspan>
+                <tspan x="539.09333312" style="fill: #696969">┄</tspan>
+                <tspan x="547.51666645" style="fill: #696969">┄</tspan>
+                <tspan x="555.93999978" style="fill: #696969">┄</tspan>
+                <tspan x="564.36333311" style="fill: #696969">┄</tspan>
+                <tspan x="572.78666644" style="fill: #696969">┄</tspan>
+                <tspan x="581.20999977" style="fill: #696969">┄</tspan>
+                <tspan x="589.6333331" style="fill: #696969">┄</tspan>
+                <tspan x="598.0566664300001" style="fill: #696969">┄</tspan>
+                <tspan x="606.47999976" style="fill: #696969">┄</tspan>
+                <tspan x="614.90333309" style="fill: #696969">┄</tspan>
+                <tspan x="623.32666642" style="fill: #696969">┄</tspan>
+                <tspan x="631.74999975" style="fill: #696969">┄</tspan>
+                <tspan x="640.17333308" style="fill: #696969">┄</tspan>
+                <tspan x="648.59666641" style="fill: #696969">┄</tspan>
+                <tspan x="657.01999974" style="fill: #696969">┄</tspan>
+                <tspan x="665.44333307" style="fill: #696969">┄</tspan>
+                <tspan x="673.8666664" style="fill: #696969">┄</tspan>
+                <tspan x="682.28999973" style="fill: #696969">┄</tspan>
+                <tspan x="690.71333306" style="fill: #696969">┄</tspan>
+                <tspan x="699.13666639" style="fill: #696969">┄</tspan>
+                <tspan x="707.5599997200001" style="fill: #696969">┄</tspan>
+                <tspan x="715.98333305" style="fill: #696969">┄</tspan>
+                <tspan x="724.40666638" style="fill: #696969">┄</tspan>
+                <tspan x="732.82999971" style="fill: #696969">┄</tspan>
+                <tspan x="741.25333304" style="fill: #696969">┄</tspan>
+                <tspan x="749.67666637" style="fill: #696969">┄</tspan>
+                <tspan x="758.0999997" style="fill: #696969">┄</tspan>
+                <tspan x="766.52333303" style="fill: #696969">┄</tspan>
+                <tspan x="774.94666636" style="fill: #696969">┄</tspan>
+                <tspan x="783.36999969" style="fill: #696969">┄</tspan>
+                <tspan x="791.79333302" style="fill: #696969">┄</tspan>
+                <tspan x="800.21666635" style="fill: #696969">┄</tspan>
+                <tspan x="808.6399996800001" style="fill: #696969">┄</tspan>
+                <tspan x="817.0633330100001" style="fill: #696969">┄</tspan>
+                <tspan x="825.48666634" style="fill: #696969">┄</tspan>
+                <tspan x="833.90999967" style="fill: #696969">┄</tspan>
+                <tspan x="842.333333" style="fill: #696969">┄</tspan>
+                <tspan x="850.75666633" style="fill: #696969">┄</tspan>
+                <tspan x="859.17999966" style="fill: #696969">┄</tspan>
+                <tspan x="867.60333299" style="fill: #696969">┄</tspan>
+                <tspan x="876.02666632" style="fill: #696969">┄</tspan>
+                <tspan x="884.44999965" style="fill: #696969">┄</tspan>
+                <tspan x="892.87333298" style="fill: #696969">┄</tspan>
+                <tspan x="901.29666631" style="fill: #696969">┄</tspan>
+                <tspan x="909.71999964" style="fill: #696969">┄</tspan>
+                <tspan x="918.1433329700001" style="fill: #696969">┄</tspan>
+                <tspan x="926.5666663000001" style="fill: #696969">┄</tspan>
+                <tspan x="934.98999963" style="fill: #696969">┄</tspan>
+                <tspan x="943.41333296" style="fill: #696969">┄</tspan>
+                <tspan x="951.83666629" style="fill: #696969">┄</tspan>
+                <tspan x="960.25999962" style="fill: #696969">┄</tspan>
+                <tspan x="968.68333295" style="fill: #696969">┄</tspan>
+                <tspan x="977.10666628" style="fill: #696969">┄</tspan>
+                <tspan x="985.52999961" style="fill: #696969">┄</tspan>
+                <tspan x="993.95333294" style="fill: #696969">┄</tspan>
+                <tspan x="1002.37666627" style="fill: #696969">┄</tspan>
+                <tspan x="1010.7999996" style="fill: #696969">┄</tspan>
+                <tspan x="1019.22333293" style="fill: #696969">┄</tspan>
+                <tspan x="1027.64666626" style="fill: #696969">┄</tspan>
+                <tspan x="1036.06999959" style="fill: #696969">┄</tspan>
+                <tspan x="1044.49333292" style="fill: #696969">┄</tspan>
+                <tspan x="1052.91666625" style="fill: #696969">┄</tspan>
+                <tspan x="1061.33999958" style="fill: #696969">┄</tspan>
+                <tspan x="1069.76333291" style="fill: #696969">┄</tspan>
+                <tspan x="1078.18666624" style="fill: #696969">┄</tspan>
+                <tspan x="1086.6099995700001" style="fill: #696969">┄</tspan>
+                <tspan x="1095.0333329" style="fill: #696969">┄</tspan>
+                <tspan x="1103.45666623" style="fill: #696969">┄</tspan>
+                <tspan x="1111.87999956" style="fill: #696969">┄</tspan>
+                <tspan x="1120.30333289" style="fill: #696969">┄</tspan>
+                <tspan x="1128.72666622" style="fill: #696969">┄</tspan>
+                <tspan x="1137.14999955" style="fill: #696969">┄</tspan>
+                <tspan x="1145.57333288" style="fill: #696969">┄</tspan>
+                <tspan x="1153.99666621" style="fill: #696969">┄</tspan>
+                <tspan x="1162.41999954" style="fill: #696969">┄</tspan>
+                <tspan x="1170.84333287" style="fill: #696969">┄</tspan>
+                <tspan x="1179.2666662" style="fill: #696969">┄</tspan>
+                <tspan x="1187.68999953" style="fill: #696969">┄</tspan>
+                <tspan x="1196.1133328600001" style="fill: #696969">┄</tspan>
+                <tspan x="1204.53666619" style="fill: #696969">┄</tspan>
+                <tspan x="1212.95999952" style="fill: #696969">┄</tspan>
+                <tspan x="1221.38333285" style="fill: #696969">┄</tspan>
+                <tspan x="1229.80666618" style="fill: #696969">┄</tspan>
+                <tspan x="1238.22999951" style="fill: #696969">┄</tspan>
+                <tspan x="1246.65333284" style="fill: #696969">┄</tspan>
+                <tspan x="1255.07666617" style="fill: #696969">┄</tspan>
+                <tspan x="1263.4999995" style="fill: #696969">┄</tspan>
+                <tspan x="1271.92333283" style="fill: #696969">┄</tspan>
+                <tspan x="1280.34666616" style="fill: #696969">┄</tspan>
+                <tspan x="1288.76999949" style="fill: #696969">┄</tspan>
+                <tspan x="1297.19333282" style="fill: #696969">┄</tspan>
+                <tspan x="1305.6166661500001" style="fill: #696969">┄</tspan>
+                <tspan x="1314.03999948" style="fill: #696969">┄</tspan>
+                <tspan x="1322.46333281" style="fill: #696969">┄</tspan>
+                <tspan x="1330.88666614" style="fill: #696969">┄</tspan>
+                <tspan x="1339.30999947" style="fill: #696969">┄</tspan>
+                <tspan x="1347.7333328" style="fill: #696969">┄</tspan>
+                <tspan x="1356.15666613" style="fill: #696969">┄</tspan>
+                <tspan x="1364.57999946" style="fill: #696969">┄</tspan>
+                <tspan x="1373.00333279" style="fill: #696969">┄</tspan>
+                <tspan x="1381.42666612" style="fill: #696969">┄</tspan>
+                <tspan x="1389.84999945" style="fill: #696969">┄</tspan>
+                <tspan x="1398.27333278" style="fill: #696969">┄</tspan>
+                <tspan x="1406.69666611" style="fill: #696969">┄</tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">║</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="391.999902">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">║</tspan>
+                <tspan x="8.42333333">                                                 </tspan>
+                <tspan x="421.1666665" style="fill: #696969">0  7  13  22  31</tspan>
+                <tspan x="555.93999978" style="fill: #adff2f">36</tspan>
+                <tspan x="572.78666644" style="fill: #696969">40  49  58  67  75  84  93  104  115  126  137  149  160  171  182  193  204  215  226  237  248 </tspan>
+                <tspan x="1389.84999945"> </tspan>
+                <tspan x="1398.27333278" style="fill: #696969">  </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">║</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="410.66656400000005">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">╚</tspan>
+                <tspan x="8.42333333" style="fill: #4682b4">═</tspan>
+                <tspan x="16.84666666" style="fill: #4682b4">═</tspan>
+                <tspan x="25.269999990000002" style="fill: #4682b4">═</tspan>
+                <tspan x="33.69333332" style="fill: #4682b4">═</tspan>
+                <tspan x="42.11666665" style="fill: #4682b4">═</tspan>
+                <tspan x="50.539999980000005" style="fill: #4682b4">═</tspan>
+                <tspan x="58.96333331" style="fill: #4682b4">═</tspan>
+                <tspan x="67.38666664" style="fill: #4682b4">═</tspan>
+                <tspan x="75.80999997" style="fill: #4682b4">═</tspan>
+                <tspan x="84.2333333" style="fill: #4682b4">═</tspan>
+                <tspan x="92.65666663" style="fill: #4682b4">═</tspan>
+                <tspan x="101.07999996000001" style="fill: #4682b4">═</tspan>
+                <tspan x="109.50333329" style="fill: #4682b4">═</tspan>
+                <tspan x="117.92666662" style="fill: #4682b4">═</tspan>
+                <tspan x="126.34999995" style="fill: #4682b4">═</tspan>
+                <tspan x="134.77333328" style="fill: #4682b4">═</tspan>
+                <tspan x="143.19666661" style="fill: #4682b4">═</tspan>
+                <tspan x="151.61999994" style="fill: #4682b4">═</tspan>
+                <tspan x="160.04333327" style="fill: #4682b4">═</tspan>
+                <tspan x="168.4666666" style="fill: #4682b4">═</tspan>
+                <tspan x="176.88999993000002" style="fill: #4682b4">═</tspan>
+                <tspan x="185.31333326" style="fill: #4682b4">═</tspan>
+                <tspan x="193.73666659" style="fill: #4682b4">═</tspan>
+                <tspan x="202.15999992000002" style="fill: #4682b4">═</tspan>
+                <tspan x="210.58333325" style="fill: #4682b4">═</tspan>
+                <tspan x="219.00666658" style="fill: #4682b4">═</tspan>
+                <tspan x="227.42999991" style="fill: #4682b4">═</tspan>
+                <tspan x="235.85333324" style="fill: #4682b4">═</tspan>
+                <tspan x="244.27666657" style="fill: #4682b4">═</tspan>
+                <tspan x="252.6999999" style="fill: #4682b4">═</tspan>
+                <tspan x="261.12333323" style="fill: #4682b4">═</tspan>
+                <tspan x="269.54666656" style="fill: #4682b4">═</tspan>
+                <tspan x="277.96999989" style="fill: #4682b4">═</tspan>
+                <tspan x="286.39333322" style="fill: #4682b4">═</tspan>
+                <tspan x="294.81666655" style="fill: #4682b4">═</tspan>
+                <tspan x="303.23999988" style="fill: #4682b4">═</tspan>
+                <tspan x="311.66333321" style="fill: #4682b4">═</tspan>
+                <tspan x="320.08666654" style="fill: #4682b4">═</tspan>
+                <tspan x="328.50999987" style="fill: #4682b4">═</tspan>
+                <tspan x="336.9333332" style="fill: #4682b4">═</tspan>
+                <tspan x="345.35666653" style="fill: #4682b4">═</tspan>
+                <tspan x="353.77999986000003" style="fill: #4682b4">═</tspan>
+                <tspan x="362.20333319" style="fill: #4682b4">═</tspan>
+                <tspan x="370.62666652" style="fill: #4682b4">═</tspan>
+                <tspan x="379.04999985" style="fill: #4682b4">═</tspan>
+                <tspan x="387.47333318" style="fill: #4682b4">═</tspan>
+                <tspan x="395.89666651" style="fill: #4682b4">═</tspan>
+                <tspan x="404.31999984000004" style="fill: #4682b4">═</tspan>
+                <tspan x="412.74333317" style="fill: #4682b4">═</tspan>
+                <tspan x="421.1666665" style="fill: #4682b4">═</tspan>
+                <tspan x="429.58999983" style="fill: #4682b4">═</tspan>
+                <tspan x="438.01333316" style="fill: #4682b4">═</tspan>
+                <tspan x="446.43666649" style="fill: #4682b4">═</tspan>
+                <tspan x="454.85999982" style="fill: #4682b4">═</tspan>
+                <tspan x="463.28333315000003" style="fill: #4682b4">═</tspan>
+                <tspan x="471.70666648" style="fill: #4682b4">═</tspan>
+                <tspan x="480.12999981" style="fill: #4682b4">═</tspan>
+                <tspan x="488.55333314" style="fill: #4682b4">═</tspan>
+                <tspan x="496.97666647" style="fill: #4682b4">═</tspan>
+                <tspan x="505.3999998" style="fill: #4682b4">═</tspan>
+                <tspan x="513.82333313" style="fill: #4682b4">═</tspan>
+                <tspan x="522.24666646" style="fill: #4682b4">═</tspan>
+                <tspan x="530.66999979" style="fill: #4682b4">═</tspan>
+                <tspan x="539.09333312" style="fill: #4682b4">═</tspan>
+                <tspan x="547.51666645" style="fill: #4682b4">═</tspan>
+                <tspan x="555.93999978" style="fill: #4682b4">═</tspan>
+                <tspan x="564.36333311" style="fill: #4682b4">═</tspan>
+                <tspan x="572.78666644" style="fill: #4682b4">═</tspan>
+                <tspan x="581.20999977" style="fill: #4682b4">═</tspan>
+                <tspan x="589.6333331" style="fill: #4682b4">═</tspan>
+                <tspan x="598.0566664300001" style="fill: #4682b4">═</tspan>
+                <tspan x="606.47999976" style="fill: #4682b4">═</tspan>
+                <tspan x="614.90333309" style="fill: #4682b4">═</tspan>
+                <tspan x="623.32666642" style="fill: #4682b4">═</tspan>
+                <tspan x="631.74999975" style="fill: #4682b4">═</tspan>
+                <tspan x="640.17333308" style="fill: #4682b4">═</tspan>
+                <tspan x="648.59666641" style="fill: #4682b4">═</tspan>
+                <tspan x="657.01999974" style="fill: #4682b4">═</tspan>
+                <tspan x="665.44333307" style="fill: #4682b4">═</tspan>
+                <tspan x="673.8666664" style="fill: #4682b4">═</tspan>
+                <tspan x="682.28999973" style="fill: #4682b4">═</tspan>
+                <tspan x="690.71333306" style="fill: #4682b4">═</tspan>
+                <tspan x="699.13666639" style="fill: #4682b4">═</tspan>
+                <tspan x="707.5599997200001" style="fill: #4682b4">═</tspan>
+                <tspan x="715.98333305" style="fill: #4682b4">═</tspan>
+                <tspan x="724.40666638" style="fill: #4682b4">═</tspan>
+                <tspan x="732.82999971" style="fill: #4682b4">═</tspan>
+                <tspan x="741.25333304" style="fill: #4682b4">═</tspan>
+                <tspan x="749.67666637" style="fill: #4682b4">═</tspan>
+                <tspan x="758.0999997" style="fill: #4682b4">═</tspan>
+                <tspan x="766.52333303" style="fill: #4682b4">═</tspan>
+                <tspan x="774.94666636" style="fill: #4682b4">═</tspan>
+                <tspan x="783.36999969" style="fill: #4682b4">═</tspan>
+                <tspan x="791.79333302" style="fill: #4682b4">═</tspan>
+                <tspan x="800.21666635" style="fill: #4682b4">═</tspan>
+                <tspan x="808.6399996800001" style="fill: #4682b4">═</tspan>
+                <tspan x="817.0633330100001" style="fill: #4682b4">═</tspan>
+                <tspan x="825.48666634" style="fill: #4682b4">═</tspan>
+                <tspan x="833.90999967" style="fill: #4682b4">═</tspan>
+                <tspan x="842.333333" style="fill: #4682b4">═</tspan>
+                <tspan x="850.75666633" style="fill: #4682b4">═</tspan>
+                <tspan x="859.17999966" style="fill: #4682b4">═</tspan>
+                <tspan x="867.60333299" style="fill: #4682b4">═</tspan>
+                <tspan x="876.02666632" style="fill: #4682b4">═</tspan>
+                <tspan x="884.44999965" style="fill: #4682b4">═</tspan>
+                <tspan x="892.87333298" style="fill: #4682b4">═</tspan>
+                <tspan x="901.29666631" style="fill: #4682b4">═</tspan>
+                <tspan x="909.71999964" style="fill: #4682b4">═</tspan>
+                <tspan x="918.1433329700001" style="fill: #4682b4">═</tspan>
+                <tspan x="926.5666663000001" style="fill: #4682b4">═</tspan>
+                <tspan x="934.98999963" style="fill: #4682b4">═</tspan>
+                <tspan x="943.41333296" style="fill: #4682b4">═</tspan>
+                <tspan x="951.83666629" style="fill: #4682b4">═</tspan>
+                <tspan x="960.25999962" style="fill: #4682b4">═</tspan>
+                <tspan x="968.68333295" style="fill: #4682b4">═</tspan>
+                <tspan x="977.10666628" style="fill: #4682b4">═</tspan>
+                <tspan x="985.52999961" style="fill: #4682b4">═</tspan>
+                <tspan x="993.95333294" style="fill: #4682b4">═</tspan>
+                <tspan x="1002.37666627" style="fill: #4682b4">═</tspan>
+                <tspan x="1010.7999996" style="fill: #4682b4">═</tspan>
+                <tspan x="1019.22333293" style="fill: #4682b4">═</tspan>
+                <tspan x="1027.64666626" style="fill: #4682b4">═</tspan>
+                <tspan x="1036.06999959" style="fill: #4682b4">═</tspan>
+                <tspan x="1044.49333292" style="fill: #4682b4">═</tspan>
+                <tspan x="1052.91666625" style="fill: #4682b4">═</tspan>
+                <tspan x="1061.33999958" style="fill: #4682b4">═</tspan>
+                <tspan x="1069.76333291" style="fill: #4682b4">═</tspan>
+                <tspan x="1078.18666624" style="fill: #4682b4">═</tspan>
+                <tspan x="1086.6099995700001" style="fill: #4682b4">═</tspan>
+                <tspan x="1095.0333329" style="fill: #4682b4">═</tspan>
+                <tspan x="1103.45666623" style="fill: #4682b4">═</tspan>
+                <tspan x="1111.87999956" style="fill: #4682b4">═</tspan>
+                <tspan x="1120.30333289" style="fill: #4682b4">═</tspan>
+                <tspan x="1128.72666622" style="fill: #4682b4">═</tspan>
+                <tspan x="1137.14999955" style="fill: #4682b4">═</tspan>
+                <tspan x="1145.57333288" style="fill: #4682b4">═</tspan>
+                <tspan x="1153.99666621" style="fill: #4682b4">═</tspan>
+                <tspan x="1162.41999954" style="fill: #4682b4">═</tspan>
+                <tspan x="1170.84333287" style="fill: #4682b4">═</tspan>
+                <tspan x="1179.2666662" style="fill: #4682b4">═</tspan>
+                <tspan x="1187.68999953" style="fill: #4682b4">═</tspan>
+                <tspan x="1196.1133328600001" style="fill: #4682b4">═</tspan>
+                <tspan x="1204.53666619" style="fill: #4682b4">═</tspan>
+                <tspan x="1212.95999952" style="fill: #4682b4">═</tspan>
+                <tspan x="1221.38333285" style="fill: #4682b4">═</tspan>
+                <tspan x="1229.80666618" style="fill: #4682b4">═</tspan>
+                <tspan x="1238.22999951" style="fill: #4682b4">═</tspan>
+                <tspan x="1246.65333284" style="fill: #4682b4">═</tspan>
+                <tspan x="1255.07666617" style="fill: #4682b4">═</tspan>
+                <tspan x="1263.4999995" style="fill: #4682b4">═</tspan>
+                <tspan x="1271.92333283" style="fill: #4682b4">═</tspan>
+                <tspan x="1280.34666616" style="fill: #4682b4">═</tspan>
+                <tspan x="1288.76999949" style="fill: #4682b4">═</tspan>
+                <tspan x="1297.19333282" style="fill: #4682b4">═</tspan>
+                <tspan x="1305.6166661500001" style="fill: #4682b4">═</tspan>
+                <tspan x="1314.03999948" style="fill: #4682b4">═</tspan>
+                <tspan x="1322.46333281" style="fill: #4682b4">═</tspan>
+                <tspan x="1330.88666614" style="fill: #4682b4">═</tspan>
+                <tspan x="1339.30999947" style="fill: #4682b4">═</tspan>
+                <tspan x="1347.7333328" style="fill: #4682b4">═</tspan>
+                <tspan x="1356.15666613" style="fill: #4682b4">═</tspan>
+                <tspan x="1364.57999946" style="fill: #4682b4">═</tspan>
+                <tspan x="1373.00333279" style="fill: #4682b4">═</tspan>
+                <tspan x="1381.42666612" style="fill: #4682b4">═</tspan>
+                <tspan x="1389.84999945" style="fill: #4682b4">═</tspan>
+                <tspan x="1398.27333278" style="fill: #4682b4">═</tspan>
+                <tspan x="1406.69666611" style="fill: #4682b4">═</tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">╝</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="429.333226">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">┌</tspan>
+                <tspan x="8.42333333" style="fill: #1a8fff"> in_bottom </tspan>
+                <tspan x="101.07999996000001" style="fill: #4682b4">─</tspan>
+                <tspan x="109.50333329" style="fill: #4682b4">─</tspan>
+                <tspan x="117.92666662" style="fill: #4682b4">─</tspan>
+                <tspan x="126.34999995" style="fill: #4682b4">─</tspan>
+                <tspan x="134.77333328" style="fill: #4682b4">─</tspan>
+                <tspan x="143.19666661" style="fill: #4682b4">─</tspan>
+                <tspan x="151.61999994" style="fill: #4682b4">─</tspan>
+                <tspan x="160.04333327" style="fill: #4682b4">─</tspan>
+                <tspan x="168.4666666" style="fill: #4682b4">─</tspan>
+                <tspan x="176.88999993000002" style="fill: #4682b4">─</tspan>
+                <tspan x="185.31333326" style="fill: #4682b4">─</tspan>
+                <tspan x="193.73666659" style="fill: #4682b4">─</tspan>
+                <tspan x="202.15999992000002" style="fill: #4682b4">─</tspan>
+                <tspan x="210.58333325" style="fill: #4682b4">─</tspan>
+                <tspan x="219.00666658" style="fill: #4682b4">─</tspan>
+                <tspan x="227.42999991" style="fill: #4682b4">─</tspan>
+                <tspan x="235.85333324" style="fill: #4682b4">─</tspan>
+                <tspan x="244.27666657" style="fill: #4682b4">─</tspan>
+                <tspan x="252.6999999" style="fill: #4682b4">─</tspan>
+                <tspan x="261.12333323" style="fill: #4682b4">─</tspan>
+                <tspan x="269.54666656" style="fill: #4682b4">─</tspan>
+                <tspan x="277.96999989" style="fill: #4682b4">─</tspan>
+                <tspan x="286.39333322" style="fill: #4682b4">─</tspan>
+                <tspan x="294.81666655" style="fill: #4682b4">─</tspan>
+                <tspan x="303.23999988" style="fill: #4682b4">─</tspan>
+                <tspan x="311.66333321" style="fill: #4682b4">─</tspan>
+                <tspan x="320.08666654" style="fill: #4682b4">─</tspan>
+                <tspan x="328.50999987" style="fill: #4682b4">─</tspan>
+                <tspan x="336.9333332" style="fill: #4682b4">─</tspan>
+                <tspan x="345.35666653" style="fill: #4682b4">─</tspan>
+                <tspan x="353.77999986000003" style="fill: #4682b4">─</tspan>
+                <tspan x="362.20333319" style="fill: #4682b4">─</tspan>
+                <tspan x="370.62666652" style="fill: #4682b4">─</tspan>
+                <tspan x="379.04999985" style="fill: #4682b4">─</tspan>
+                <tspan x="387.47333318" style="fill: #4682b4">─</tspan>
+                <tspan x="395.89666651" style="fill: #4682b4">─</tspan>
+                <tspan x="404.31999984000004" style="fill: #4682b4">─</tspan>
+                <tspan x="412.74333317" style="fill: #4682b4">─</tspan>
+                <tspan x="421.1666665" style="fill: #4682b4">─</tspan>
+                <tspan x="429.58999983" style="fill: #4682b4">─</tspan>
+                <tspan x="438.01333316" style="fill: #4682b4">─</tspan>
+                <tspan x="446.43666649" style="fill: #4682b4">─</tspan>
+                <tspan x="454.85999982" style="fill: #4682b4">─</tspan>
+                <tspan x="463.28333315000003" style="fill: #4682b4">─</tspan>
+                <tspan x="471.70666648" style="fill: #4682b4">─</tspan>
+                <tspan x="480.12999981" style="fill: #4682b4">─</tspan>
+                <tspan x="488.55333314" style="fill: #4682b4">─</tspan>
+                <tspan x="496.97666647" style="fill: #4682b4">─</tspan>
+                <tspan x="505.3999998" style="fill: #4682b4">─</tspan>
+                <tspan x="513.82333313" style="fill: #4682b4">─</tspan>
+                <tspan x="522.24666646" style="fill: #4682b4">─</tspan>
+                <tspan x="530.66999979" style="fill: #4682b4">─</tspan>
+                <tspan x="539.09333312" style="fill: #4682b4">─</tspan>
+                <tspan x="547.51666645" style="fill: #4682b4">─</tspan>
+                <tspan x="555.93999978" style="fill: #4682b4">─</tspan>
+                <tspan x="564.36333311" style="fill: #4682b4">─</tspan>
+                <tspan x="572.78666644" style="fill: #4682b4">─</tspan>
+                <tspan x="581.20999977" style="fill: #4682b4">─</tspan>
+                <tspan x="589.6333331" style="fill: #4682b4">─</tspan>
+                <tspan x="598.0566664300001" style="fill: #4682b4">─</tspan>
+                <tspan x="606.47999976" style="fill: #4682b4">─</tspan>
+                <tspan x="614.90333309" style="fill: #4682b4">─</tspan>
+                <tspan x="623.32666642" style="fill: #4682b4">─</tspan>
+                <tspan x="631.74999975" style="fill: #4682b4">─</tspan>
+                <tspan x="640.17333308" style="fill: #4682b4">─</tspan>
+                <tspan x="648.59666641" style="fill: #4682b4">─</tspan>
+                <tspan x="657.01999974" style="fill: #4682b4">─</tspan>
+                <tspan x="665.44333307" style="fill: #4682b4">─</tspan>
+                <tspan x="673.8666664" style="fill: #4682b4">─</tspan>
+                <tspan x="682.28999973" style="fill: #4682b4">─</tspan>
+                <tspan x="690.71333306" style="fill: #4682b4">─</tspan>
+                <tspan x="699.13666639" style="fill: #4682b4">─</tspan>
+                <tspan x="707.5599997200001" style="fill: #4682b4">─</tspan>
+                <tspan x="715.98333305" style="fill: #4682b4">─</tspan>
+                <tspan x="724.40666638" style="fill: #4682b4">─</tspan>
+                <tspan x="732.82999971" style="fill: #4682b4">─</tspan>
+                <tspan x="741.25333304" style="fill: #4682b4">─</tspan>
+                <tspan x="749.67666637" style="fill: #4682b4">─</tspan>
+                <tspan x="758.0999997" style="fill: #4682b4">─</tspan>
+                <tspan x="766.52333303" style="fill: #4682b4">─</tspan>
+                <tspan x="774.94666636" style="fill: #4682b4">─</tspan>
+                <tspan x="783.36999969" style="fill: #4682b4">─</tspan>
+                <tspan x="791.79333302" style="fill: #4682b4">─</tspan>
+                <tspan x="800.21666635" style="fill: #4682b4">─</tspan>
+                <tspan x="808.6399996800001" style="fill: #4682b4">─</tspan>
+                <tspan x="817.0633330100001" style="fill: #4682b4">─</tspan>
+                <tspan x="825.48666634" style="fill: #4682b4">─</tspan>
+                <tspan x="833.90999967" style="fill: #4682b4">─</tspan>
+                <tspan x="842.333333" style="fill: #4682b4">─</tspan>
+                <tspan x="850.75666633" style="fill: #4682b4">─</tspan>
+                <tspan x="859.17999966" style="fill: #4682b4">─</tspan>
+                <tspan x="867.60333299" style="fill: #4682b4">─</tspan>
+                <tspan x="876.02666632" style="fill: #4682b4">─</tspan>
+                <tspan x="884.44999965" style="fill: #4682b4">─</tspan>
+                <tspan x="892.87333298" style="fill: #4682b4">─</tspan>
+                <tspan x="901.29666631" style="fill: #4682b4">─</tspan>
+                <tspan x="909.71999964" style="fill: #4682b4">─</tspan>
+                <tspan x="918.1433329700001" style="fill: #4682b4">─</tspan>
+                <tspan x="926.5666663000001" style="fill: #4682b4">─</tspan>
+                <tspan x="934.98999963" style="fill: #4682b4">─</tspan>
+                <tspan x="943.41333296" style="fill: #4682b4">─</tspan>
+                <tspan x="951.83666629" style="fill: #4682b4">─</tspan>
+                <tspan x="960.25999962" style="fill: #4682b4">─</tspan>
+                <tspan x="968.68333295" style="fill: #4682b4">─</tspan>
+                <tspan x="977.10666628" style="fill: #4682b4">─</tspan>
+                <tspan x="985.52999961" style="fill: #4682b4">─</tspan>
+                <tspan x="993.95333294" style="fill: #4682b4">─</tspan>
+                <tspan x="1002.37666627" style="fill: #4682b4">─</tspan>
+                <tspan x="1010.7999996" style="fill: #4682b4">─</tspan>
+                <tspan x="1019.22333293" style="fill: #4682b4">─</tspan>
+                <tspan x="1027.64666626" style="fill: #4682b4">─</tspan>
+                <tspan x="1036.06999959" style="fill: #4682b4">─</tspan>
+                <tspan x="1044.49333292" style="fill: #4682b4">─</tspan>
+                <tspan x="1052.91666625" style="fill: #4682b4">─</tspan>
+                <tspan x="1061.33999958" style="fill: #4682b4">─</tspan>
+                <tspan x="1069.76333291" style="fill: #4682b4">─</tspan>
+                <tspan x="1078.18666624" style="fill: #4682b4">─</tspan>
+                <tspan x="1086.6099995700001" style="fill: #4682b4">─</tspan>
+                <tspan x="1095.0333329" style="fill: #4682b4">─</tspan>
+                <tspan x="1103.45666623" style="fill: #4682b4">─</tspan>
+                <tspan x="1111.87999956" style="fill: #4682b4">─</tspan>
+                <tspan x="1120.30333289" style="fill: #4682b4">─</tspan>
+                <tspan x="1128.72666622" style="fill: #4682b4">─</tspan>
+                <tspan x="1137.14999955" style="fill: #4682b4">─</tspan>
+                <tspan x="1145.57333288" style="fill: #4682b4">─</tspan>
+                <tspan x="1153.99666621" style="fill: #4682b4">─</tspan>
+                <tspan x="1162.41999954" style="fill: #4682b4">─</tspan>
+                <tspan x="1170.84333287" style="fill: #4682b4">─</tspan>
+                <tspan x="1179.2666662" style="fill: #4682b4">─</tspan>
+                <tspan x="1187.68999953" style="fill: #4682b4">─</tspan>
+                <tspan x="1196.1133328600001" style="fill: #4682b4">─</tspan>
+                <tspan x="1204.53666619" style="fill: #4682b4">─</tspan>
+                <tspan x="1212.95999952" style="fill: #4682b4">─</tspan>
+                <tspan x="1221.38333285" style="fill: #4682b4">─</tspan>
+                <tspan x="1229.80666618" style="fill: #4682b4">─</tspan>
+                <tspan x="1238.22999951" style="fill: #4682b4">─</tspan>
+                <tspan x="1246.65333284" style="fill: #4682b4">─</tspan>
+                <tspan x="1255.07666617" style="fill: #4682b4">─</tspan>
+                <tspan x="1263.4999995" style="fill: #4682b4">─</tspan>
+                <tspan x="1271.92333283" style="fill: #4682b4">─</tspan>
+                <tspan x="1280.34666616" style="fill: #4682b4">─</tspan>
+                <tspan x="1288.76999949" style="fill: #4682b4">─</tspan>
+                <tspan x="1297.19333282" style="fill: #4682b4">─</tspan>
+                <tspan x="1305.6166661500001" style="fill: #4682b4">─</tspan>
+                <tspan x="1314.03999948" style="fill: #4682b4">─</tspan>
+                <tspan x="1322.46333281" style="fill: #4682b4">─</tspan>
+                <tspan x="1330.88666614" style="fill: #4682b4">─</tspan>
+                <tspan x="1339.30999947" style="fill: #4682b4">─</tspan>
+                <tspan x="1347.7333328" style="fill: #4682b4">─</tspan>
+                <tspan x="1356.15666613" style="fill: #4682b4">─</tspan>
+                <tspan x="1364.57999946" style="fill: #4682b4">─</tspan>
+                <tspan x="1373.00333279" style="fill: #4682b4">─</tspan>
+                <tspan x="1381.42666612" style="fill: #4682b4">─</tspan>
+                <tspan x="1389.84999945" style="fill: #4682b4">─</tspan>
+                <tspan x="1398.27333278" style="fill: #4682b4">─</tspan>
+                <tspan x="1406.69666611" style="fill: #4682b4">─</tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">┐</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="447.99988800000006">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">│</tspan>
+                <tspan x="8.42333333" style="fill: #87ceeb">[General]</tspan>
+                <tspan x="84.2333333">                                        </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                                                         </tspan>
+                <tspan x="909.71999964" style="fill: #4682b4">⠆</tspan>
+                <tspan x="918.1433329700001">                                                     </tspan>
+                <tspan x="1364.57999946" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="1373.00333279" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="1381.42666612" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1389.84999945" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1398.27333278" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1406.69666611" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">│</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="466.66655000000003">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">│</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">ID                </tspan>
+                <tspan x="160.04333327" style="fill: #ffffff"> </tspan>
+                <tspan x="168.4666666" style="fill: #ffffff">in_bottom</tspan>
+                <tspan x="244.27666657">              </tspan>
+                <tspan x="362.20333319" style="fill: #696969">1367</tspan>
+                <tspan x="395.89666651">   </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                                                         </tspan>
+                <tspan x="909.71999964" style="fill: #4682b4">⠆</tspan>
+                <tspan x="918.1433329700001">                                               </tspan>
+                <tspan x="1314.03999948" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="1322.46333281" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="1330.88666614" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1339.30999947" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1347.7333328" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1356.15666613" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1364.57999946" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="1373.00333279">     </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">│</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="485.33321200000006">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">│</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">Curve             </tspan>
+                <tspan x="160.04333327" style="fill: #ffffff"> </tspan>
+                <tspan x="168.4666666" style="fill: #ffffff">case_curve</tspan>
+                <tspan x="252.6999999">                    </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                                                         </tspan>
+                <tspan x="909.71999964" style="fill: #4682b4">⠆</tspan>
+                <tspan x="918.1433329700001">                                        </tspan>
+                <tspan x="1255.07666617" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="1263.4999995" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="1271.92333283" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1280.34666616" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1288.76999949" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1297.19333282" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1305.6166661500001" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1314.03999948" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="1322.46333281">           </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">│</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="503.99987400000003">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">│</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">NeverStop         </tspan>
+                <tspan x="160.04333327" style="fill: #ffffff"> </tspan>
+                <tspan x="168.4666666" style="fill: #9370db">true</tspan>
+                <tspan x="202.15999992000002">                   </tspan>
+                <tspan x="362.20333319" style="fill: #696969">1215</tspan>
+                <tspan x="395.89666651">   </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                                                         </tspan>
+                <tspan x="909.71999964" style="fill: #4682b4">⠆</tspan>
+                <tspan x="918.1433329700001">                                 </tspan>
+                <tspan x="1196.1133328600001" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="1204.53666619" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="1212.95999952" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1221.38333285" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1229.80666618" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1238.22999951" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1246.65333284" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1255.07666617" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="1263.4999995">                  </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">│</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="522.6665360000001">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">│</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">Use Unscaled Curve</tspan>
+                <tspan x="160.04333327" style="fill: #ffffff"> </tspan>
+                <tspan x="168.4666666" style="fill: #9370db">false</tspan>
+                <tspan x="210.58333325">                         </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                                                         </tspan>
+                <tspan x="909.71999964" style="fill: #4682b4">⠆</tspan>
+                <tspan x="918.1433329700001">                          </tspan>
+                <tspan x="1137.14999955" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="1145.57333288" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="1153.99666621" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1162.41999954" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1170.84333287" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1179.2666662" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1187.68999953" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1196.1133328600001" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="1204.53666619">                         </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">│</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="541.333198">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">│</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">Min PWM           </tspan>
+                <tspan x="160.04333327" style="fill: #ffffff"> </tspan>
+                <tspan x="168.4666666" style="fill: #87cefa">80</tspan>
+                <tspan x="185.31333326">                     </tspan>
+                <tspan x="362.20333319" style="fill: #696969">1063</tspan>
+                <tspan x="395.89666651">   </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                                                         </tspan>
+                <tspan x="909.71999964" style="fill: #4682b4">⠆</tspan>
+                <tspan x="918.1433329700001">               </tspan>
+                <tspan x="1044.49333292" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="1052.91666625" style="fill: #1a8fff">⠳</tspan>
+                <tspan x="1061.33999958" style="fill: #1a8fff">⡀</tspan>
+                <tspan x="1069.76333291" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="1078.18666624" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="1086.6099995700001" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1095.0333329" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1103.45666623" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1111.87999956" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1120.30333289" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1128.72666622" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1137.14999955" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="1145.57333288">                                </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">│</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="559.99986">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">│</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">Start PWM         </tspan>
+                <tspan x="160.04333327" style="fill: #ffffff"> </tspan>
+                <tspan x="168.4666666" style="fill: #87cefa">80</tspan>
+                <tspan x="185.31333326">                            </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                                                         </tspan>
+                <tspan x="909.71999964" style="fill: #4682b4">⠆</tspan>
+                <tspan x="918.1433329700001">            </tspan>
+                <tspan x="1019.22333293" style="fill: #1a8fff">⢀</tspan>
+                <tspan x="1027.64666626" style="fill: #1a8fff">⠷</tspan>
+                <tspan x="1036.06999959" style="fill: #1a8fff">⣠</tspan>
+                <tspan x="1044.49333292" style="fill: #1a8fff">⠃</tspan>
+                <tspan x="1052.91666625"> </tspan>
+                <tspan x="1061.33999958" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="1069.76333291" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="1078.18666624">                                        </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">│</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="578.6665220000001">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">│</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">Max PWM           </tspan>
+                <tspan x="160.04333327" style="fill: #ffffff"> </tspan>
+                <tspan x="168.4666666" style="fill: #87cefa">200</tspan>
+                <tspan x="193.73666659">                    </tspan>
+                <tspan x="362.20333319" style="fill: #696969">911</tspan>
+                <tspan x="387.47333318">    </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                                                         </tspan>
+                <tspan x="909.71999964" style="fill: #4682b4">⠆</tspan>
+                <tspan x="918.1433329700001">   </tspan>
+                <tspan x="943.41333296" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="951.83666629" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="960.25999962" style="fill: #1a8fff">⠱</tspan>
+                <tspan x="968.68333295" style="fill: #1a8fff">⣠</tspan>
+                <tspan x="977.10666628" style="fill: #1a8fff">⠳</tspan>
+                <tspan x="985.52999961" style="fill: #1a8fff">⡀</tspan>
+                <tspan x="993.95333294" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="1002.37666627" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="1010.7999996" style="fill: #1a8fff">⠱</tspan>
+                <tspan x="1019.22333293" style="fill: #1a8fff">⡸</tspan>
+                <tspan x="1027.64666626"> </tspan>
+                <tspan x="1036.06999959" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="1044.49333292">                                            </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">│</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="597.3331840000001">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">│</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">PWM Set Delay     </tspan>
+                <tspan x="160.04333327" style="fill: #ffffff"> </tspan>
+                <tspan x="168.4666666" style="fill: #a9a9a9">N/A</tspan>
+                <tspan x="193.73666659">                           </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                                                        </tspan>
+                <tspan x="901.29666631" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="909.71999964" style="fill: #4682b4">⠆</tspan>
+                <tspan x="918.1433329700001" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="926.5666663000001" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="934.98999963" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="943.41333296" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="951.83666629">  </tspan>
+                <tspan x="968.68333295" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="977.10666628"> </tspan>
+                <tspan x="985.52999961" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="993.95333294" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="1002.37666627">  </tspan>
+                <tspan x="1019.22333293" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="1027.64666626">                                              </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">│</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="615.999846">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">│</tspan>
+                <tspan x="8.42333333">                                          </tspan>
+                <tspan x="362.20333319" style="fill: #adff2f">786</tspan>
+                <tspan x="387.47333318">    </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                                                  </tspan>
+                <tspan x="850.75666633" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="859.17999966" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="867.60333299" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="876.02666632" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="884.44999965" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="892.87333298" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="901.29666631" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="909.71999964" style="fill: #adff2f">⠛</tspan>
+                <tspan x="918.1433329700001">                                                           </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">│</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="634.666508">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">│</tspan>
+                <tspan x="8.42333333" style="fill: #48d1cc">[HwMon]</tspan>
+                <tspan x="67.38666664">                                          </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                                              </tspan>
+                <tspan x="817.0633330100001" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="825.48666634" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="833.90999967" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="842.333333" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="850.75666633" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="859.17999966">      </tspan>
+                <tspan x="909.71999964" style="fill: #4682b4">⠆</tspan>
+                <tspan x="918.1433329700001">                                                           </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">│</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="653.33317">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">│</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">Platform   </tspan>
+                <tspan x="101.07999996000001" style="fill: #ffffff"> </tspan>
+                <tspan x="109.50333329" style="fill: #ffffff">nct6798</tspan>
+                <tspan x="168.4666666">                       </tspan>
+                <tspan x="362.20333319" style="fill: #696969">607</tspan>
+                <tspan x="387.47333318">    </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                                       </tspan>
+                <tspan x="758.0999997" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="766.52333303" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="774.94666636" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="783.36999969" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="791.79333302" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="800.21666635" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="808.6399996800001" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="817.0633330100001" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="825.48666634">          </tspan>
+                <tspan x="909.71999964" style="fill: #4682b4">⠆</tspan>
+                <tspan x="918.1433329700001">                                                           </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">│</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="671.9998320000001">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">│</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">Index      </tspan>
+                <tspan x="101.07999996000001" style="fill: #ffffff"> </tspan>
+                <tspan x="109.50333329" style="fill: #87cefa">4</tspan>
+                <tspan x="117.92666662">                                    </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                                    </tspan>
+                <tspan x="732.82999971" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="741.25333304" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="749.67666637" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="758.0999997" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="766.52333303">                 </tspan>
+                <tspan x="909.71999964" style="fill: #4682b4">⠆</tspan>
+                <tspan x="918.1433329700001">                                                           </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">│</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="690.6664940000001">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">│</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">PWM Channel</tspan>
+                <tspan x="101.07999996000001" style="fill: #ffffff"> </tspan>
+                <tspan x="109.50333329" style="fill: #87cefa">4</tspan>
+                <tspan x="117.92666662">                             </tspan>
+                <tspan x="362.20333319" style="fill: #696969">455</tspan>
+                <tspan x="387.47333318">    </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                             </tspan>
+                <tspan x="673.8666664" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="682.28999973" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="690.71333306" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="699.13666639" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="707.5599997200001" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="715.98333305" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="724.40666638" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="732.82999971" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="741.25333304">                    </tspan>
+                <tspan x="909.71999964" style="fill: #4682b4">⠆</tspan>
+                <tspan x="918.1433329700001">                                                           </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">│</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="709.333156">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">│</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">RPM Channel</tspan>
+                <tspan x="101.07999996000001" style="fill: #ffffff"> </tspan>
+                <tspan x="109.50333329" style="fill: #87cefa">4</tspan>
+                <tspan x="117.92666662">                                    </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                       </tspan>
+                <tspan x="623.32666642" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="631.74999975" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="640.17333308" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="648.59666641" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="657.01999974" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="665.44333307" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="673.8666664" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="682.28999973">                           </tspan>
+                <tspan x="909.71999964" style="fill: #4682b4">⠆</tspan>
+                <tspan x="918.1433329700001">                                                           </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">│</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="727.999818">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">│</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">Sysfs Path </tspan>
+                <tspan x="101.07999996000001" style="fill: #ffffff"> </tspan>
+                <tspan x="109.50333329" style="fill: #d2b48c">/sys/class/hwmon/hwmon6</tspan>
+                <tspan x="303.23999988">       </tspan>
+                <tspan x="362.20333319" style="fill: #696969">303</tspan>
+                <tspan x="387.47333318">    </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">                </tspan>
+                <tspan x="564.36333311" style="fill: #1a8fff">⢠</tspan>
+                <tspan x="572.78666644" style="fill: #1a8fff">⠋</tspan>
+                <tspan x="581.20999977" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="589.6333331" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="598.0566664300001" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="606.47999976" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="614.90333309" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="623.32666642" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="631.74999975">                                 </tspan>
+                <tspan x="909.71999964" style="fill: #4682b4">⠆</tspan>
+                <tspan x="918.1433329700001">                                                           </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">│</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="746.6664800000001">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">│</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">PWM Path   </tspan>
+                <tspan x="101.07999996000001" style="fill: #ffffff"> </tspan>
+                <tspan x="109.50333329" style="fill: #d2b48c">/sys/class/hwmon/hwmon6/pwm4</tspan>
+                <tspan x="345.35666653">         </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">              </tspan>
+                <tspan x="547.51666645" style="fill: #1a8fff">⢀</tspan>
+                <tspan x="555.93999978" style="fill: #1a8fff">⠏</tspan>
+                <tspan x="564.36333311" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="572.78666644">                                        </tspan>
+                <tspan x="909.71999964" style="fill: #4682b4">⠆</tspan>
+                <tspan x="918.1433329700001">                                                           </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">│</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="765.3331420000001">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">│</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">PWM Enable </tspan>
+                <tspan x="101.07999996000001" style="fill: #ffffff"> </tspan>
+                <tspan x="109.50333329" style="fill: #d2b48c">/sys/class/hwmon/hwmon6/pwm4_</tspan>
+                <tspan x="353.77999986000003"> </tspan>
+                <tspan x="362.20333319" style="fill: #696969">151</tspan>
+                <tspan x="387.47333318">    </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983">              </tspan>
+                <tspan x="547.51666645" style="fill: #1a8fff">⡸</tspan>
+                <tspan x="555.93999978">                                          </tspan>
+                <tspan x="909.71999964" style="fill: #4682b4">⠆</tspan>
+                <tspan x="918.1433329700001">                                                           </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">│</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="783.999804">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">│</tspan>
+                <tspan x="8.42333333" style="fill: #c0c0c0">RPM Input  </tspan>
+                <tspan x="101.07999996000001" style="fill: #ffffff"> </tspan>
+                <tspan x="109.50333329" style="fill: #d2b48c">/sys/class/hwmon/hwmon6/fan4_</tspan>
+                <tspan x="353.77999986000003">        </tspan>
+                <tspan x="421.1666665" style="fill: #696969">┆</tspan>
+                <tspan x="429.58999983"> </tspan>
+                <tspan x="438.01333316" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="446.43666649" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="454.85999982" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="463.28333315000003" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="471.70666648" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="480.12999981" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="488.55333314" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="496.97666647" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="505.3999998" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="513.82333313" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="522.24666646" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="530.66999979" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="539.09333312" style="fill: #1a8fff">⠉</tspan>
+                <tspan x="547.51666645" style="fill: #1a8fff">⠁</tspan>
+                <tspan x="555.93999978">                                          </tspan>
+                <tspan x="909.71999964" style="fill: #4682b4">⠆</tspan>
+                <tspan x="918.1433329700001">                                                </tspan>
+                <tspan x="1322.46333281" style="fill: #1a8fff">●</tspan>
+                <tspan x="1330.88666614" style="fill: #000000"> </tspan>
+                <tspan x="1339.30999947" style="fill: #ffffff">RPM / PWM</tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">│</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="802.666466">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">│</tspan>
+                <tspan x="8.42333333">                                          </tspan>
+                <tspan x="362.20333319" style="fill: #696969">0</tspan>
+                <tspan x="370.62666652">      </tspan>
+                <tspan x="421.1666665" style="fill: #696969">└</tspan>
+                <tspan x="429.58999983" style="fill: #696969">┄</tspan>
+                <tspan x="438.01333316" style="fill: #696969">┄</tspan>
+                <tspan x="446.43666649" style="fill: #696969">┄</tspan>
+                <tspan x="454.85999982" style="fill: #696969">┄</tspan>
+                <tspan x="463.28333315000003" style="fill: #696969">┄</tspan>
+                <tspan x="471.70666648" style="fill: #696969">┄</tspan>
+                <tspan x="480.12999981" style="fill: #696969">┄</tspan>
+                <tspan x="488.55333314" style="fill: #696969">┄</tspan>
+                <tspan x="496.97666647" style="fill: #696969">┄</tspan>
+                <tspan x="505.3999998" style="fill: #696969">┄</tspan>
+                <tspan x="513.82333313" style="fill: #696969">┄</tspan>
+                <tspan x="522.24666646" style="fill: #696969">┄</tspan>
+                <tspan x="530.66999979" style="fill: #696969">┄</tspan>
+                <tspan x="539.09333312" style="fill: #696969">┄</tspan>
+                <tspan x="547.51666645" style="fill: #696969">┄</tspan>
+                <tspan x="555.93999978" style="fill: #696969">┄</tspan>
+                <tspan x="564.36333311" style="fill: #696969">┄</tspan>
+                <tspan x="572.78666644" style="fill: #696969">┄</tspan>
+                <tspan x="581.20999977" style="fill: #696969">┄</tspan>
+                <tspan x="589.6333331" style="fill: #696969">┄</tspan>
+                <tspan x="598.0566664300001" style="fill: #696969">┄</tspan>
+                <tspan x="606.47999976" style="fill: #696969">┄</tspan>
+                <tspan x="614.90333309" style="fill: #696969">┄</tspan>
+                <tspan x="623.32666642" style="fill: #696969">┄</tspan>
+                <tspan x="631.74999975" style="fill: #696969">┄</tspan>
+                <tspan x="640.17333308" style="fill: #696969">┄</tspan>
+                <tspan x="648.59666641" style="fill: #696969">┄</tspan>
+                <tspan x="657.01999974" style="fill: #696969">┄</tspan>
+                <tspan x="665.44333307" style="fill: #696969">┄</tspan>
+                <tspan x="673.8666664" style="fill: #696969">┄</tspan>
+                <tspan x="682.28999973" style="fill: #696969">┄</tspan>
+                <tspan x="690.71333306" style="fill: #696969">┄</tspan>
+                <tspan x="699.13666639" style="fill: #696969">┄</tspan>
+                <tspan x="707.5599997200001" style="fill: #696969">┄</tspan>
+                <tspan x="715.98333305" style="fill: #696969">┄</tspan>
+                <tspan x="724.40666638" style="fill: #696969">┄</tspan>
+                <tspan x="732.82999971" style="fill: #696969">┄</tspan>
+                <tspan x="741.25333304" style="fill: #696969">┄</tspan>
+                <tspan x="749.67666637" style="fill: #696969">┄</tspan>
+                <tspan x="758.0999997" style="fill: #696969">┄</tspan>
+                <tspan x="766.52333303" style="fill: #696969">┄</tspan>
+                <tspan x="774.94666636" style="fill: #696969">┄</tspan>
+                <tspan x="783.36999969" style="fill: #696969">┄</tspan>
+                <tspan x="791.79333302" style="fill: #696969">┄</tspan>
+                <tspan x="800.21666635" style="fill: #696969">┄</tspan>
+                <tspan x="808.6399996800001" style="fill: #696969">┄</tspan>
+                <tspan x="817.0633330100001" style="fill: #696969">┄</tspan>
+                <tspan x="825.48666634" style="fill: #696969">┄</tspan>
+                <tspan x="833.90999967" style="fill: #696969">┄</tspan>
+                <tspan x="842.333333" style="fill: #696969">┄</tspan>
+                <tspan x="850.75666633" style="fill: #696969">┄</tspan>
+                <tspan x="859.17999966" style="fill: #696969">┄</tspan>
+                <tspan x="867.60333299" style="fill: #696969">┄</tspan>
+                <tspan x="876.02666632" style="fill: #696969">┄</tspan>
+                <tspan x="884.44999965" style="fill: #696969">┄</tspan>
+                <tspan x="892.87333298" style="fill: #696969">┄</tspan>
+                <tspan x="901.29666631" style="fill: #696969">┄</tspan>
+                <tspan x="909.71999964" style="fill: #696969">┄</tspan>
+                <tspan x="918.1433329700001" style="fill: #696969">┄</tspan>
+                <tspan x="926.5666663000001" style="fill: #696969">┄</tspan>
+                <tspan x="934.98999963" style="fill: #696969">┄</tspan>
+                <tspan x="943.41333296" style="fill: #696969">┄</tspan>
+                <tspan x="951.83666629" style="fill: #696969">┄</tspan>
+                <tspan x="960.25999962" style="fill: #696969">┄</tspan>
+                <tspan x="968.68333295" style="fill: #696969">┄</tspan>
+                <tspan x="977.10666628" style="fill: #696969">┄</tspan>
+                <tspan x="985.52999961" style="fill: #696969">┄</tspan>
+                <tspan x="993.95333294" style="fill: #696969">┄</tspan>
+                <tspan x="1002.37666627" style="fill: #696969">┄</tspan>
+                <tspan x="1010.7999996" style="fill: #696969">┄</tspan>
+                <tspan x="1019.22333293" style="fill: #696969">┄</tspan>
+                <tspan x="1027.64666626" style="fill: #696969">┄</tspan>
+                <tspan x="1036.06999959" style="fill: #696969">┄</tspan>
+                <tspan x="1044.49333292" style="fill: #696969">┄</tspan>
+                <tspan x="1052.91666625" style="fill: #696969">┄</tspan>
+                <tspan x="1061.33999958" style="fill: #696969">┄</tspan>
+                <tspan x="1069.76333291" style="fill: #696969">┄</tspan>
+                <tspan x="1078.18666624" style="fill: #696969">┄</tspan>
+                <tspan x="1086.6099995700001" style="fill: #696969">┄</tspan>
+                <tspan x="1095.0333329" style="fill: #696969">┄</tspan>
+                <tspan x="1103.45666623" style="fill: #696969">┄</tspan>
+                <tspan x="1111.87999956" style="fill: #696969">┄</tspan>
+                <tspan x="1120.30333289" style="fill: #696969">┄</tspan>
+                <tspan x="1128.72666622" style="fill: #696969">┄</tspan>
+                <tspan x="1137.14999955" style="fill: #696969">┄</tspan>
+                <tspan x="1145.57333288" style="fill: #696969">┄</tspan>
+                <tspan x="1153.99666621" style="fill: #696969">┄</tspan>
+                <tspan x="1162.41999954" style="fill: #696969">┄</tspan>
+                <tspan x="1170.84333287" style="fill: #696969">┄</tspan>
+                <tspan x="1179.2666662" style="fill: #696969">┄</tspan>
+                <tspan x="1187.68999953" style="fill: #696969">┄</tspan>
+                <tspan x="1196.1133328600001" style="fill: #696969">┄</tspan>
+                <tspan x="1204.53666619" style="fill: #696969">┄</tspan>
+                <tspan x="1212.95999952" style="fill: #696969">┄</tspan>
+                <tspan x="1221.38333285" style="fill: #696969">┄</tspan>
+                <tspan x="1229.80666618" style="fill: #696969">┄</tspan>
+                <tspan x="1238.22999951" style="fill: #696969">┄</tspan>
+                <tspan x="1246.65333284" style="fill: #696969">┄</tspan>
+                <tspan x="1255.07666617" style="fill: #696969">┄</tspan>
+                <tspan x="1263.4999995" style="fill: #696969">┄</tspan>
+                <tspan x="1271.92333283" style="fill: #696969">┄</tspan>
+                <tspan x="1280.34666616" style="fill: #696969">┄</tspan>
+                <tspan x="1288.76999949" style="fill: #696969">┄</tspan>
+                <tspan x="1297.19333282" style="fill: #696969">┄</tspan>
+                <tspan x="1305.6166661500001" style="fill: #696969">┄</tspan>
+                <tspan x="1314.03999948" style="fill: #696969">┄</tspan>
+                <tspan x="1322.46333281" style="fill: #696969">┄</tspan>
+                <tspan x="1330.88666614" style="fill: #696969">┄</tspan>
+                <tspan x="1339.30999947" style="fill: #696969">┄</tspan>
+                <tspan x="1347.7333328" style="fill: #696969">┄</tspan>
+                <tspan x="1356.15666613" style="fill: #696969">┄</tspan>
+                <tspan x="1364.57999946" style="fill: #696969">┄</tspan>
+                <tspan x="1373.00333279" style="fill: #696969">┄</tspan>
+                <tspan x="1381.42666612" style="fill: #696969">┄</tspan>
+                <tspan x="1389.84999945" style="fill: #696969">┄</tspan>
+                <tspan x="1398.27333278" style="fill: #696969">┄</tspan>
+                <tspan x="1406.69666611" style="fill: #696969">┄</tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">│</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+            <tspan y="821.3331280000001">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">│</tspan>
+                <tspan x="8.42333333" style="fill: #f0e68c">[PwmMap]</tspan>
+                <tspan x="75.80999997">                                         </tspan>
+                <tspan x="421.1666665"
+                       style="fill: #696969">0  7  13  22  31  40  49  58  67  75  84  93  104  115  1</tspan>
+                <tspan x="901.29666631" style="fill: #adff2f">127</tspan>
+                <tspan x="926.5666663000001" style="fill: #696969"> 137  149  160  171  182  193  204  215  226  237  248 </tspan>
+                <tspan x="1389.84999945"> </tspan>
+                <tspan x="1398.27333278" style="fill: #696969">  </tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">│</tspan>
+                <tspan x="1423.54333277" style="fill: #1a8fff">▼</tspan>
+      </tspan>
+            <tspan y="839.9997900000001">
+        <tspan dy="1em" x="0.0" style="fill: #4682b4">└</tspan>
+                <tspan x="8.42333333" style="fill: #4682b4">─</tspan>
+                <tspan x="16.84666666" style="fill: #4682b4">─</tspan>
+                <tspan x="25.269999990000002" style="fill: #4682b4">─</tspan>
+                <tspan x="33.69333332" style="fill: #4682b4">─</tspan>
+                <tspan x="42.11666665" style="fill: #4682b4">─</tspan>
+                <tspan x="50.539999980000005" style="fill: #4682b4">─</tspan>
+                <tspan x="58.96333331" style="fill: #4682b4">─</tspan>
+                <tspan x="67.38666664" style="fill: #4682b4">─</tspan>
+                <tspan x="75.80999997" style="fill: #4682b4">─</tspan>
+                <tspan x="84.2333333" style="fill: #4682b4">─</tspan>
+                <tspan x="92.65666663" style="fill: #4682b4">─</tspan>
+                <tspan x="101.07999996000001" style="fill: #4682b4">─</tspan>
+                <tspan x="109.50333329" style="fill: #4682b4">─</tspan>
+                <tspan x="117.92666662" style="fill: #4682b4">─</tspan>
+                <tspan x="126.34999995" style="fill: #4682b4">─</tspan>
+                <tspan x="134.77333328" style="fill: #4682b4">─</tspan>
+                <tspan x="143.19666661" style="fill: #4682b4">─</tspan>
+                <tspan x="151.61999994" style="fill: #4682b4">─</tspan>
+                <tspan x="160.04333327" style="fill: #4682b4">─</tspan>
+                <tspan x="168.4666666" style="fill: #4682b4">─</tspan>
+                <tspan x="176.88999993000002" style="fill: #4682b4">─</tspan>
+                <tspan x="185.31333326" style="fill: #4682b4">─</tspan>
+                <tspan x="193.73666659" style="fill: #4682b4">─</tspan>
+                <tspan x="202.15999992000002" style="fill: #4682b4">─</tspan>
+                <tspan x="210.58333325" style="fill: #4682b4">─</tspan>
+                <tspan x="219.00666658" style="fill: #4682b4">─</tspan>
+                <tspan x="227.42999991" style="fill: #4682b4">─</tspan>
+                <tspan x="235.85333324" style="fill: #4682b4">─</tspan>
+                <tspan x="244.27666657" style="fill: #4682b4">─</tspan>
+                <tspan x="252.6999999" style="fill: #4682b4">─</tspan>
+                <tspan x="261.12333323" style="fill: #4682b4">─</tspan>
+                <tspan x="269.54666656" style="fill: #4682b4">─</tspan>
+                <tspan x="277.96999989" style="fill: #4682b4">─</tspan>
+                <tspan x="286.39333322" style="fill: #4682b4">─</tspan>
+                <tspan x="294.81666655" style="fill: #4682b4">─</tspan>
+                <tspan x="303.23999988" style="fill: #4682b4">─</tspan>
+                <tspan x="311.66333321" style="fill: #4682b4">─</tspan>
+                <tspan x="320.08666654" style="fill: #4682b4">─</tspan>
+                <tspan x="328.50999987" style="fill: #4682b4">─</tspan>
+                <tspan x="336.9333332" style="fill: #4682b4">─</tspan>
+                <tspan x="345.35666653" style="fill: #4682b4">─</tspan>
+                <tspan x="353.77999986000003" style="fill: #4682b4">─</tspan>
+                <tspan x="362.20333319" style="fill: #4682b4">─</tspan>
+                <tspan x="370.62666652" style="fill: #4682b4">─</tspan>
+                <tspan x="379.04999985" style="fill: #4682b4">─</tspan>
+                <tspan x="387.47333318" style="fill: #4682b4">─</tspan>
+                <tspan x="395.89666651" style="fill: #4682b4">─</tspan>
+                <tspan x="404.31999984000004" style="fill: #4682b4">─</tspan>
+                <tspan x="412.74333317" style="fill: #4682b4">─</tspan>
+                <tspan x="421.1666665" style="fill: #4682b4">─</tspan>
+                <tspan x="429.58999983" style="fill: #4682b4">─</tspan>
+                <tspan x="438.01333316" style="fill: #4682b4">─</tspan>
+                <tspan x="446.43666649" style="fill: #4682b4">─</tspan>
+                <tspan x="454.85999982" style="fill: #4682b4">─</tspan>
+                <tspan x="463.28333315000003" style="fill: #4682b4">─</tspan>
+                <tspan x="471.70666648" style="fill: #4682b4">─</tspan>
+                <tspan x="480.12999981" style="fill: #4682b4">─</tspan>
+                <tspan x="488.55333314" style="fill: #4682b4">─</tspan>
+                <tspan x="496.97666647" style="fill: #4682b4">─</tspan>
+                <tspan x="505.3999998" style="fill: #4682b4">─</tspan>
+                <tspan x="513.82333313" style="fill: #4682b4">─</tspan>
+                <tspan x="522.24666646" style="fill: #4682b4">─</tspan>
+                <tspan x="530.66999979" style="fill: #4682b4">─</tspan>
+                <tspan x="539.09333312" style="fill: #4682b4">─</tspan>
+                <tspan x="547.51666645" style="fill: #4682b4">─</tspan>
+                <tspan x="555.93999978" style="fill: #4682b4">─</tspan>
+                <tspan x="564.36333311" style="fill: #4682b4">─</tspan>
+                <tspan x="572.78666644" style="fill: #4682b4">─</tspan>
+                <tspan x="581.20999977" style="fill: #4682b4">─</tspan>
+                <tspan x="589.6333331" style="fill: #4682b4">─</tspan>
+                <tspan x="598.0566664300001" style="fill: #4682b4">─</tspan>
+                <tspan x="606.47999976" style="fill: #4682b4">─</tspan>
+                <tspan x="614.90333309" style="fill: #4682b4">─</tspan>
+                <tspan x="623.32666642" style="fill: #4682b4">─</tspan>
+                <tspan x="631.74999975" style="fill: #4682b4">─</tspan>
+                <tspan x="640.17333308" style="fill: #4682b4">─</tspan>
+                <tspan x="648.59666641" style="fill: #4682b4">─</tspan>
+                <tspan x="657.01999974" style="fill: #4682b4">─</tspan>
+                <tspan x="665.44333307" style="fill: #4682b4">─</tspan>
+                <tspan x="673.8666664" style="fill: #4682b4">─</tspan>
+                <tspan x="682.28999973" style="fill: #4682b4">─</tspan>
+                <tspan x="690.71333306" style="fill: #4682b4">─</tspan>
+                <tspan x="699.13666639" style="fill: #4682b4">─</tspan>
+                <tspan x="707.5599997200001" style="fill: #4682b4">─</tspan>
+                <tspan x="715.98333305" style="fill: #4682b4">─</tspan>
+                <tspan x="724.40666638" style="fill: #4682b4">─</tspan>
+                <tspan x="732.82999971" style="fill: #4682b4">─</tspan>
+                <tspan x="741.25333304" style="fill: #4682b4">─</tspan>
+                <tspan x="749.67666637" style="fill: #4682b4">─</tspan>
+                <tspan x="758.0999997" style="fill: #4682b4">─</tspan>
+                <tspan x="766.52333303" style="fill: #4682b4">─</tspan>
+                <tspan x="774.94666636" style="fill: #4682b4">─</tspan>
+                <tspan x="783.36999969" style="fill: #4682b4">─</tspan>
+                <tspan x="791.79333302" style="fill: #4682b4">─</tspan>
+                <tspan x="800.21666635" style="fill: #4682b4">─</tspan>
+                <tspan x="808.6399996800001" style="fill: #4682b4">─</tspan>
+                <tspan x="817.0633330100001" style="fill: #4682b4">─</tspan>
+                <tspan x="825.48666634" style="fill: #4682b4">─</tspan>
+                <tspan x="833.90999967" style="fill: #4682b4">─</tspan>
+                <tspan x="842.333333" style="fill: #4682b4">─</tspan>
+                <tspan x="850.75666633" style="fill: #4682b4">─</tspan>
+                <tspan x="859.17999966" style="fill: #4682b4">─</tspan>
+                <tspan x="867.60333299" style="fill: #4682b4">─</tspan>
+                <tspan x="876.02666632" style="fill: #4682b4">─</tspan>
+                <tspan x="884.44999965" style="fill: #4682b4">─</tspan>
+                <tspan x="892.87333298" style="fill: #4682b4">─</tspan>
+                <tspan x="901.29666631" style="fill: #4682b4">─</tspan>
+                <tspan x="909.71999964" style="fill: #4682b4">─</tspan>
+                <tspan x="918.1433329700001" style="fill: #4682b4">─</tspan>
+                <tspan x="926.5666663000001" style="fill: #4682b4">─</tspan>
+                <tspan x="934.98999963" style="fill: #4682b4">─</tspan>
+                <tspan x="943.41333296" style="fill: #4682b4">─</tspan>
+                <tspan x="951.83666629" style="fill: #4682b4">─</tspan>
+                <tspan x="960.25999962" style="fill: #4682b4">─</tspan>
+                <tspan x="968.68333295" style="fill: #4682b4">─</tspan>
+                <tspan x="977.10666628" style="fill: #4682b4">─</tspan>
+                <tspan x="985.52999961" style="fill: #4682b4">─</tspan>
+                <tspan x="993.95333294" style="fill: #4682b4">─</tspan>
+                <tspan x="1002.37666627" style="fill: #4682b4">─</tspan>
+                <tspan x="1010.7999996" style="fill: #4682b4">─</tspan>
+                <tspan x="1019.22333293" style="fill: #4682b4">─</tspan>
+                <tspan x="1027.64666626" style="fill: #4682b4">─</tspan>
+                <tspan x="1036.06999959" style="fill: #4682b4">─</tspan>
+                <tspan x="1044.49333292" style="fill: #4682b4">─</tspan>
+                <tspan x="1052.91666625" style="fill: #4682b4">─</tspan>
+                <tspan x="1061.33999958" style="fill: #4682b4">─</tspan>
+                <tspan x="1069.76333291" style="fill: #4682b4">─</tspan>
+                <tspan x="1078.18666624" style="fill: #4682b4">─</tspan>
+                <tspan x="1086.6099995700001" style="fill: #4682b4">─</tspan>
+                <tspan x="1095.0333329" style="fill: #4682b4">─</tspan>
+                <tspan x="1103.45666623" style="fill: #4682b4">─</tspan>
+                <tspan x="1111.87999956" style="fill: #4682b4">─</tspan>
+                <tspan x="1120.30333289" style="fill: #4682b4">─</tspan>
+                <tspan x="1128.72666622" style="fill: #4682b4">─</tspan>
+                <tspan x="1137.14999955" style="fill: #4682b4">─</tspan>
+                <tspan x="1145.57333288" style="fill: #4682b4">─</tspan>
+                <tspan x="1153.99666621" style="fill: #4682b4">─</tspan>
+                <tspan x="1162.41999954" style="fill: #4682b4">─</tspan>
+                <tspan x="1170.84333287" style="fill: #4682b4">─</tspan>
+                <tspan x="1179.2666662" style="fill: #4682b4">─</tspan>
+                <tspan x="1187.68999953" style="fill: #4682b4">─</tspan>
+                <tspan x="1196.1133328600001" style="fill: #4682b4">─</tspan>
+                <tspan x="1204.53666619" style="fill: #4682b4">─</tspan>
+                <tspan x="1212.95999952" style="fill: #4682b4">─</tspan>
+                <tspan x="1221.38333285" style="fill: #4682b4">─</tspan>
+                <tspan x="1229.80666618" style="fill: #4682b4">─</tspan>
+                <tspan x="1238.22999951" style="fill: #4682b4">─</tspan>
+                <tspan x="1246.65333284" style="fill: #4682b4">─</tspan>
+                <tspan x="1255.07666617" style="fill: #4682b4">─</tspan>
+                <tspan x="1263.4999995" style="fill: #4682b4">─</tspan>
+                <tspan x="1271.92333283" style="fill: #4682b4">─</tspan>
+                <tspan x="1280.34666616" style="fill: #4682b4">─</tspan>
+                <tspan x="1288.76999949" style="fill: #4682b4">─</tspan>
+                <tspan x="1297.19333282" style="fill: #4682b4">─</tspan>
+                <tspan x="1305.6166661500001" style="fill: #4682b4">─</tspan>
+                <tspan x="1314.03999948" style="fill: #4682b4">─</tspan>
+                <tspan x="1322.46333281" style="fill: #4682b4">─</tspan>
+                <tspan x="1330.88666614" style="fill: #4682b4">─</tspan>
+                <tspan x="1339.30999947" style="fill: #4682b4">─</tspan>
+                <tspan x="1347.7333328" style="fill: #4682b4">─</tspan>
+                <tspan x="1356.15666613" style="fill: #4682b4">─</tspan>
+                <tspan x="1364.57999946" style="fill: #4682b4">─</tspan>
+                <tspan x="1373.00333279" style="fill: #4682b4">─</tspan>
+                <tspan x="1381.42666612" style="fill: #4682b4">─</tspan>
+                <tspan x="1389.84999945" style="fill: #4682b4">─</tspan>
+                <tspan x="1398.27333278" style="fill: #4682b4">─</tspan>
+                <tspan x="1406.69666611" style="fill: #4682b4">─</tspan>
+                <tspan x="1415.1199994400001" style="fill: #4682b4">┘</tspan>
+                <tspan x="1423.54333277"> </tspan>
+      </tspan>
+    </text>
+    </svg>
+
+    <svg x="636.673" y="350.933" width="175.467" height="175.467">
+        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000.0 1000.0"
+             style="filter: drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.4))">
+            <defs>
+                <mask id="small-triangle-mask">
+                    <rect width="100%" height="100%" fill="white"></rect>
+                    <polygon
+                            points="700.0 500.0, 400.00000000000006 326.7949192431122, 399.9999999999999 673.2050807568877"
+                            fill="black">
+                    </polygon>
+                </mask>
+            </defs>
+            <polygon points="1000.0 500.0, 250.0000000000001 66.98729810778059, 249.99999999999977 933.0127018922192"
+                     mask="url(#small-triangle-mask)" fill="white">
+            </polygon>
+            <polyline points="673.2050807568878 400.0, 326.7949192431123 600.0" stroke="white" stroke-width="90">
+            </polyline>
+        </svg>
+    </svg>
+</svg>
