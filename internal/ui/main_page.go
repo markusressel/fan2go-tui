@@ -232,9 +232,10 @@ func (mainPage *MainPage) updateShortcutMap() {
 		shortcutMap := c.GetShortcutMap()
 
 		globalShortcutMapEntries := []shortcut_helper.ShortcutEntry{
-			{KeyCombo: []string{"?"}, Name: "Help"},
+			{KeyCombo: []string{"+", "-"}, Name: "Refresh Interval"},
 			{KeyCombo: []string{"Tab"}, Name: "Next"},
 			{KeyCombo: []string{"1-3"}, Name: "Switch"},
+			{KeyCombo: []string{"?", "F1"}, Name: "Help"},
 			{KeyCombo: []string{"Ctrl+Q"}, Name: "Quit"},
 		}
 
