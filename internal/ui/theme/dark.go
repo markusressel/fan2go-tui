@@ -81,6 +81,10 @@ var (
 			ValuePath:          tcell.ColorTan,
 			ValueSpecial:       tcell.ColorDarkGray,
 		},
+		ShortcutMap: ShortcutMapColors{
+			KeyCombo: tcell.ColorDodgerBlue,
+			Name:     tcell.ColorWhite,
+		},
 	}
 
 	Style = StyleStruct{

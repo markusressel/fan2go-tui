@@ -2,7 +2,7 @@ package fan
 
 import (
 	"fan2go-tui/internal/client"
-	"fan2go-tui/internal/ui/txwidget"
+	"fan2go-tui/internal/ui/txwidgets"
 	"strings"
 
 	"github.com/rivo/tview"
@@ -15,7 +15,7 @@ type FanInfoComponent struct {
 
 	layout *tview.Flex
 
-	configComponent *txwidget.ConfigInfoComponent
+	configComponent *txwidgets.ConfigInfoComponent
 	onOpenCurve     func(curveID string)
 }
 
@@ -34,7 +34,7 @@ func NewFanInfoComponent(application *tview.Application, fan *client.Fan, onOpen
 func (c *FanInfoComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 
-	configComponent := txwidget.NewConfigInfoComponent()
+	configComponent := txwidgets.NewConfigInfoComponent()
 	configComponent.SetFieldClickablePredicate(func(sectionTitle, label, value string) bool {
 		return strings.EqualFold(sectionTitle, "General") && strings.EqualFold(label, "Curve") && value != ""
 	})
@@ -65,7 +65,7 @@ func (c *FanInfoComponent) refresh() {
 	}
 
 	config := c.Fan.Config
-	c.configComponent.SetSections(txwidget.FanConfigSections(config))
+	c.configComponent.SetSections(txwidgets.FanConfigSections(config))
 }
 
 func (c *FanInfoComponent) ScrollHorizontal(delta int) {

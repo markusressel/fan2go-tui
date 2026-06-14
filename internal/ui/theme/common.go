@@ -40,6 +40,12 @@ type Color struct {
 	Graph               GraphsColors
 	List                ListsColors
 	ConfigInfoComponent ConfigInfoComponentColors
+	ShortcutMap         ShortcutMapColors
+}
+
+type ShortcutMapColors struct {
+	KeyCombo tcell.Color
+	Name     tcell.Color
 }
 
 type ConfigInfoComponentColors struct {
