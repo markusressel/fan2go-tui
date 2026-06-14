@@ -2,7 +2,7 @@ package curve
 
 import (
 	"fan2go-tui/internal/client"
-	"fan2go-tui/internal/ui/txwidget"
+	"fan2go-tui/internal/ui/txwidgets"
 	"strings"
 
 	"github.com/rivo/tview"
@@ -15,7 +15,7 @@ type CurveInfoComponent struct {
 
 	layout *tview.Flex
 
-	configComponent *txwidget.ConfigInfoComponent
+	configComponent *txwidgets.ConfigInfoComponent
 	onOpenSensor    func(sensorID string)
 	onOpenCurve     func(curveID string)
 }
@@ -36,7 +36,7 @@ func NewCurveInfoComponent(application *tview.Application, curve *client.Curve, 
 func (c *CurveInfoComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 
-	configComponent := txwidget.NewConfigInfoComponent()
+	configComponent := txwidgets.NewConfigInfoComponent()
 	configComponent.SetFieldClickablePredicate(func(sectionTitle, label, value string) bool {
 		isSensor := strings.EqualFold(sectionTitle, "Curve") && strings.EqualFold(label, "Sensor") && value != ""
 		isCurveRef := strings.EqualFold(sectionTitle, "Curve") && (strings.EqualFold(label, "Curves") || label == "") && strings.HasPrefix(value, "- ")
@@ -81,7 +81,7 @@ func (c *CurveInfoComponent) refresh() {
 	}
 
 	config := c.Curve.Config
-	c.configComponent.SetSections(txwidget.CurveConfigSections(config))
+	c.configComponent.SetSections(txwidgets.CurveConfigSections(config))
 }
 
 func (c *CurveInfoComponent) ScrollHorizontal(delta int) {

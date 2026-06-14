@@ -2,6 +2,7 @@ package curve
 
 import (
 	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/ui/shortcut_helper"
 	"fan2go-tui/internal/ui/util"
 	"sort"
 	"strings"
@@ -162,4 +163,11 @@ func (c *CurvesPage) SelectCurveByID(curveID string) bool {
 	}
 	c.curveList.SelectEntry(curveListItem)
 	return true
+}
+
+func (c *CurvesPage) GetShortcutMap() []shortcut_helper.ShortcutEntry {
+	return []shortcut_helper.ShortcutEntry{
+		{KeyCombo: []string{"↑", "↓"}, Name: "Select"},
+		{KeyCombo: []string{"PgUp", "PgDn"}, Name: "Scroll"},
+	}
 }

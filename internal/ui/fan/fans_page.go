@@ -2,6 +2,7 @@ package fan
 
 import (
 	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/ui/shortcut_helper"
 	"fan2go-tui/internal/ui/util"
 	"sort"
 	"strings"
@@ -150,4 +151,11 @@ func (c *FansPage) Refresh() error {
 
 func (c *FansPage) ScrollToItem() {
 	c.fanList.SelectEntry(c.fanList.GetSelectedItem())
+}
+
+func (c *FansPage) GetShortcutMap() []shortcut_helper.ShortcutEntry {
+	return []shortcut_helper.ShortcutEntry{
+		{KeyCombo: []string{"↑", "↓"}, Name: "Select"},
+		{KeyCombo: []string{"PgUp", "PgDn"}, Name: "Scroll"},
+	}
 }

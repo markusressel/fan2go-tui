@@ -1,4 +1,4 @@
-package txwidget
+package txwidgets
 
 import (
 	"fan2go-tui/internal/ui/theme"

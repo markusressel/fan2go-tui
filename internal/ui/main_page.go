@@ -5,6 +5,7 @@ import (
 	"fan2go-tui/internal/ui/curve"
 	"fan2go-tui/internal/ui/fan"
 	"fan2go-tui/internal/ui/sensor"
+	"fan2go-tui/internal/ui/shortcut_helper"
 	"fan2go-tui/internal/ui/status_message"
 	"fan2go-tui/internal/ui/util"
 	"slices"
@@ -29,8 +30,9 @@ type MainPage struct {
 
 	client client.Fan2goApiClient
 
-	layout *tview.Flex
-	header *ApplicationHeaderComponent
+	layout      *tview.Flex
+	header      *ApplicationHeaderComponent
+	shortcutMap *shortcut_helper.ShortcutMapComponent
 
 	page                Page
 	mainPagePagerLayout *tview.Pages
@@ -47,6 +49,8 @@ func NewMainPage(application *tview.Application, client client.Fan2goApiClient) 
 		page:        FansPage,
 		pagesMap:    *orderedmap.NewOrderedMap[Page, util.PagesPage](),
 	}
+
+	mainPage.shortcutMap = shortcut_helper.NewShortcutMap(application)
 
 	mainPage.layout = mainPage.createLayout()
 	mainPage.layout.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
@@ -96,6 +100,7 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 
 	mainPageLayout.AddItem(header.layout, 1, 0, false)
 	mainPageLayout.AddItem(mainPagePagerLayout, 0, 1, true)
+	mainPageLayout.AddItem(mainPage.shortcutMap.GetLayout(), 1, 0, false)
 
 	for page, pagesPage := range mainPage.pagesMap.Iterator() {
 		mainPage.mainPagePagerLayout.AddPage(
@@ -117,6 +122,7 @@ func (mainPage *MainPage) Init() {
 	mainPage.application.ForceDraw()
 	mainPage.Refresh()
 	mainPage.scrollCurrentPageToItem()
+	mainPage.updateShortcutMap()
 }
 
 func (mainPage *MainPage) Refresh() {
@@ -155,6 +161,7 @@ func (mainPage *MainPage) SetPage(page Page) {
 	mainPage.Refresh()
 
 	mainPage.scrollCurrentPageToItem()
+	mainPage.updateShortcutMap()
 }
 
 func (mainPage *MainPage) scrollCurrentPageToItem() {
@@ -209,4 +216,31 @@ func (mainPage *MainPage) showStatusMessage(status *status_message.StatusMessage
 
 func (mainPage *MainPage) UpdateHeader() {
 	mainPage.header.Refresh()
+}
+
+func (mainPage *MainPage) setShortcutMap(shortcutEntries []shortcut_helper.ShortcutEntry) {
+	mainPage.shortcutMap.SetEntries(shortcutEntries)
+}
+
+func (mainPage *MainPage) clearShortcutMap() {
+	mainPage.shortcutMap.Clear()
+}
+
+func (mainPage *MainPage) updateShortcutMap() {
+	component := mainPage.GetCurrentPage()
+	if c, ok := component.(shortcut_helper.ShortcutMapProvider); ok {
+		shortcutMap := c.GetShortcutMap()
+
+		globalShortcutMapEntries := []shortcut_helper.ShortcutEntry{
+			{KeyCombo: []string{"?"}, Name: "Help"},
+			{KeyCombo: []string{"Tab"}, Name: "Next"},
+			{KeyCombo: []string{"1-3"}, Name: "Switch"},
+			{KeyCombo: []string{"Ctrl+Q"}, Name: "Quit"},
+		}
+
+		shortcutMap = append(shortcutMap, globalShortcutMapEntries...)
+		mainPage.setShortcutMap(shortcutMap)
+	} else {
+		mainPage.clearShortcutMap()
+	}
 }

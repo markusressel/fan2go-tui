@@ -2,7 +2,7 @@ package sensor
 
 import (
 	"fan2go-tui/internal/client"
-	"fan2go-tui/internal/ui/txwidget"
+	"fan2go-tui/internal/ui/txwidgets"
 
 	"github.com/rivo/tview"
 )
@@ -14,7 +14,7 @@ type SensorInfoComponent struct {
 
 	layout *tview.Flex
 
-	configComponent *txwidget.ConfigInfoComponent
+	configComponent *txwidgets.ConfigInfoComponent
 }
 
 func NewSensorInfoComponent(application *tview.Application, sensor *client.Sensor) *SensorInfoComponent {
@@ -31,7 +31,7 @@ func NewSensorInfoComponent(application *tview.Application, sensor *client.Senso
 func (c *SensorInfoComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 
-	configComponent := txwidget.NewConfigInfoComponent()
+	configComponent := txwidgets.NewConfigInfoComponent()
 	layout.AddItem(configComponent.GetPrimitive(), 0, 1, false)
 	c.configComponent = configComponent
 
@@ -54,7 +54,7 @@ func (c *SensorInfoComponent) refresh() {
 	}
 
 	config := c.Sensor.Config
-	c.configComponent.SetSections(txwidget.SensorConfigSections(config))
+	c.configComponent.SetSections(txwidgets.SensorConfigSections(config))
 }
 
 func (c *SensorInfoComponent) ScrollHorizontal(delta int) {
