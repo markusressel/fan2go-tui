@@ -44,13 +44,11 @@ type HorizontalScrollable interface {
 // The application is used to redraw the component.
 // The config is used to configure the component.
 // The getLayout function is used to create the layout for each entry.
-// The compare function is used to sort the entries.
 // The sortListEntries function is used to sort the entries.
 func NewListComponent[T comparable](
 	application *tview.Application,
 	config *ListComponentConfig,
 	getLayout func(entry *T) (layout *tview.Flex),
-//compare func(a, b *T) bool,
 	sortListEntries func(entries []*T, inverted bool) []*T,
 ) *ListComponent[T] {
 	listComponent := &ListComponent[T]{
@@ -174,12 +172,6 @@ func (c *ListComponent[T]) SetTitle(title string) {
 
 func (c *ListComponent[T]) GetData() []*T {
 	return c.sortListEntries(c.entries, c.sortInverted)
-	//sort.SliceStable(c.entries, func(i, j int) bool {
-	//	a := c.entries[i]
-	//	b := c.entries[j]
-	//	return c.compare(a, b)
-	//})
-	//return c.entries
 }
 
 func (c *ListComponent[T]) SetData(entries []*T) {
@@ -478,7 +470,6 @@ func (c *ListComponent[T]) updateScrollBar() {
 	c.scrollbarComponent.SetMax(maxScrollIndex)
 	visibleIndexMin, visibleIndexMax := c.GetVisibleRange()
 
-	//newPosition := c.GetSelectedIndex()
 	c.scrollbarComponent.SetPosition(visibleIndexMin)
 
 	width := (visibleIndexMax - visibleIndexMin) + 1
