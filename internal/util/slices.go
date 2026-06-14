@@ -36,9 +36,12 @@ func RotateSliceBy[T any](slice []T, n int) []T {
 
 func DistributeValuesOverRange(values []float64, totalRange int) []float64 {
 	valuesCount := len(values)
-	slotsPerValue := float64(totalRange) / float64(valuesCount)
-
 	result := make([]float64, totalRange)
+	if valuesCount == 0 {
+		return result
+	}
+
+	slotsPerValue := float64(totalRange) / float64(valuesCount)
 	for i := 0; i < totalRange; i++ {
 		slotIndex := int(float64(i) / slotsPerValue)
 		if slotIndex >= valuesCount {
