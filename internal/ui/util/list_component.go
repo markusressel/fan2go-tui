@@ -7,7 +7,6 @@ import (
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
-	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
 )
 
@@ -22,6 +21,7 @@ type ListComponent[T comparable] struct {
 
 	config             *ListComponentConfig
 	entryVisibilityMap map[*T]bool
+	startIndex         int
 	selectedIndex      int
 
 	getLayout                func(entry *T) (layout *tview.Flex)
@@ -30,7 +30,6 @@ type ListComponent[T comparable] struct {
 
 	sortListEntries func(entries []*T, inverted bool) []*T
 
-	//compare      func(a, b *T) bool
 	sortInverted bool
 
 	scrollbarComponent *ScrollbarComponent
@@ -44,13 +43,11 @@ type HorizontalScrollable interface {
 // The application is used to redraw the component.
 // The config is used to configure the component.
 // The getLayout function is used to create the layout for each entry.
-// The compare function is used to sort the entries.
 // The sortListEntries function is used to sort the entries.
 func NewListComponent[T comparable](
 	application *tview.Application,
 	config *ListComponentConfig,
 	getLayout func(entry *T) (layout *tview.Flex),
-	//compare func(a, b *T) bool,
 	sortListEntries func(entries []*T, inverted bool) []*T,
 ) *ListComponent[T] {
 	listComponent := &ListComponent[T]{
@@ -174,12 +171,6 @@ func (c *ListComponent[T]) SetTitle(title string) {
 
 func (c *ListComponent[T]) GetData() []*T {
 	return c.sortListEntries(c.entries, c.sortInverted)
-	//sort.SliceStable(c.entries, func(i, j int) bool {
-	//	a := c.entries[i]
-	//	b := c.entries[j]
-	//	return c.compare(a, b)
-	//})
-	//return c.entries
 }
 
 func (c *ListComponent[T]) SetData(entries []*T) {
@@ -290,26 +281,7 @@ func (c *ListComponent[T]) scrollByPage(direction int) {
 }
 
 func (c *ListComponent[T]) setVisibleWindow(startIndex int, pageSize int) {
-	if pageSize < 1 {
-		pageSize = 1
-	}
-	if startIndex < 0 {
-		startIndex = 0
-	}
-
-	data := c.GetData()
-	if len(data) == 0 {
-		return
-	}
-	if startIndex >= len(data) {
-		startIndex = len(data) - 1
-	}
-
-	endIndex := int(math.Min(float64(len(data)-1), float64(startIndex+pageSize-1)))
-	c.entryVisibilityMap = map[*T]bool{}
-	for index, entry := range data {
-		c.entryVisibilityMap[entry] = index >= startIndex && index <= endIndex
-	}
+	c.startIndex = startIndex
 	c.updateLayout()
 }
 
@@ -346,81 +318,54 @@ func (c *ListComponent[T]) scrollSelectedEntryHorizontal(delta int) bool {
 }
 
 func (c *ListComponent[T]) scroll(rows int) {
-	var entryVisibilityMapKeys []*T
-	var entryVisibilityMapValues []bool
-
-	var keys = c.GetData()
-
-	for _, key := range keys {
-		value := c.entryVisibilityMap[key]
-		entryVisibilityMapKeys = append(entryVisibilityMapKeys, key)
-		entryVisibilityMapValues = append(entryVisibilityMapValues, value)
-	}
-
-	if len(entryVisibilityMapValues) > 0 && rows < 0 && entryVisibilityMapValues[0] == false || rows > 0 && entryVisibilityMapValues[len(entryVisibilityMapValues)-1] == false {
-		entryVisibilityMapValues = util.RotateSliceBy(entryVisibilityMapValues, rows)
-	}
-
-	c.entryVisibilityMap = map[*T]bool{}
-	for i, key := range entryVisibilityMapKeys {
-		c.entryVisibilityMap[key] = entryVisibilityMapValues[i]
-	}
+	c.startIndex += rows
 	c.updateLayout()
 }
 
 func (c *ListComponent[T]) GetVisibleRange() (int, int) {
-	minIndex := len(c.entryVisibilityMap)
-	maxIndex := 0
-	for idx, entry := range c.entries {
-		isVisible := c.entryVisibilityMap[entry]
-		if isVisible {
-			minIndex = int(math.Min(float64(minIndex), float64(idx)))
-			maxIndex = int(math.Max(float64(maxIndex), float64(idx)))
-		}
+	data := c.GetData()
+	if len(data) == 0 {
+		return 0, 0
 	}
-	return minIndex, maxIndex
+	maxVisible := c.GetMaxVisibleItems()
+	endIndex := c.startIndex + maxVisible - 1
+	if endIndex >= len(data) {
+		endIndex = len(data) - 1
+	}
+	return c.startIndex, endIndex
 }
 
 func (c *ListComponent[T]) updateVisibleEntries() {
 	// ensure we are displaying as many items as specified by MaxVisibleItems
 	maxVisibleItems := c.GetMaxVisibleItems()
+	data := c.GetData()
 
-	// cleanup the visibility map (remove entries that are not in the dataset anymore)
-	c.cleanupVisibilityMap()
-	// insert entries into the visibility map, if necessary
-	for _, entry := range c.entries {
-		c.insertEntryIntoVisibilityMap(entry, maxVisibleItems)
+	if len(data) == 0 {
+		c.startIndex = 0
+	} else {
+		if c.startIndex+maxVisibleItems > len(data) {
+			c.startIndex = len(data) - maxVisibleItems
+		}
+		if c.startIndex < 0 {
+			c.startIndex = 0
+		}
+	}
+
+	// rebuild the visibility map
+	c.entryVisibilityMap = map[*T]bool{}
+	for index, entry := range data {
+		c.entryVisibilityMap[entry] = index >= c.startIndex && index < c.startIndex+maxVisibleItems
 	}
 
 	// cleanup the entries layout
 	c.entriesLayout.Clear()
 	// create a layout for each visible entry
-	for _, entry := range c.entries {
+	for _, entry := range data {
 		currentVisibility := c.entryVisibilityMap[entry]
 		if currentVisibility {
 			c.entriesLayout.AddItem(c.getLayout(entry), 0, 1, false)
 		}
 	}
-}
-
-func (c *ListComponent[T]) cleanupVisibilityMap() {
-	keys := maps.Keys(c.entryVisibilityMap)
-	for _, key := range keys {
-		ok := slices.Contains(c.entries, key)
-		if !ok {
-			delete(c.entryVisibilityMap, key)
-		}
-	}
-}
-
-func (c *ListComponent[T]) getVisibleEntriesCount() int {
-	count := 0
-	for _, isVisible := range c.entryVisibilityMap {
-		if isVisible {
-			count += 1
-		}
-	}
-	return count
 }
 
 func (c *ListComponent[T]) SelectEntry(entry *T) {
@@ -449,15 +394,16 @@ func (c *ListComponent[T]) selectNextEntry() {
 }
 
 func (c *ListComponent[T]) shiftSelection(rows int) *T {
-	for idx, entry := range c.entries {
+	data := c.GetData()
+	for idx, entry := range data {
 		entryLayout := c.getLayout(entry)
 		if entryLayout.HasFocus() {
-			nextEntryIndex := (len(c.entries) + idx + rows) % len(c.entries)
-			nextEntry := c.entries[nextEntryIndex]
+			nextEntryIndex := (len(data) + idx + rows) % len(data)
+			nextEntry := data[nextEntryIndex]
 			nextEntryLayout := c.getLayout(nextEntry)
-			c.selectedIndex = nextEntryIndex
+			c.selectedIndex = slices.Index(c.entries, nextEntry)
 			c.application.SetFocus(nextEntryLayout)
-			c.selectionChangedCallback(entry)
+			c.selectionChangedCallback(nextEntry)
 			return nextEntry
 		}
 	}
@@ -477,49 +423,37 @@ func (c *ListComponent[T]) scrollToSelection() {
 }
 
 func (c *ListComponent[T]) isInVisibleScrollRange(selection *T) bool {
-	for _, entry := range c.GetData() {
-		isVisible := c.entryVisibilityMap[entry]
-		if entry == selection && isVisible {
-			return true
-		}
+	data := c.GetData()
+	index := slices.Index(data, selection)
+	if index < 0 {
+		return false
 	}
-	return false
+	maxVisible := c.GetMaxVisibleItems()
+	return index >= c.startIndex && index < c.startIndex+maxVisible
 }
 
 func (c *ListComponent[T]) determineScrollDistanceToEntry(selection *T) int {
 	data := c.GetData()
-
 	index := slices.Index(data, selection)
-
-	// find the min/max indices of currently visible items
-	minIndex := len(c.entryVisibilityMap)
-	maxIndex := 0
-	for idx, entry := range data {
-		isVisible := c.entryVisibilityMap[entry]
-		if isVisible {
-			minIndex = int(math.Min(float64(minIndex), float64(idx)))
-			maxIndex = int(math.Max(float64(maxIndex), float64(idx)))
-		}
+	if index < 0 {
+		return 0
 	}
 
-	if index < minIndex {
-		return index - minIndex
-	} else if index > maxIndex {
-		return index - maxIndex
+	maxVisible := c.GetMaxVisibleItems()
+	if index < c.startIndex {
+		return index - c.startIndex
+	} else if index >= c.startIndex+maxVisible {
+		return index - (c.startIndex + maxVisible - 1)
 	} else {
 		return 0
 	}
 }
 
 func (c *ListComponent[T]) SelectFirst() {
-	for idx, entry := range c.GetData() {
-		entryLayout := c.getLayout(entry)
-		c.application.SetFocus(entryLayout)
-		c.selectedIndex = idx
-		c.selectionChangedCallback(entry)
-		return
+	data := c.GetData()
+	if len(data) > 0 {
+		c.SelectEntry(data[0])
 	}
-	c.scrollToSelection()
 }
 
 func (c *ListComponent[T]) updateScrollBar() {
@@ -535,7 +469,6 @@ func (c *ListComponent[T]) updateScrollBar() {
 	c.scrollbarComponent.SetMax(maxScrollIndex)
 	visibleIndexMin, visibleIndexMax := c.GetVisibleRange()
 
-	//newPosition := c.GetSelectedIndex()
 	c.scrollbarComponent.SetPosition(visibleIndexMin)
 
 	width := (visibleIndexMax - visibleIndexMin) + 1
@@ -583,31 +516,4 @@ func (c *ListComponent[T]) GetMaxVisibleItems() int {
 
 	dynamicMaxVisibleItems := util.Coerce(float64(height/c.config.MinHeightPerEntry), 1, float64(1000))
 	return int(dynamicMaxVisibleItems)
-}
-
-func (c *ListComponent[T]) insertEntryIntoVisibilityMap(entry *T, maxVisibleItems int) {
-	_, ok := c.entryVisibilityMap[entry]
-	currentlyVisibleEntriesCount := c.getVisibleEntriesCount()
-
-	//  the item is new
-	if !ok {
-		if currentlyVisibleEntriesCount < maxVisibleItems {
-			// we are currently displaying less items than allowed, so we can display it immediately
-			c.entryVisibilityMap[entry] = true
-		} else {
-			// we are currently displaying as many items as allowed, so we hide the new item
-			c.entryVisibilityMap[entry] = false
-		}
-	}
-
-	// we already know about this item
-	if ok {
-		if currentlyVisibleEntriesCount < maxVisibleItems {
-			// we are currently displaying less items than allowed, so we add this item to the visible items
-			c.entryVisibilityMap[entry] = true
-		} else if currentlyVisibleEntriesCount > maxVisibleItems {
-			// we are currently displaying more items than allowed, so we hide this item
-			c.entryVisibilityMap[entry] = false
-		}
-	}
 }
