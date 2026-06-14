@@ -10,6 +10,14 @@ VERSION    ?= 0.4.0
 test:   ## Run all tests
 	@go clean --testcache && go test -v ./...
 
+coverage: ## Run all tests with coverage and show summary
+	@go test -coverprofile=coverage.out ./...
+	@go tool cover -func=coverage.out
+
+coverage-html: ## Run all tests with coverage and open HTML report
+	@go test -coverprofile=coverage.out ./...
+	@go tool cover -html=coverage.out
+
 build:  ## Builds the CLI
 	@go build ${GO_FLAGS} \
 	-ldflags "-w -s \
