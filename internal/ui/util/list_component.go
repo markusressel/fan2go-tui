@@ -30,7 +30,6 @@ type ListComponent[T comparable] struct {
 
 	sortListEntries func(entries []*T, inverted bool) []*T
 
-	//compare      func(a, b *T) bool
 	sortInverted bool
 
 	scrollbarComponent *ScrollbarComponent
