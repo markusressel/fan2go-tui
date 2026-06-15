@@ -1,13 +1,13 @@
 module fan2go-tui
 
-go 1.24.7
+go 1.25.6
 
 require (
 	github.com/asecurityteam/rolling v2.0.4+incompatible
 	github.com/elliotchance/orderedmap/v2 v2.7.0
 	github.com/gdamore/tcell/v2 v2.13.10
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/navidys/tvxwidgets v0.13.0
+	github.com/navidys/tvxwidgets v0.14.0
 	github.com/oklog/run v1.2.0
 	github.com/pterm/pterm v0.12.83
 	github.com/qdm12/reprint v0.0.0-20200326205758-722754a53494
@@ -41,7 +41,7 @@ require (
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/sys v0.41.0 // indirect
-	golang.org/x/term v0.40.0 // indirect
-	golang.org/x/text v0.34.0 // indirect
+	golang.org/x/sys v0.43.0 // indirect
+	golang.org/x/term v0.42.0 // indirect
+	golang.org/x/text v0.36.0 // indirect
 )
