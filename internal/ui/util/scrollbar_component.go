@@ -10,6 +10,15 @@ import (
 
 type ScrollBarOrientation int
 
+type ScrollbarRuneType int
+
+const (
+	ScrollbarRuneTypeLeft ScrollbarRuneType = iota
+	ScrollbarRuneTypeRight
+	ScrollbarRuneTypeTop
+	ScrollbarRuneTypeBottom
+)
+
 const (
 	ScrollBarVertical ScrollBarOrientation = iota
 	ScrollBarHorizontal
@@ -90,7 +99,7 @@ func (c *ScrollbarComponent) createLayout() {
 	c.layout = layout
 }
 
-func (c *ScrollbarComponent) updateLayout() {
+func (c *ScrollbarComponent) UpdateLayout() {
 	c.updateTopEndText()
 	c.updateScrollbar()
 	c.updateBottomEndText()
@@ -106,7 +115,7 @@ func (c *ScrollbarComponent) SetOrientation(orientation ScrollBarOrientation) {
 	case ScrollBarHorizontal:
 		c.layout.SetDirection(tview.FlexColumn)
 	}
-	c.updateLayout()
+	c.UpdateLayout()
 }
 
 func (c *ScrollbarComponent) GetLayout() *tview.Flex {
@@ -131,12 +140,12 @@ func (c *ScrollbarComponent) GetPosition() int {
 
 func (c *ScrollbarComponent) SetMin(min int) {
 	c.min = min
-	c.updateLayout()
+	c.UpdateLayout()
 }
 
 func (c *ScrollbarComponent) SetMax(max int) {
 	c.max = max
-	c.updateLayout()
+	c.UpdateLayout()
 }
 
 func (c *ScrollbarComponent) SetPosition(position int) {
@@ -144,7 +153,7 @@ func (c *ScrollbarComponent) SetPosition(position int) {
 		position = 0
 	}
 	c.scrollPosition = position
-	c.updateLayout()
+	c.UpdateLayout()
 }
 
 func (c *ScrollbarComponent) HasFocus() bool {
@@ -178,7 +187,7 @@ func (c *ScrollbarComponent) scroll(amount int) {
 	newBarWidth := c.calculateBarWidth()
 	c.barWidth = newBarWidth
 
-	c.updateLayout()
+	c.UpdateLayout()
 }
 
 func (c *ScrollbarComponent) ScrollToTop() {
@@ -187,49 +196,47 @@ func (c *ScrollbarComponent) ScrollToTop() {
 
 func (c *ScrollbarComponent) calculateBarWidth() int {
 	// calculate the bar width
+	if c.max <= c.min {
+		return 1
+	}
 	barWidth := int(math.Max(1, float64(c.max/(c.max-c.min))))
 	return barWidth
 }
 
 func (c *ScrollbarComponent) updateTopEndText() {
 	c.layout.ResizeItem(c.topArrow, 1, 0)
-	text := ""
-	textColor := theme.Colors.List.Scrollbar.IndicatorInactive
 	isAtLimit := c.scrollPosition <= c.min
-	switch c.orientation {
-	case ScrollBarVertical:
-		if isAtLimit {
-			text = ScrollIndicatorMiddle
-			textColor = theme.Colors.List.Scrollbar.IndicatorInactive
-		} else {
-			text = ScrollIndicatorTop
-			textColor = theme.Colors.List.Scrollbar.IndicatorActive
-		}
-	case ScrollBarHorizontal:
-		if isAtLimit {
-			text = ScrollIndicatorMiddle
-			textColor = theme.Colors.List.Scrollbar.IndicatorInactive
-		} else {
-			text = ScrollIndicatorLeft
-			textColor = theme.Colors.List.Scrollbar.IndicatorActive
-		}
-	}
+	text, textColor := c.determineRuneAndColor(ScrollbarRuneTypeTop, isAtLimit)
 	c.topArrow.SetText(text)
 	c.topArrow.SetTextColor(textColor)
 }
 
 func (c *ScrollbarComponent) updateBottomEndText() {
 	c.layout.ResizeItem(c.bottomArrow, 1, 0)
-	text := ""
-	textColor := theme.Colors.List.Scrollbar.IndicatorInactive
 	isAtLimit := c.scrollPosition+c.barWidth >= c.max
+	text, textColor := c.determineRuneAndColor(ScrollbarRuneTypeBottom, isAtLimit)
+	c.bottomArrow.SetText(text)
+	c.bottomArrow.SetTextColor(textColor)
+}
+
+func (c *ScrollbarComponent) determineRuneAndColor(
+	scrollbarRuneType ScrollbarRuneType,
+	isAtLimit bool,
+) (text string, textColor tcell.Color) {
 	switch c.orientation {
 	case ScrollBarVertical:
 		if isAtLimit {
 			text = ScrollIndicatorMiddle
 			textColor = theme.Colors.List.Scrollbar.IndicatorInactive
 		} else {
-			text = ScrollIndicatorBottom
+			switch scrollbarRuneType {
+			case ScrollbarRuneTypeBottom:
+				text = ScrollIndicatorBottom
+			case ScrollbarRuneTypeTop:
+				fallthrough
+			default:
+				text = ScrollIndicatorTop
+			}
 			textColor = theme.Colors.List.Scrollbar.IndicatorActive
 		}
 	case ScrollBarHorizontal:
@@ -237,12 +244,18 @@ func (c *ScrollbarComponent) updateBottomEndText() {
 			text = ScrollIndicatorMiddle
 			textColor = theme.Colors.List.Scrollbar.IndicatorInactive
 		} else {
-			text = ScrollIndicatorRight
+			switch scrollbarRuneType {
+			case ScrollbarRuneTypeRight:
+				text = ScrollIndicatorRight
+			case ScrollbarRuneTypeLeft:
+				fallthrough
+			default:
+				text = ScrollIndicatorLeft
+			}
 			textColor = theme.Colors.List.Scrollbar.IndicatorActive
 		}
 	}
-	c.bottomArrow.SetText(text)
-	c.bottomArrow.SetTextColor(textColor)
+	return text, textColor
 }
 
 func (c *ScrollbarComponent) updateScrollbar() {
@@ -295,5 +308,5 @@ func (c *ScrollbarComponent) updateScrollbar() {
 
 func (c *ScrollbarComponent) SetWidth(width int) {
 	c.barWidth = width
-	c.updateLayout()
+	c.UpdateLayout()
 }
