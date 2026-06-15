@@ -249,9 +249,7 @@ func (c *ScrollbarComponent) updateScrollbar() {
 	// calculate the box sizes
 	upperBoxStart := float64(c.min)
 	upperBoxEnd := float64(c.min + c.scrollPosition)
-	scrollBarBoxStart := upperBoxEnd
-	scrollBarBoxEnd := scrollBarBoxStart + float64(c.barWidth)
-	lowerBoxStart := scrollBarBoxEnd
+	scrollBarBoxEnd := upperBoxEnd + float64(c.barWidth)
 	lowerBoxEnd := float64(c.max)
 
 	//x, y, width, height := c.layout.GetInnerRect()
@@ -260,21 +258,38 @@ func (c *ScrollbarComponent) updateScrollbar() {
 	if c.orientation == ScrollBarHorizontal {
 		total = width - 2
 	}
-	scale := float64(total) / (lowerBoxEnd - upperBoxStart)
 
-	upperBoxStart = upperBoxStart
-	upperBoxEnd = upperBoxEnd * scale
-	scrollBarBoxStart = scrollBarBoxStart * scale
-	scrollBarBoxEnd = scrollBarBoxEnd * scale
-	lowerBoxStart = lowerBoxStart * scale
-	lowerBoxEnd = lowerBoxEnd * scale
+	if total <= 0 {
+		return
+	}
+
+	scale := float64(total) / math.Max(1, lowerBoxEnd-upperBoxStart)
+
+	upperBoxEndScaled := (upperBoxEnd - upperBoxStart) * scale
+	scrollBarBoxEndScaled := (scrollBarBoxEnd - upperBoxStart) * scale
+
+	upperBoxSize := int(math.Round(upperBoxEndScaled))
+	scrollBarBoxEndInt := int(math.Round(scrollBarBoxEndScaled))
+
+	scrollBarBoxSize := scrollBarBoxEndInt - upperBoxSize
+	if scrollBarBoxSize < 1 {
+		scrollBarBoxSize = 1
+		if upperBoxSize+scrollBarBoxSize > total {
+			upperBoxSize = total - scrollBarBoxSize
+			if upperBoxSize < 0 {
+				upperBoxSize = 0
+			}
+		}
+	}
+
+	lowerBoxSize := total - (upperBoxSize + scrollBarBoxSize)
+	if lowerBoxSize < 0 {
+		lowerBoxSize = 0
+	}
 
 	// update scrollbar and "padding" boxes
-	upperBoxSize := int(math.Max(0, upperBoxEnd-upperBoxStart))
 	c.layout.ResizeItem(c.upperBox, upperBoxSize, 0)
-	scrollBarBoxSize := int(math.Max(0, scrollBarBoxEnd-scrollBarBoxStart))
 	c.layout.ResizeItem(c.scrollBarBox, scrollBarBoxSize, 0)
-	lowerBoxSize := int(math.Max(0, lowerBoxEnd-lowerBoxStart))
 	c.layout.ResizeItem(c.lowerBox, lowerBoxSize, 0)
 }
 
