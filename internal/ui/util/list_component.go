@@ -33,8 +33,6 @@ type ListComponent[T comparable] struct {
 	sortInverted bool
 
 	scrollbarComponent *ScrollbarComponent
-
-	lastKnownHeight int
 }
 
 type HorizontalScrollable interface {
@@ -74,14 +72,7 @@ func NewListComponent[T comparable](
 
 func (c *ListComponent[T]) createLayout() {
 	layout := tview.NewFlex()
-	layout.SetDrawFunc(func(screen tcell.Screen, x, y, width, height int) (int, int, int, int) {
-		_, _, _, innerHeight := layout.GetInnerRect()
-		if innerHeight > 0 && innerHeight != c.lastKnownHeight {
-			c.lastKnownHeight = innerHeight
-			c.updateLayoutInternal()
-		}
-		return layout.GetInnerRect()
-	})
+	SetupReactiveResize(c.application, layout.Box, c.updateLayoutInternal)
 
 	c.entriesLayout = tview.NewFlex().SetDirection(tview.FlexRow)
 	layout.AddItem(c.entriesLayout, 0, 1, true)
@@ -172,7 +163,7 @@ func (c *ListComponent[T]) updateLayout() {
 
 func (c *ListComponent[T]) updateLayoutInternal() {
 	c.updateVisibleEntries()
-	c.updateScrollBarInternal()
+	c.updateScrollBar()
 }
 
 func (c *ListComponent[T]) GetLayout() *tview.Flex {
@@ -186,7 +177,10 @@ func (c *ListComponent[T]) SetTitle(title string) {
 func (c *ListComponent[T]) GetData() []*T {
 	c.entriesMutex.Lock()
 	defer c.entriesMutex.Unlock()
-	return c.sortListEntries(c.entries, c.sortInverted)
+	sortedEntries := c.sortListEntries(c.entries, c.sortInverted)
+	dataCopy := make([]*T, len(sortedEntries))
+	copy(dataCopy, sortedEntries)
+	return dataCopy
 }
 
 func (c *ListComponent[T]) SetData(entries []*T) {
@@ -476,11 +470,6 @@ func (c *ListComponent[T]) SelectFirst() {
 }
 
 func (c *ListComponent[T]) updateScrollBar() {
-	c.updateScrollBarInternal()
-	c.scrollbarComponent.UpdateLayout()
-}
-
-func (c *ListComponent[T]) updateScrollBarInternal() {
 	if len(c.entries) <= c.GetMaxVisibleItems() {
 		c.hideScrollbar()
 	} else {
@@ -488,15 +477,15 @@ func (c *ListComponent[T]) updateScrollBarInternal() {
 	}
 
 	minScrollIndex := 0
-	c.scrollbarComponent.SetMinInternal(minScrollIndex)
+	c.scrollbarComponent.SetMin(minScrollIndex)
 	maxScrollIndex := int(math.Max(0.0, float64(len(c.entries))))
-	c.scrollbarComponent.SetMaxInternal(maxScrollIndex)
+	c.scrollbarComponent.SetMax(maxScrollIndex)
 	visibleIndexMin, visibleIndexMax := c.GetVisibleRange()
 
-	c.scrollbarComponent.SetPositionInternal(visibleIndexMin)
+	c.scrollbarComponent.SetPosition(visibleIndexMin)
 
 	width := (visibleIndexMax - visibleIndexMin) + 1
-	c.scrollbarComponent.SetWidthInternal(width)
+	c.scrollbarComponent.SetWidth(width)
 }
 
 func (c *ListComponent[T]) GetSelectedIndex() int {
