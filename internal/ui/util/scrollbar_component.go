@@ -47,6 +47,9 @@ type ScrollbarComponent struct {
 	barWidth       int
 	min            int
 	max            int
+
+	lastKnownWidth  int
+	lastKnownHeight int
 }
 
 // NewScrollbarComponent creates a new ScrollbarComponent.
@@ -81,6 +84,14 @@ func NewScrollbarComponent(
 
 func (c *ScrollbarComponent) createLayout() {
 	layout := tview.NewFlex()
+	layout.SetDrawFunc(func(screen tcell.Screen, x, y, width, height int) (int, int, int, int) {
+		if width != c.lastKnownWidth || height != c.lastKnownHeight {
+			c.lastKnownWidth = width
+			c.lastKnownHeight = height
+			c.updateLayoutInternal()
+		}
+		return layout.GetInnerRect()
+	})
 
 	c.topArrow = tview.NewTextView()
 	layout.AddItem(c.topArrow, 1, 0, false)
@@ -100,11 +111,15 @@ func (c *ScrollbarComponent) createLayout() {
 }
 
 func (c *ScrollbarComponent) UpdateLayout() {
+	c.updateLayoutInternal()
+
+	c.application.ForceDraw()
+}
+
+func (c *ScrollbarComponent) updateLayoutInternal() {
 	c.updateTopEndText()
 	c.updateScrollbar()
 	c.updateBottomEndText()
-
-	c.application.ForceDraw()
 }
 
 func (c *ScrollbarComponent) SetOrientation(orientation ScrollBarOrientation) {
@@ -143,9 +158,19 @@ func (c *ScrollbarComponent) SetMin(min int) {
 	c.UpdateLayout()
 }
 
+func (c *ScrollbarComponent) SetMinInternal(min int) {
+	c.min = min
+	c.updateLayoutInternal()
+}
+
 func (c *ScrollbarComponent) SetMax(max int) {
 	c.max = max
 	c.UpdateLayout()
+}
+
+func (c *ScrollbarComponent) SetMaxInternal(max int) {
+	c.max = max
+	c.updateLayoutInternal()
 }
 
 func (c *ScrollbarComponent) SetPosition(position int) {
@@ -154,6 +179,14 @@ func (c *ScrollbarComponent) SetPosition(position int) {
 	}
 	c.scrollPosition = position
 	c.UpdateLayout()
+}
+
+func (c *ScrollbarComponent) SetPositionInternal(position int) {
+	if position < 0 {
+		position = 0
+	}
+	c.scrollPosition = position
+	c.updateLayoutInternal()
 }
 
 func (c *ScrollbarComponent) HasFocus() bool {
@@ -309,4 +342,9 @@ func (c *ScrollbarComponent) updateScrollbar() {
 func (c *ScrollbarComponent) SetWidth(width int) {
 	c.barWidth = width
 	c.UpdateLayout()
+}
+
+func (c *ScrollbarComponent) SetWidthInternal(width int) {
+	c.barWidth = width
+	c.updateLayoutInternal()
 }
