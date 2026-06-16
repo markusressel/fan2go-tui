@@ -33,6 +33,8 @@ type ListComponent[T comparable] struct {
 	sortInverted bool
 
 	scrollbarComponent *ScrollbarComponent
+
+	lastKnownHeight int
 }
 
 type HorizontalScrollable interface {
@@ -72,6 +74,14 @@ func NewListComponent[T comparable](
 
 func (c *ListComponent[T]) createLayout() {
 	layout := tview.NewFlex()
+	layout.SetDrawFunc(func(screen tcell.Screen, x, y, width, height int) (int, int, int, int) {
+		_, _, _, innerHeight := layout.GetInnerRect()
+		if innerHeight > 0 && innerHeight != c.lastKnownHeight {
+			c.lastKnownHeight = innerHeight
+			c.updateLayoutInternal()
+		}
+		return layout.GetInnerRect()
+	})
 
 	c.entriesLayout = tview.NewFlex().SetDirection(tview.FlexRow)
 	layout.AddItem(c.entriesLayout, 0, 1, true)
@@ -156,9 +166,13 @@ func (c *ListComponent[T]) SetDirection(direction int) {
 }
 
 func (c *ListComponent[T]) updateLayout() {
-	c.updateVisibleEntries()
-	c.updateScrollBar()
+	c.updateLayoutInternal()
 	c.application.ForceDraw()
+}
+
+func (c *ListComponent[T]) updateLayoutInternal() {
+	c.updateVisibleEntries()
+	c.updateScrollBarInternal()
 }
 
 func (c *ListComponent[T]) GetLayout() *tview.Flex {
@@ -170,6 +184,8 @@ func (c *ListComponent[T]) SetTitle(title string) {
 }
 
 func (c *ListComponent[T]) GetData() []*T {
+	c.entriesMutex.Lock()
+	defer c.entriesMutex.Unlock()
 	return c.sortListEntries(c.entries, c.sortInverted)
 }
 
@@ -187,7 +203,6 @@ func (c *ListComponent[T]) SetData(entries []*T) {
 	c.updateLayout()
 
 	if len(entries) == 0 {
-		c.application.ForceDraw()
 		return
 	}
 
@@ -218,10 +233,14 @@ func (c *ListComponent[abc]) HasFocus() bool {
 }
 
 func (c *ListComponent[T]) GetEntries() []*T {
+	c.entriesMutex.Lock()
+	defer c.entriesMutex.Unlock()
 	return c.entries
 }
 
 func (c *ListComponent[T]) IsEmpty() bool {
+	c.entriesMutex.Lock()
+	defer c.entriesMutex.Unlock()
 	return len(c.entries) <= 0
 }
 
@@ -457,6 +476,11 @@ func (c *ListComponent[T]) SelectFirst() {
 }
 
 func (c *ListComponent[T]) updateScrollBar() {
+	c.updateScrollBarInternal()
+	c.scrollbarComponent.UpdateLayout()
+}
+
+func (c *ListComponent[T]) updateScrollBarInternal() {
 	if len(c.entries) <= c.GetMaxVisibleItems() {
 		c.hideScrollbar()
 	} else {
@@ -464,15 +488,15 @@ func (c *ListComponent[T]) updateScrollBar() {
 	}
 
 	minScrollIndex := 0
-	c.scrollbarComponent.SetMin(minScrollIndex)
+	c.scrollbarComponent.SetMinInternal(minScrollIndex)
 	maxScrollIndex := int(math.Max(0.0, float64(len(c.entries))))
-	c.scrollbarComponent.SetMax(maxScrollIndex)
+	c.scrollbarComponent.SetMaxInternal(maxScrollIndex)
 	visibleIndexMin, visibleIndexMax := c.GetVisibleRange()
 
-	c.scrollbarComponent.SetPosition(visibleIndexMin)
+	c.scrollbarComponent.SetPositionInternal(visibleIndexMin)
 
 	width := (visibleIndexMax - visibleIndexMin) + 1
-	c.scrollbarComponent.SetWidth(width)
+	c.scrollbarComponent.SetWidthInternal(width)
 }
 
 func (c *ListComponent[T]) GetSelectedIndex() int {
@@ -505,7 +529,7 @@ func (c *ListComponent[T]) GetMaxVisibleItems() int {
 		return 1
 	}
 
-	_, _, width, height := c.entriesLayout.GetRect()
+	_, _, width, height := c.layout.GetInnerRect()
 	// During startup, primitives may report a placeholder 1x1 rect before real layout is applied.
 	if height <= 1 || width <= 1 || (len(c.entryVisibilityMap) == 0 && height < c.config.MinHeightPerEntry) {
 		if len(c.entries) > 0 {
