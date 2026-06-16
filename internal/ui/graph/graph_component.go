@@ -3,7 +3,6 @@ package graph
 import (
 	"fan2go-tui/internal/ui/theme"
 	uiutil "fan2go-tui/internal/ui/util"
-	coreutil "fan2go-tui/internal/util"
 	"math"
 
 	"github.com/gdamore/tcell/v2"
@@ -22,6 +21,10 @@ type GraphComponent struct {
 
 	yMinValue *float64
 	yMaxValue *float64
+
+	zoomMinX       *float64
+	zoomMaxX       *float64
+	lastKnownWidth int
 
 	layout          *tview.Flex
 	plotLayout      *OverlayPlot
@@ -114,6 +117,15 @@ func (c *GraphComponent) createLayout() *tview.Flex {
 
 	plotLayout.SetYAxisLabelDataType(c.config.YAxisLabelDataType)
 
+	plotLayout.SetDrawFunc(func(screen tcell.Screen, x, y, width, height int) (int, int, int, int) {
+		_, _, innerWidth, _ := plotLayout.GetInnerRect()
+		if innerWidth > 0 && innerWidth != c.lastKnownWidth {
+			c.lastKnownWidth = innerWidth
+			c.Refresh()
+		}
+		return plotLayout.GetInnerRect()
+	})
+
 	layout.AddItem(plotLayout, 0, 1, false)
 	_, _, width, _ := plotLayout.GetRect()
 	c.setValueBufferSize(width * 4)
@@ -158,6 +170,7 @@ func (c *GraphComponent) Refresh() {
 	}
 
 	c.UpdateValueBufferSize()
+	c.applyZoom()
 
 	c.updateViewPort()
 	combinedData := c.computePlotSeriesData()
@@ -397,6 +410,19 @@ func (c *GraphComponent) computePlotSeriesData() [][]float64 {
 }
 
 func (c *GraphComponent) ZoomToRangeX(minX, maxX float64) {
+	c.zoomMinX = &minX
+	c.zoomMaxX = &maxX
+	c.applyZoom()
+}
+
+func (c *GraphComponent) applyZoom() {
+	if c.zoomMinX == nil || c.zoomMaxX == nil {
+		return
+	}
+
+	minX := *c.zoomMinX
+	maxX := *c.zoomMaxX
+
 	span := maxX - minX
 	if span <= 0 {
 		return
@@ -440,7 +466,8 @@ func (c *GraphComponent) UpdateValueBufferSize() {
 }
 
 func (c *GraphComponent) isVisible() bool {
-	return coreutil.IsTxViewVisible(c.layout.Box)
+	_, _, width, height := c.layout.GetRect()
+	return width > 0 && height > 0
 }
 
 func (c *GraphComponent) setValueBufferSize(i int) {

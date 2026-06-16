@@ -83,6 +83,7 @@ func NewFanRpmCurveComponent(application *tview.Application, fan *client.Fan) *F
 
 	graphComponent.AddSeries(rpmGraphLine, graph.WithLegend(graph.NewGraphSeriesLegend("RPM / PWM")))
 	graphComponent.SetXRange(fanRpmCurveMinX, fanRpmCurveMaxX)
+	graphComponent.ZoomToRangeX(fanRpmCurveMinX, fanRpmCurveMaxX)
 	c.graphComponent = graphComponent
 
 	c.layout = c.createLayout()
@@ -132,9 +133,6 @@ func (c *FanRpmCurveComponent) refresh() {
 	}
 	c.appendHistory(float64(fan.Pwm), float64(fan.Rpm))
 
-	// First refresh updates buffer/layout, second uses fixed x-range zoom for final draw.
-	c.graphComponent.Refresh()
-	c.graphComponent.ZoomToRangeX(fanRpmCurveMinX, fanRpmCurveMaxX)
 	c.graphComponent.Refresh()
 }
 
