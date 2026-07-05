@@ -2,6 +2,7 @@ package fan
 
 import (
 	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/state"
 	"math"
 	"testing"
 
@@ -52,7 +53,7 @@ func TestFanListItemComponentSwitchesFromHistoryToCurve(t *testing.T) {
 	app := tview.NewApplication()
 
 	historyFan := &client.Fan{Config: client.FanConfig{ID: "fan-1"}, Pwm: 30, Rpm: 1200}
-	c := NewFanListItemComponent(app, historyFan, nil)
+	c := NewFanListItemComponent(app, &state.FanState{Fan: historyFan}, nil)
 
 	if c.fanGraphComponent == nil || c.fanRpmCurveComponent != nil {
 		t.Fatalf("expected history variant on initialization")
@@ -60,7 +61,7 @@ func TestFanListItemComponentSwitchesFromHistoryToCurve(t *testing.T) {
 
 	curveData := map[int]float64{30: 1200}
 	curveFan := &client.Fan{Config: client.FanConfig{ID: "fan-1"}, Pwm: 30, Rpm: 1200, FanCurveData: &curveData}
-	c.SetFan(curveFan)
+	c.SetFan(&state.FanState{Fan: curveFan})
 
 	if c.fanGraphComponent != nil || c.fanRpmCurveComponent == nil {
 		t.Fatalf("expected curve variant after curve data appears")
@@ -72,14 +73,14 @@ func TestFanListItemComponentSwitchesFromCurveToHistory(t *testing.T) {
 
 	curveData := map[int]float64{20: 900}
 	curveFan := &client.Fan{Config: client.FanConfig{ID: "fan-1"}, Pwm: 20, Rpm: 900, FanCurveData: &curveData}
-	c := NewFanListItemComponent(app, curveFan, nil)
+	c := NewFanListItemComponent(app, &state.FanState{Fan: curveFan}, nil)
 
 	if c.fanGraphComponent != nil || c.fanRpmCurveComponent == nil {
 		t.Fatalf("expected curve variant on initialization")
 	}
 
 	historyFan := &client.Fan{Config: client.FanConfig{ID: "fan-1"}, Pwm: 15, Rpm: 800}
-	c.SetFan(historyFan)
+	c.SetFan(&state.FanState{Fan: historyFan})
 
 	if c.fanGraphComponent == nil || c.fanRpmCurveComponent != nil {
 		t.Fatalf("expected history variant after curve data disappears")
@@ -91,7 +92,7 @@ func TestFanListItemComponentUpdatesCurveSeriesWithoutRebuild(t *testing.T) {
 
 	curveDataA := map[int]float64{10: 1000}
 	fanA := &client.Fan{Config: client.FanConfig{ID: "fan-1"}, Pwm: 10, Rpm: 1000, FanCurveData: &curveDataA}
-	c := NewFanListItemComponent(app, fanA, nil)
+	c := NewFanListItemComponent(app, &state.FanState{Fan: fanA}, nil)
 
 	curveComponent := c.fanRpmCurveComponent
 	if curveComponent == nil {
@@ -100,7 +101,7 @@ func TestFanListItemComponentUpdatesCurveSeriesWithoutRebuild(t *testing.T) {
 
 	curveDataB := map[int]float64{20: 2000, 30: 3000}
 	fanB := &client.Fan{Config: client.FanConfig{ID: "fan-1"}, Pwm: 20, Rpm: 2000, FanCurveData: &curveDataB}
-	c.SetFan(fanB)
+	c.SetFan(&state.FanState{Fan: fanB})
 
 	if c.fanRpmCurveComponent != curveComponent {
 		t.Fatalf("expected existing curve component to be reused")
