@@ -50,8 +50,9 @@ func colorAtY(y float64, stops []GraphBarGradientStop, fallback tcell.Color) tce
 // OverlayPlot extends tvxwidgets.Plot with lightweight overlay rendering.
 type OverlayPlot struct {
 	*tvxwidgets.Plot
-	overlays   []GraphComponentOverlay
-	overlayCtx OverlayRenderContext
+	overlays       []GraphComponentOverlay
+	overlayCtx     OverlayRenderContext
+	onLayoutChange func()
 }
 
 type brailleLineCell struct {
@@ -85,9 +86,32 @@ func (p *OverlayPlot) SetOverlayContext(ctx OverlayRenderContext) {
 	p.overlayCtx = ctx
 }
 
+func (p *OverlayPlot) SetOnLayoutChange(f func()) {
+	p.onLayoutChange = f
+}
+
 func (p *OverlayPlot) Draw(screen tcell.Screen) {
 	p.Plot.Draw(screen)
+
+	_, _, width, height := p.Plot.GetPlotRect()
+	if width <= 0 || height <= 0 {
+		return
+	}
+
 	ctx := p.overlayCtx
+
+	// If the data context was computed for a different width,
+	// update synchronously and redraw to avoid any visual glitches.
+	if ctx.ValueBufferSize > 0 && ctx.ValueBufferSize != width {
+		if p.onLayoutChange != nil {
+			p.onLayoutChange()
+			ctx = p.overlayCtx
+			p.Plot.Draw(screen) // Redraw axes with the correct data context
+		} else {
+			return
+		}
+	}
+
 	ctx.Plot = p.Plot
 	ctx.Background = p.GetBackgroundColor()
 	p.drawBars(screen, ctx)

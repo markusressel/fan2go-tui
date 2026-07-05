@@ -70,6 +70,7 @@ func (c *GraphTestPage) createLayout() *tview.Flex {
 
 	graphComponent.SetYRange(-100, 200)
 	graphComponent.SetXRange(0, 100)
+	graphComponent.ZoomToRangeX(0, 100)
 
 	graphTestPageLayout.AddItem(c.graphComponent.GetLayout(), 0, 1, true)
 
@@ -111,6 +112,5 @@ func (c *GraphTestPage) GetLayout() *tview.Flex {
 
 func (c *GraphTestPage) Refresh() error {
 	c.graphComponent.Refresh()
-	c.graphComponent.ZoomToRangeX(0, 100)
 	return nil
 }

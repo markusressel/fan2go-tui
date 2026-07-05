@@ -19,12 +19,6 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v7
 
-      - name: Set safe directory for git
-        run: |
-          git config --system --add safe.directory '*'
-          git config --global --add safe.directory '*'
-          git config --global --add safe.directory '/__w/fan2go-tui/fan2go-tui'
-
       - uses: actions/setup-go@v6
         with:
           go-version: '^1.23'
@@ -55,7 +49,7 @@ jobs:
           - goarch: ppc64le
             runner: ubuntu-24.04
             native: false
-            just_target: build-cross
+            just_target: build
             cc: powerpc64le-linux-gnu-gcc
             dpkg_arch: ppc64el
             cross_pkg: crossbuild-essential-ppc64el
@@ -63,7 +57,7 @@ jobs:
           - goarch: s390x
             runner: ubuntu-24.04
             native: false
-            just_target: build-cross
+            just_target: build
             cc: s390x-linux-gnu-gcc
             dpkg_arch: s390x
             cross_pkg: crossbuild-essential-s390x
@@ -71,7 +65,7 @@ jobs:
           - goarch: riscv64
             runner: ubuntu-24.04
             native: false
-            just_target: build-cross
+            just_target: build
             cc: riscv64-linux-gnu-gcc
             dpkg_arch: riscv64
             cross_pkg: crossbuild-essential-riscv64
@@ -105,13 +99,17 @@ jobs:
       - uses: extractions/setup-just@v4
 
       - name: Generate build files (${{ matrix.goarch }})
-        env:
-          CC: ${{ matrix.cc }}
-          GOOS: linux
-          GOARCH: ${{ matrix.goarch }}
         run: |
           OUTPUT_BIN="dist/fan2go-tui-linux-${{ matrix.goarch }}"
-          just OUTPUT_BIN="${OUTPUT_BIN}" ${{ matrix.just_target }}
+          
+          # Pass cross-compilation variables explicitly as arguments to just
+          just \
+            GOOS="linux" \
+            GOARCH="${{ matrix.goarch }}" \
+            CC="${{ matrix.cc }}" \
+            OUTPUT_BIN="${OUTPUT_BIN}" \
+            ${{ matrix.just_target }}
+          
           file "${OUTPUT_BIN}"
 
       - name: Upload artifacts

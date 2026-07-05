@@ -81,6 +81,7 @@ func NewScrollbarComponent(
 
 func (c *ScrollbarComponent) createLayout() {
 	layout := tview.NewFlex()
+	SetupReactiveResize(c.application, layout.Box, c.UpdateLayout)
 
 	c.topArrow = tview.NewTextView()
 	layout.AddItem(c.topArrow, 1, 0, false)

@@ -72,6 +72,7 @@ func NewListComponent[T comparable](
 
 func (c *ListComponent[T]) createLayout() {
 	layout := tview.NewFlex()
+	SetupReactiveResize(c.application, layout.Box, c.updateLayoutInternal)
 
 	c.entriesLayout = tview.NewFlex().SetDirection(tview.FlexRow)
 	layout.AddItem(c.entriesLayout, 0, 1, true)
@@ -156,9 +157,13 @@ func (c *ListComponent[T]) SetDirection(direction int) {
 }
 
 func (c *ListComponent[T]) updateLayout() {
+	c.updateLayoutInternal()
+	c.application.ForceDraw()
+}
+
+func (c *ListComponent[T]) updateLayoutInternal() {
 	c.updateVisibleEntries()
 	c.updateScrollBar()
-	c.application.ForceDraw()
 }
 
 func (c *ListComponent[T]) GetLayout() *tview.Flex {
@@ -170,7 +175,12 @@ func (c *ListComponent[T]) SetTitle(title string) {
 }
 
 func (c *ListComponent[T]) GetData() []*T {
-	return c.sortListEntries(c.entries, c.sortInverted)
+	c.entriesMutex.Lock()
+	defer c.entriesMutex.Unlock()
+	sortedEntries := c.sortListEntries(c.entries, c.sortInverted)
+	dataCopy := make([]*T, len(sortedEntries))
+	copy(dataCopy, sortedEntries)
+	return dataCopy
 }
 
 func (c *ListComponent[T]) SetData(entries []*T) {
@@ -187,7 +197,6 @@ func (c *ListComponent[T]) SetData(entries []*T) {
 	c.updateLayout()
 
 	if len(entries) == 0 {
-		c.application.ForceDraw()
 		return
 	}
 
@@ -218,10 +227,14 @@ func (c *ListComponent[abc]) HasFocus() bool {
 }
 
 func (c *ListComponent[T]) GetEntries() []*T {
+	c.entriesMutex.Lock()
+	defer c.entriesMutex.Unlock()
 	return c.entries
 }
 
 func (c *ListComponent[T]) IsEmpty() bool {
+	c.entriesMutex.Lock()
+	defer c.entriesMutex.Unlock()
 	return len(c.entries) <= 0
 }
 
@@ -505,7 +518,7 @@ func (c *ListComponent[T]) GetMaxVisibleItems() int {
 		return 1
 	}
 
-	_, _, width, height := c.entriesLayout.GetRect()
+	_, _, width, height := c.layout.GetInnerRect()
 	// During startup, primitives may report a placeholder 1x1 rect before real layout is applied.
 	if height <= 1 || width <= 1 || (len(c.entryVisibilityMap) == 0 && height < c.config.MinHeightPerEntry) {
 		if len(c.entries) > 0 {

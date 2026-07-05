@@ -3,7 +3,6 @@ package graph
 import (
 	"fan2go-tui/internal/ui/theme"
 	uiutil "fan2go-tui/internal/ui/util"
-	coreutil "fan2go-tui/internal/util"
 	"math"
 
 	"github.com/gdamore/tcell/v2"
@@ -22,6 +21,9 @@ type GraphComponent struct {
 
 	yMinValue *float64
 	yMaxValue *float64
+
+	zoomMinX float64
+	zoomMaxX float64
 
 	layout          *tview.Flex
 	plotLayout      *OverlayPlot
@@ -75,6 +77,8 @@ func NewGraphComponent(
 	c := &GraphComponent{
 		application: application,
 		config:      config,
+		zoomMinX:    math.NaN(),
+		zoomMaxX:    math.NaN(),
 	}
 
 	c.layout = c.createLayout()
@@ -89,6 +93,7 @@ func (c *GraphComponent) createLayout() *tview.Flex {
 
 	plotLayout := NewOverlayPlot()
 	c.plotLayout = plotLayout
+	plotLayout.SetOnLayoutChange(c.Refresh)
 	if len(c.config.Overlays) > 0 {
 		plotLayout.SetOverlays(c.config.Overlays)
 	}
@@ -158,6 +163,7 @@ func (c *GraphComponent) Refresh() {
 	}
 
 	c.UpdateValueBufferSize()
+	c.applyZoom()
 
 	c.updateViewPort()
 	combinedData := c.computePlotSeriesData()
@@ -397,13 +403,31 @@ func (c *GraphComponent) computePlotSeriesData() [][]float64 {
 }
 
 func (c *GraphComponent) ZoomToRangeX(minX, maxX float64) {
+	c.zoomMinX = minX
+	c.zoomMaxX = maxX
+	c.applyZoom()
+}
+
+func (c *GraphComponent) applyZoom() {
+	if math.IsNaN(c.zoomMinX) || math.IsNaN(c.zoomMaxX) {
+		return
+	}
+
+	minX := c.zoomMinX
+	maxX := c.zoomMaxX
+
 	span := maxX - minX
 	if span <= 0 {
 		return
 	}
 
-	_, _, width, _ := c.plotLayout.GetInnerRect()
-	availableSlots := width - 10
+	_, _, width, _ := c.plotLayout.GetPlotRect()
+	availableSlots := width
+	if availableSlots <= 0 {
+		_, _, innerWidth, _ := c.plotLayout.GetInnerRect()
+		availableSlots = innerWidth - 10
+	}
+
 	if availableSlots <= 0 {
 		return
 	}
@@ -432,7 +456,11 @@ func (c *GraphComponent) UpdateValueBufferSize() {
 		return
 	}
 
-	_, _, width, _ := c.plotLayout.GetInnerRect()
+	_, _, width, _ := c.plotLayout.GetPlotRect()
+	if width <= 0 {
+		_, _, innerWidth, _ := c.plotLayout.GetInnerRect()
+		width = innerWidth - 10
+	}
 	if width <= 0 {
 		return
 	}
@@ -440,7 +468,8 @@ func (c *GraphComponent) UpdateValueBufferSize() {
 }
 
 func (c *GraphComponent) isVisible() bool {
-	return coreutil.IsTxViewVisible(c.layout.Box)
+	_, _, width, height := c.layout.GetRect()
+	return width > 0 && height > 0
 }
 
 func (c *GraphComponent) setValueBufferSize(i int) {
