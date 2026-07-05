@@ -1,8 +1,14 @@
+# Explicitly define variables so they accept command-line/matrix overrides
+GOOS := "linux"
+GOARCH := "amd64"
+CC := "gcc"
+CGO_ENABLED := "1"
+
 GO_FLAGS := ""
 NAME := "fan2go-tui"
 OUTPUT_BIN := "bin/" + NAME
 PACKAGE := "github.com/markusressel/" + NAME
-GIT_REV := `git rev-parse --short HEAD`
+GIT_REV := `git rev-parse --short HEAD 2>/dev/null || echo "unknown"`
 DATE := `date -u +"%Y-%m-%dT%H:%M:%SZ"`
 VERSION := "0.4.0"
 
@@ -21,9 +27,11 @@ coverage-html:
     go test -coverprofile=coverage.out ./...
     go tool cover -html=coverage.out
 
-# Builds the CLI
+# Builds the CLI with explicit architecture/compiler environment variables
 build:
-    @go build {{GO_FLAGS}} \
+    @mkdir -p $(dirname {{OUTPUT_BIN}})
+    CGO_ENABLED={{CGO_ENABLED}} GOOS={{GOOS}} GOARCH={{GOARCH}} CC={{CC}} \
+    go build {{GO_FLAGS}} \
         -ldflags "-w -s \
         -X {{NAME}}/cmd/global.Version={{VERSION}} \
         -X {{PACKAGE}}/cmd/global.Version={{VERSION}} \
@@ -33,16 +41,13 @@ build:
         -X {{PACKAGE}}/cmd/global.Date={{DATE}}" \
         -a -tags netgo -o {{OUTPUT_BIN}} main.go
 
-# Builds the CLI for cross-compilation (ensures CGO is enabled)
-build-cross:
-    CGO_ENABLED=1 just build
-
 # Build and run the CLI
 run: build
     ./{{OUTPUT_BIN}}
 
 # Deploy to custom bin directory
 deploy-custom: clean build
+    mkdir -p ~/.custom/bin/
     cp ./{{OUTPUT_BIN}} ~/.custom/bin/
 
 # Deploy to /usr/local/bin
