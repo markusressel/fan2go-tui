@@ -1,7 +1,7 @@
 package ui
 
 import (
-	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/state"
 	"fan2go-tui/internal/ui/curve"
 	"fan2go-tui/internal/ui/fan"
 	"fan2go-tui/internal/ui/sensor"
@@ -28,7 +28,7 @@ const (
 type MainPage struct {
 	application *tview.Application
 
-	client client.Fan2goApiClient
+	store *state.Store
 
 	layout      *tview.Flex
 	header      *ApplicationHeaderComponent
@@ -41,11 +41,11 @@ type MainPage struct {
 	pagesMap orderedmap.OrderedMap[Page, util.PagesPage]
 }
 
-func NewMainPage(application *tview.Application, client client.Fan2goApiClient) *MainPage {
+func NewMainPage(application *tview.Application, store *state.Store) *MainPage {
 
 	mainPage := &MainPage{
 		application: application,
-		client:      client,
+		store:       store,
 		page:        FansPage,
 		pagesMap:    *orderedmap.NewOrderedMap[Page, util.PagesPage](),
 	}
@@ -83,9 +83,9 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 	mainPage.mainPagePagerLayout = mainPagePagerLayout
 
 	//graphTestPage := graph_test.NewGraphTestPage(mainPage.application)
-	fansPage := fan.NewFansPage(mainPage.application, mainPage.client, mainPage.OpenCurveByID)
-	curvesPage := curve.NewCurvesPage(mainPage.application, mainPage.client, mainPage.OpenSensorByID, mainPage.OpenCurveByID)
-	sensorsPage := sensor.NewSensorsPage(mainPage.application, mainPage.client)
+	fansPage := fan.NewFansPage(mainPage.application, mainPage.store, mainPage.OpenCurveByID)
+	curvesPage := curve.NewCurvesPage(mainPage.application, mainPage.store, mainPage.OpenSensorByID, mainPage.OpenCurveByID)
+	sensorsPage := sensor.NewSensorsPage(mainPage.application, mainPage.store)
 
 	//mainPage.AddPage(GraphTestPage, &graphTestPage, true)
 	mainPage.AddPage(FansPage, &fansPage)

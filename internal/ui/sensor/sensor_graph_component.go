@@ -2,6 +2,7 @@ package sensor
 
 import (
 	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/state"
 	"fan2go-tui/internal/ui/graph"
 	"fan2go-tui/internal/ui/theme"
 
@@ -12,7 +13,7 @@ import (
 type SensorGraphComponent struct {
 	application *tview.Application
 
-	Sensor *client.Sensor
+	SensorState *state.SensorState
 
 	layout         *tview.Flex
 	graphComponent *graph.GraphComponent
@@ -20,11 +21,11 @@ type SensorGraphComponent struct {
 	values         *[]float64
 }
 
-func NewSensorGraphComponent(application *tview.Application, sensor *client.Sensor) *SensorGraphComponent {
+func NewSensorGraphComponent(application *tview.Application, sensorState *state.SensorState) *SensorGraphComponent {
 	values := &[]float64{}
 	c := &SensorGraphComponent{
 		application: application,
-		Sensor:      sensor,
+		SensorState: sensorState,
 		values:      values,
 	}
 
@@ -81,25 +82,26 @@ func (c *SensorGraphComponent) createLayout() *tview.Flex {
 }
 
 func (c *SensorGraphComponent) getSensor() *client.Sensor {
-	if c == nil {
+	if c == nil || c.SensorState == nil {
 		return nil
 	}
-	return c.Sensor
+	return c.SensorState.Sensor
 }
 
 func (c *SensorGraphComponent) refresh() {
-	sensor := c.Sensor
-	if sensor == nil {
+	if c.SensorState == nil || c.SensorState.Sensor == nil {
 		return
 	}
 	component := c.graphComponent
-	value := sensor.MovingAvg / 1000
-	*c.values = append(*c.values, value)
-
 	bufferSize := component.GetValueBufferSize()
-	if len(*c.values) > bufferSize {
-		trimmed := (*c.values)[len(*c.values)-bufferSize:]
-		*c.values = trimmed
+
+	if bufferSize > 0 {
+		history := c.SensorState.Values
+		if len(history) > bufferSize {
+			*c.values = append([]float64(nil), history[len(history)-bufferSize:]...)
+		} else {
+			*c.values = append([]float64(nil), history...)
+		}
 	}
 
 	component.Refresh()
@@ -109,8 +111,8 @@ func (c *SensorGraphComponent) GetLayout() *tview.Flex {
 	return c.layout
 }
 
-func (c *SensorGraphComponent) SetSensor(sensor *client.Sensor) {
-	c.Sensor = sensor
+func (c *SensorGraphComponent) SetSensor(sensorState *state.SensorState) {
+	c.SensorState = sensorState
 	c.refresh()
 }
 

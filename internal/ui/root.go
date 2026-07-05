@@ -3,7 +3,9 @@ package ui
 import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/configuration"
+	"fan2go-tui/internal/state"
 	"fan2go-tui/internal/ui/dialog"
+	"fan2go-tui/internal/ui/status_message"
 	"fan2go-tui/internal/ui/util"
 	"time"
 
@@ -32,7 +34,21 @@ func CreateUi(fullscreen bool) *tview.Application {
 	port := configuration.CurrentConfig.Api.Port
 	apiClient := client.NewApiClient(baseUrl, port)
 
-	mainPage := NewMainPage(application, apiClient)
+	store := state.NewStore()
+
+	mainPage := NewMainPage(application, store)
+
+	poller := state.NewPoller(apiClient, store, func(err error) {
+		application.QueueUpdateDraw(func() {
+			if err != nil {
+				mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
+			} else {
+				mainPage.clearStatusMessage()
+			}
+			mainPage.Refresh()
+		})
+	})
+
 	helpPage := dialog.NewHelpPage()
 
 	pagesLayout := tview.NewPages().
@@ -84,11 +100,11 @@ func CreateUi(fullscreen bool) *tview.Application {
 	}()
 
 	go func() {
+		// Initial fetch
+		poller.FetchAndUpdate()
 		for {
 			<-UpdateTicker.C
-			application.QueueUpdateDraw(func() {
-				mainPage.Refresh()
-			})
+			poller.FetchAndUpdate()
 		}
 	}()
 

@@ -2,6 +2,7 @@ package fan
 
 import (
 	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/state"
 	"fan2go-tui/internal/ui/shortcut_helper"
 	"fan2go-tui/internal/ui/util"
 	"sort"
@@ -15,7 +16,7 @@ import (
 type FansPage struct {
 	application *tview.Application
 
-	client client.Fan2goApiClient
+	store *state.Store
 
 	layout *tview.Flex
 
@@ -25,11 +26,11 @@ type FansPage struct {
 	onOpenCurve           func(curveID string)
 }
 
-func NewFansPage(application *tview.Application, c client.Fan2goApiClient, onOpenCurve func(curveID string)) FansPage {
+func NewFansPage(application *tview.Application, store *state.Store, onOpenCurve func(curveID string)) FansPage {
 
 	fansPage := FansPage{
 		application:           application,
-		client:                c,
+		store:                 store,
 		fanListItemComponents: map[string]*FanListItemComponent{},
 		onOpenCurve:           onOpenCurve,
 	}
@@ -56,8 +57,8 @@ func (c *FansPage) createLayout() *tview.Flex {
 		//},
 		func(entries []*FanListItemComponent, inverted bool) []*FanListItemComponent {
 			sort.SliceStable(entries, func(i, j int) bool {
-				x := entries[i].Fan.Config.ID
-				y := entries[j].Fan.Config.ID
+				x := entries[i].FanState.Fan.Config.ID
+				y := entries[j].FanState.Fan.Config.ID
 
 				result := strings.Compare(strings.ToLower(x), strings.ToLower(y))
 
@@ -81,14 +82,9 @@ func (c *FansPage) createLayout() *tview.Flex {
 	return fansPageLayout
 }
 
-func (c *FansPage) fetchFans() (*map[string]*client.Fan, []string, error) {
-	result, err := c.client.GetFans()
-	if err != nil {
-		return nil, nil, err
-	}
-
+func (c *FansPage) getFanIds(fans map[string]*client.Fan) []string {
 	var fanIds []string
-	for _, f := range *result {
+	for _, f := range fans {
 		fanIds = append(fanIds, f.Config.ID)
 	}
 
@@ -105,7 +101,7 @@ func (c *FansPage) fetchFans() (*map[string]*client.Fan, []string, error) {
 		}
 	})
 
-	return result, fanIds, nil
+	return fanIds
 }
 
 func (c *FansPage) GetLayout() *tview.Flex {
@@ -113,17 +109,15 @@ func (c *FansPage) GetLayout() *tview.Flex {
 }
 
 func (c *FansPage) Refresh() error {
-	fans, fanIds, err := c.fetchFans()
-	if err != nil || fans == nil {
-		fans = &map[string]*client.Fan{}
-	}
+	fans := c.store.GetFans()
+	fanIds := c.getFanIds(fans)
 
 	var fanListItemsComponents []*FanListItemComponent
 
 	oldFIds := maps.Keys(c.fanListItemComponents)
 	// remove now nonexisting entries
 	for _, oldFId := range oldFIds {
-		_, ok := (*fans)[oldFId]
+		_, ok := fans[oldFId]
 		if !ok {
 			delete(c.fanListItemComponents, oldFId)
 		}
@@ -131,22 +125,22 @@ func (c *FansPage) Refresh() error {
 
 	// add new entries / update existing entries
 	for _, fId := range fanIds {
-		fan := (*fans)[fId]
+		fanState := c.store.GetFanState(fId)
 		fanListItemComponent, ok := c.fanListItemComponents[fId]
 		if ok {
-			fanListItemComponent.SetFan(fan)
+			fanListItemComponent.SetFan(fanState)
 			fanListItemsComponents = append(fanListItemsComponents, fanListItemComponent)
 		} else {
-			fanListItemComponent = NewFanListItemComponent(c.application, fan, c.onOpenCurve)
+			fanListItemComponent = NewFanListItemComponent(c.application, fanState, c.onOpenCurve)
 			c.fanListItemComponents[fId] = fanListItemComponent
-			fanListItemComponent.SetFan(fan)
+			fanListItemComponent.SetFan(fanState)
 			fanListItemsComponents = append(fanListItemsComponents, fanListItemComponent)
 		}
 	}
 
 	c.fanList.SetData(fanListItemsComponents)
 
-	return err
+	return nil
 }
 
 func (c *FansPage) ScrollToItem() {

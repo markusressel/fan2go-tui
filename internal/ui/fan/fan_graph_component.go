@@ -2,6 +2,7 @@ package fan
 
 import (
 	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/state"
 	"fan2go-tui/internal/ui/graph"
 	"fan2go-tui/internal/ui/theme"
 
@@ -12,7 +13,7 @@ import (
 type FanGraphComponent struct {
 	application *tview.Application
 
-	Fan *client.Fan
+	FanState *state.FanState
 
 	layout         *tview.Flex
 	graphComponent *graph.GraphComponent
@@ -20,12 +21,12 @@ type FanGraphComponent struct {
 	pwmValues      *[]float64
 }
 
-func NewFanGraphComponent(application *tview.Application, fan *client.Fan) *FanGraphComponent {
+func NewFanGraphComponent(application *tview.Application, fanState *state.FanState) *FanGraphComponent {
 	rpmValues := &[]float64{}
 	pwmValues := &[]float64{}
 	c := &FanGraphComponent{
 		application: application,
-		Fan:         fan,
+		FanState:    fanState,
 		rpmValues:   rpmValues,
 		pwmValues:   pwmValues,
 	}
@@ -72,27 +73,35 @@ func (c *FanGraphComponent) createLayout() *tview.Flex {
 }
 
 func (c *FanGraphComponent) getFan() *client.Fan {
-	if c == nil {
+	if c == nil || c.FanState == nil {
 		return nil
 	}
-	return c.Fan
+	return c.FanState.Fan
 }
 
 func (c *FanGraphComponent) refresh() {
-	fan := c.Fan
-	if fan == nil {
+	if c.FanState == nil || c.FanState.Fan == nil {
 		return
 	}
 	component := c.graphComponent
-	*c.rpmValues = append(*c.rpmValues, float64(fan.Rpm))
-	*c.pwmValues = append(*c.pwmValues, float64(fan.Pwm))
 	bufferSize := component.GetValueBufferSize()
-	if len(*c.rpmValues) > bufferSize {
-		*c.rpmValues = (*c.rpmValues)[len(*c.rpmValues)-bufferSize:]
+
+	if bufferSize > 0 {
+		rpmHistory := c.FanState.RpmValues
+		if len(rpmHistory) > bufferSize {
+			*c.rpmValues = append([]float64(nil), rpmHistory[len(rpmHistory)-bufferSize:]...)
+		} else {
+			*c.rpmValues = append([]float64(nil), rpmHistory...)
+		}
+
+		pwmHistory := c.FanState.PwmValues
+		if len(pwmHistory) > bufferSize {
+			*c.pwmValues = append([]float64(nil), pwmHistory[len(pwmHistory)-bufferSize:]...)
+		} else {
+			*c.pwmValues = append([]float64(nil), pwmHistory...)
+		}
 	}
-	if len(*c.pwmValues) > bufferSize {
-		*c.pwmValues = (*c.pwmValues)[len(*c.pwmValues)-bufferSize:]
-	}
+
 	component.Refresh()
 }
 
@@ -100,8 +109,8 @@ func (c *FanGraphComponent) GetLayout() *tview.Flex {
 	return c.layout
 }
 
-func (c *FanGraphComponent) SetFan(fan *client.Fan) {
-	c.Fan = fan
+func (c *FanGraphComponent) SetFan(fanState *state.FanState) {
+	c.FanState = fanState
 	c.refresh()
 }
 

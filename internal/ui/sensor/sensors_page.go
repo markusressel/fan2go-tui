@@ -2,6 +2,7 @@ package sensor
 
 import (
 	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/state"
 	"fan2go-tui/internal/ui/shortcut_helper"
 	"fan2go-tui/internal/ui/util"
 	"sort"
@@ -15,7 +16,7 @@ import (
 type SensorsPage struct {
 	application *tview.Application
 
-	client client.Fan2goApiClient
+	store *state.Store
 
 	Sensors map[string]*client.Sensor
 
@@ -27,11 +28,11 @@ type SensorsPage struct {
 	sensorListItemComponents map[string]*SensorListItemComponent
 }
 
-func NewSensorsPage(application *tview.Application, client client.Fan2goApiClient) SensorsPage {
+func NewSensorsPage(application *tview.Application, store *state.Store) SensorsPage {
 
 	sensorsPage := SensorsPage{
 		application:              application,
-		client:                   client,
+		store:                    store,
 		sensorListItemComponents: map[string]*SensorListItemComponent{},
 	}
 
@@ -55,8 +56,8 @@ func (c *SensorsPage) createLayout() *tview.Flex {
 		//},
 		func(entries []*SensorListItemComponent, inverted bool) []*SensorListItemComponent {
 			sort.SliceStable(entries, func(i, j int) bool {
-				a := entries[i].Sensor.Config.ID
-				b := entries[j].Sensor.Config.ID
+				a := entries[i].SensorState.Sensor.Config.ID
+				b := entries[j].SensorState.Sensor.Config.ID
 
 				result := strings.Compare(strings.ToLower(a), strings.ToLower(b))
 
@@ -80,14 +81,9 @@ func (c *SensorsPage) createLayout() *tview.Flex {
 	return sensorsPageLayout
 }
 
-func (c *SensorsPage) fetchSensors() (*map[string]*client.Sensor, []string, error) {
-	result, err := c.client.GetSensors()
-	if err != nil {
-		return nil, nil, err
-	}
-
+func (c *SensorsPage) getSensorIds(sensors map[string]*client.Sensor) []string {
 	var sensorIds []string
-	for _, s := range *result {
+	for _, s := range sensors {
 		sensorIds = append(sensorIds, s.Config.ID)
 	}
 	sort.SliceStable(sensorIds, func(i, j int) bool {
@@ -103,7 +99,7 @@ func (c *SensorsPage) fetchSensors() (*map[string]*client.Sensor, []string, erro
 		}
 	})
 
-	return result, sensorIds, err
+	return sensorIds
 }
 
 func (c *SensorsPage) GetLayout() *tview.Flex {
@@ -111,17 +107,15 @@ func (c *SensorsPage) GetLayout() *tview.Flex {
 }
 
 func (c *SensorsPage) Refresh() error {
-	sensors, sensorIds, err := c.fetchSensors()
-	if err != nil || sensors == nil {
-		sensors = &map[string]*client.Sensor{}
-	}
+	sensors := c.store.GetSensors()
+	sensorIds := c.getSensorIds(sensors)
 
 	var sensorListItemsComponents []*SensorListItemComponent
 
 	oldSIds := maps.Keys(c.sensorListItemComponents)
 	// remove now nonexisting entries
 	for _, oldSId := range oldSIds {
-		_, ok := (*sensors)[oldSId]
+		_, ok := sensors[oldSId]
 		if !ok {
 			delete(c.sensorListItemComponents, oldSId)
 		}
@@ -129,22 +123,22 @@ func (c *SensorsPage) Refresh() error {
 
 	// add new entries / update existing entries
 	for _, sId := range sensorIds {
-		sensor := (*sensors)[sId]
+		sensorState := c.store.GetSensorState(sId)
 		sensorListItemComponent, ok := c.sensorListItemComponents[sId]
 		if ok {
-			sensorListItemComponent.SetSensor(sensor)
+			sensorListItemComponent.SetSensor(sensorState)
 			sensorListItemsComponents = append(sensorListItemsComponents, sensorListItemComponent)
 		} else {
-			sensorListItemComponent = NewSensorListItemComponent(c.application, sensor)
+			sensorListItemComponent = NewSensorListItemComponent(c.application, sensorState)
 			c.sensorListItemComponents[sId] = sensorListItemComponent
-			sensorListItemComponent.SetSensor(sensor)
+			sensorListItemComponent.SetSensor(sensorState)
 			sensorListItemsComponents = append(sensorListItemsComponents, sensorListItemComponent)
 		}
 	}
 
 	c.sensorList.SetData(sensorListItemsComponents)
 
-	return err
+	return nil
 }
 
 func (c *SensorsPage) ScrollToItem() {
