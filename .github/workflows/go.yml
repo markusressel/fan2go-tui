@@ -9,8 +9,8 @@ on:
     branches: [ main ]
 
 jobs:
-  generate:
-    name: Generate cross-platform builds
+  test:
+    name: Test
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -19,64 +19,130 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v7
 
+      - name: Set safe directory for git
+        run: |
+          git config --system --add safe.directory '*'
+          git config --global --add safe.directory '*'
+          git config --global --add safe.directory '/__w/fan2go-tui/fan2go-tui'
+
       - uses: actions/setup-go@v6
         with:
           go-version: '^1.23'
 
-      - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v9.2.1
-        if: false
-        with:
-          # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
-          version: v1.61.0
-
-          # Optional: working directory, useful for monorepos
-          # working-directory: somedir
-
-          # Optional: golangci-lint command line arguments.
-          args: --exclude-use-default
-          # --issues-exit-code=0
-
-          # Optional: show only new issues if it's a pull request. The default value is `false`.
-          # only-new-issues: true
-
-          # Optional: if set to true then the all caching functionality will be complete disabled,
-          #           takes precedence over all other caching options.
-          # skip-cache: true
-
-          # Optional: if set to true then the action don't cache or restore ~/go/pkg.
-          skip-pkg-cache: false
-
-          # Optional: if set to true then the action don't cache or restore ~/.cache/go-build.
-          # skip-build-cache: true
+      - uses: extractions/setup-just@v4
 
       - name: Test
-        run: make test
+        run: just test
 
-      - name: Generate build files (amd64)
-        run: |
-          GOOS="linux"
-          GOARCH="amd64"
-          GOFLAGS="-buildmode=exe"
-          NAME="fan2go-tui-${GOOS}-${GOARCH}"
-          OUTPUT_BIN="dist/${NAME}"
-          make build GOOS="${GOOS}" OARCH="${GOARCH}" GOFLAGS="${GOFLAGS}" OUTPUT_BIN="${OUTPUT_BIN}"
+  build:
+    name: Build linux/${{ matrix.goarch }}
+    runs-on: ${{ matrix.runner }}
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - goarch: amd64
+            runner: ubuntu-latest
+            native: true
+            just_target: build
 
-      - name: Generate build files (arm64)
+          - goarch: arm64
+            runner: ubuntu-24.04-arm
+            native: true
+            just_target: build
+
+          - goarch: ppc64le
+            runner: ubuntu-24.04
+            native: false
+            just_target: build-cross
+            cc: powerpc64le-linux-gnu-gcc
+            dpkg_arch: ppc64el
+            cross_pkg: crossbuild-essential-ppc64el
+
+          - goarch: s390x
+            runner: ubuntu-24.04
+            native: false
+            just_target: build-cross
+            cc: s390x-linux-gnu-gcc
+            dpkg_arch: s390x
+            cross_pkg: crossbuild-essential-s390x
+
+          - goarch: riscv64
+            runner: ubuntu-24.04
+            native: false
+            just_target: build-cross
+            cc: riscv64-linux-gnu-gcc
+            dpkg_arch: riscv64
+            cross_pkg: crossbuild-essential-riscv64
+
+    steps:
+      - name: Set up multiarch and cross-compilation toolchain
+        if: ${{ !matrix.native }}
         run: |
-          GOOS="linux"
-          GOARCH="arm64"
-          GOFLAGS="-buildmode=exe"
-          NAME="fan2go-tui-${GOOS}-${GOARCH}"
-          OUTPUT_BIN="dist/${NAME}"
-          make build GOOS="${GOOS}" OARCH="${GOARCH}" GOFLAGS="${GOFLAGS}" OUTPUT_BIN="${OUTPUT_BIN}"
+          sudo dpkg --add-architecture ${{ matrix.dpkg_arch }}
+          # Replace the runner's ubuntu.sources with one pinned to amd64 only.
+          sudo tee /etc/apt/sources.list.d/ubuntu.sources > /dev/null << 'EOF'
+          Types: deb
+          URIs: http://azure.archive.ubuntu.com/ubuntu
+          Suites: noble noble-updates noble-backports noble-security
+          Components: main restricted universe multiverse
+          Architectures: amd64
+          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+          EOF
+          # Add ports.ubuntu.com for the foreign arch
+          printf 'Types: deb\nURIs: http://ports.ubuntu.com/ubuntu-ports\nSuites: noble noble-updates noble-security\nComponents: main restricted universe multiverse\nArchitectures: %s\nSigned-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg\n' "${{ matrix.dpkg_arch }}" | sudo tee /etc/apt/sources.list.d/ports-${{ matrix.dpkg_arch }}.sources
+          sudo apt-get update
+          sudo apt-get install -y ${{ matrix.cross_pkg }}
+
+      - name: Checkout the repository
+        uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '^1.23'
+
+      - uses: extractions/setup-just@v4
+
+      - name: Generate build files (${{ matrix.goarch }})
+        env:
+          CC: ${{ matrix.cc }}
+          GOOS: linux
+          GOARCH: ${{ matrix.goarch }}
+        run: |
+          OUTPUT_BIN="dist/fan2go-tui-linux-${{ matrix.goarch }}"
+          just OUTPUT_BIN="${OUTPUT_BIN}" ${{ matrix.just_target }}
+          file "${OUTPUT_BIN}"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: fan2go-tui-linux-${{ matrix.goarch }}
+          path: dist/fan2go-tui-linux-${{ matrix.goarch }}
+
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: dist/
+          merge-multiple: true
 
       - name: Release
         uses: softprops/action-gh-release@v3
-        if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
             dist/fan2go-tui-linux-amd64
             dist/fan2go-tui-linux-arm64
+            dist/fan2go-tui-linux-ppc64le
+            dist/fan2go-tui-linux-s390x
+            dist/fan2go-tui-linux-riscv64
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
