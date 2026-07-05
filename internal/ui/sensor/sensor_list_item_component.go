@@ -1,7 +1,7 @@
 package sensor
 
 import (
-	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/state"
 	uiutil "fan2go-tui/internal/ui/util"
 
 	"github.com/rivo/tview"
@@ -10,7 +10,7 @@ import (
 type SensorListItemComponent struct {
 	application *tview.Application
 
-	Sensor *client.Sensor
+	SensorState *state.SensorState
 
 	layout *tview.Flex
 
@@ -18,10 +18,10 @@ type SensorListItemComponent struct {
 	sensorGraphComponent *SensorGraphComponent
 }
 
-func NewSensorListItemComponent(application *tview.Application, sensor *client.Sensor) *SensorListItemComponent {
+func NewSensorListItemComponent(application *tview.Application, sensorState *state.SensorState) *SensorListItemComponent {
 	c := &SensorListItemComponent{
 		application: application,
-		Sensor:      sensor,
+		SensorState: sensorState,
 	}
 
 	c.layout = c.createLayout()
@@ -33,12 +33,12 @@ func (c *SensorListItemComponent) createLayout() *tview.Flex {
 	rootLayout := tview.NewFlex().SetDirection(tview.FlexRow)
 
 	sensorColumnLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
-	uiutil.SetupWindow(sensorColumnLayout, c.Sensor.Config.ID)
+	uiutil.SetupWindow(sensorColumnLayout, c.SensorState.Sensor.Config.ID)
 	sensorColumnLayout.SetTitleAlign(tview.AlignLeft)
 	sensorColumnLayout.SetBorder(true)
 	rootLayout.AddItem(sensorColumnLayout, 0, 1, true)
 
-	f := c.Sensor
+	f := c.SensorState.Sensor
 	sensorInfoComponent := NewSensorInfoComponent(c.application, f)
 	c.sensorInfoComponent = sensorInfoComponent
 	sensorInfoComponent.SetSensor(f)
@@ -46,9 +46,9 @@ func (c *SensorListItemComponent) createLayout() *tview.Flex {
 	sensorColumnLayout.AddItem(layout, 0, 1, true)
 	sensorColumnLayout.AddItem(tview.NewBox(), 1, 0, false)
 
-	sensorGraphComponent := NewSensorGraphComponent(c.application, f)
+	sensorGraphComponent := NewSensorGraphComponent(c.application, c.SensorState)
 	c.sensorGraphComponent = sensorGraphComponent
-	sensorGraphComponent.SetSensor(f)
+	sensorGraphComponent.SetSensor(c.SensorState)
 	layout = sensorGraphComponent.GetLayout()
 	sensorColumnLayout.AddItem(layout, 0, 3, true)
 
@@ -59,14 +59,14 @@ func (c *SensorListItemComponent) GetLayout() *tview.Flex {
 	return c.layout
 }
 
-func (c *SensorListItemComponent) SetSensor(sensor *client.Sensor) {
-	c.Sensor = sensor
+func (c *SensorListItemComponent) SetSensor(sensorState *state.SensorState) {
+	c.SensorState = sensorState
 	c.refresh()
 }
 
 func (c *SensorListItemComponent) refresh() {
-	c.sensorInfoComponent.SetSensor(c.Sensor)
-	c.sensorGraphComponent.SetSensor(c.Sensor)
+	c.sensorInfoComponent.SetSensor(c.SensorState.Sensor)
+	c.sensorGraphComponent.SetSensor(c.SensorState)
 }
 
 func (c *SensorListItemComponent) ScrollHorizontal(delta int) {

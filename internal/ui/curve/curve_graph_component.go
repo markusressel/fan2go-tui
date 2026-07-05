@@ -2,6 +2,7 @@ package curve
 
 import (
 	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/state"
 	"fan2go-tui/internal/ui/graph"
 	"fan2go-tui/internal/ui/theme"
 
@@ -12,18 +13,18 @@ import (
 type CurveGraphComponent struct {
 	application *tview.Application
 
-	Curve *client.Curve
+	CurveState *state.CurveState
 
 	layout         *tview.Flex
 	graphComponent *graph.GraphComponent
 	values         *[]float64
 }
 
-func NewCurveGraphComponent(application *tview.Application, curve *client.Curve) *CurveGraphComponent {
+func NewCurveGraphComponent(application *tview.Application, curveState *state.CurveState) *CurveGraphComponent {
 	values := &[]float64{}
 	c := &CurveGraphComponent{
 		application: application,
-		Curve:       curve,
+		CurveState:  curveState,
 		values:      values,
 	}
 
@@ -69,23 +70,28 @@ func (c *CurveGraphComponent) createLayout() *tview.Flex {
 }
 
 func (c *CurveGraphComponent) getCurve() *client.Curve {
-	if c == nil {
+	if c == nil || c.CurveState == nil {
 		return nil
 	}
-	return c.Curve
+	return c.CurveState.Curve
 }
 
 func (c *CurveGraphComponent) refresh() {
-	curve := c.Curve
-	if curve == nil {
+	if c.CurveState == nil || c.CurveState.Curve == nil {
 		return
 	}
 	component := c.graphComponent
-	*c.values = append(*c.values, curve.Value)
 	bufferSize := component.GetValueBufferSize()
-	if len(*c.values) > bufferSize {
-		*c.values = (*c.values)[len(*c.values)-bufferSize:]
+
+	if bufferSize > 0 {
+		history := c.CurveState.Values
+		if len(history) > bufferSize {
+			*c.values = append([]float64(nil), history[len(history)-bufferSize:]...)
+		} else {
+			*c.values = append([]float64(nil), history...)
+		}
 	}
+
 	component.Refresh()
 }
 
@@ -93,8 +99,8 @@ func (c *CurveGraphComponent) GetLayout() *tview.Flex {
 	return c.layout
 }
 
-func (c *CurveGraphComponent) SetCurve(curve *client.Curve) {
-	c.Curve = curve
+func (c *CurveGraphComponent) SetCurve(curveState *state.CurveState) {
+	c.CurveState = curveState
 	c.refresh()
 }
 

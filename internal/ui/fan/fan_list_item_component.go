@@ -2,6 +2,7 @@ package fan
 
 import (
 	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/state"
 	uiutil "fan2go-tui/internal/ui/util"
 
 	"github.com/rivo/tview"
@@ -10,7 +11,7 @@ import (
 type FanListItemComponent struct {
 	application *tview.Application
 
-	Fan *client.Fan
+	FanState *state.FanState
 
 	layout          *tview.Flex
 	graphHostLayout *tview.Flex
@@ -37,10 +38,10 @@ func hasFanCurveData(fan *client.Fan) bool {
 	return len(*fan.FanCurveData) > 0
 }
 
-func NewFanListItemComponent(application *tview.Application, fan *client.Fan, onOpenCurve func(curveID string)) *FanListItemComponent {
+func NewFanListItemComponent(application *tview.Application, fanState *state.FanState, onOpenCurve func(curveID string)) *FanListItemComponent {
 	c := &FanListItemComponent{
 		application: application,
-		Fan:         fan,
+		FanState:    fanState,
 	}
 
 	c.layout = c.createLayout(onOpenCurve)
@@ -52,12 +53,12 @@ func (c *FanListItemComponent) createLayout(onOpenCurve func(curveID string)) *t
 	rootLayout := tview.NewFlex().SetDirection(tview.FlexRow)
 
 	fanColumnLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
-	uiutil.SetupWindow(fanColumnLayout, c.Fan.Config.ID)
+	uiutil.SetupWindow(fanColumnLayout, c.FanState.Fan.Config.ID)
 	fanColumnLayout.SetTitleAlign(tview.AlignLeft)
 	fanColumnLayout.SetBorder(true)
 	rootLayout.AddItem(fanColumnLayout, 0, 1, true)
 
-	f := c.Fan
+	f := c.FanState.Fan
 	fanInfoComponent := NewFanInfoComponent(c.application, f, onOpenCurve)
 	c.fanInfoComponent = fanInfoComponent
 	fanInfoComponent.SetFan(f)
@@ -75,7 +76,7 @@ func (c *FanListItemComponent) createLayout(onOpenCurve func(curveID string)) *t
 }
 
 func (c *FanListItemComponent) desiredGraphVariant() fanGraphVariant {
-	if hasFanCurveData(c.Fan) {
+	if hasFanCurveData(c.FanState.Fan) {
 		return fanGraphVariantCurve
 	}
 	return fanGraphVariantHistory
@@ -101,10 +102,10 @@ func (c *FanListItemComponent) ensureGraphVariant() {
 	}
 
 	if desiredVariant == fanGraphVariantCurve {
-		c.fanRpmCurveComponent = NewFanRpmCurveComponent(c.application, c.Fan)
+		c.fanRpmCurveComponent = NewFanRpmCurveComponent(c.application, c.FanState.Fan)
 		c.graphHostLayout.AddItem(c.fanRpmCurveComponent.GetLayout(), 0, 1, true)
 	} else {
-		c.fanGraphComponent = NewFanGraphComponent(c.application, c.Fan)
+		c.fanGraphComponent = NewFanGraphComponent(c.application, c.FanState)
 		c.graphHostLayout.AddItem(c.fanGraphComponent.GetLayout(), 0, 1, true)
 	}
 
@@ -115,21 +116,21 @@ func (c *FanListItemComponent) GetLayout() *tview.Flex {
 	return c.layout
 }
 
-func (c *FanListItemComponent) SetFan(fan *client.Fan) {
-	c.Fan = fan
+func (c *FanListItemComponent) SetFan(fanState *state.FanState) {
+	c.FanState = fanState
 	c.ensureGraphVariant()
 	c.refresh()
 }
 
 func (c *FanListItemComponent) refresh() {
 	if c.fanInfoComponent != nil {
-		c.fanInfoComponent.SetFan(c.Fan)
+		c.fanInfoComponent.SetFan(c.FanState.Fan)
 	}
 	if c.fanGraphComponent != nil {
-		c.fanGraphComponent.SetFan(c.Fan)
+		c.fanGraphComponent.SetFan(c.FanState)
 	}
 	if c.fanRpmCurveComponent != nil {
-		c.fanRpmCurveComponent.SetFan(c.Fan)
+		c.fanRpmCurveComponent.SetFan(c.FanState.Fan)
 	}
 }
 

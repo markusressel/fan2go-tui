@@ -2,6 +2,7 @@ package curve
 
 import (
 	"fan2go-tui/internal/client"
+	"fan2go-tui/internal/state"
 	"fan2go-tui/internal/ui/shortcut_helper"
 	"fan2go-tui/internal/ui/util"
 	"sort"
@@ -15,7 +16,7 @@ import (
 type CurvesPage struct {
 	application *tview.Application
 
-	client client.Fan2goApiClient
+	store *state.Store
 
 	Curves             map[string]*client.Curve
 	entryVisibilityMap []string
@@ -30,11 +31,11 @@ type CurvesPage struct {
 	onOpenCurve             func(curveID string)
 }
 
-func NewCurvesPage(application *tview.Application, client client.Fan2goApiClient, onOpenSensor func(sensorID string), onOpenCurve func(curveID string)) CurvesPage {
+func NewCurvesPage(application *tview.Application, store *state.Store, onOpenSensor func(sensorID string), onOpenCurve func(curveID string)) CurvesPage {
 
 	curvesPage := CurvesPage{
 		application:             application,
-		client:                  client,
+		store:                   store,
 		curveListItemComponents: map[string]*CurveListItemComponent{},
 		onOpenSensor:            onOpenSensor,
 		onOpenCurve:             onOpenCurve,
@@ -60,8 +61,8 @@ func (c *CurvesPage) createLayout() *tview.Flex {
 		//},
 		func(entries []*CurveListItemComponent, inverted bool) []*CurveListItemComponent {
 			sort.SliceStable(entries, func(i, j int) bool {
-				a := entries[i].Curve.Config.ID
-				b := entries[j].Curve.Config.ID
+				a := entries[i].CurveState.Curve.Config.ID
+				b := entries[j].CurveState.Curve.Config.ID
 
 				result := strings.Compare(strings.ToLower(a), strings.ToLower(b))
 
@@ -85,14 +86,9 @@ func (c *CurvesPage) createLayout() *tview.Flex {
 	return curvesPageLayout
 }
 
-func (c *CurvesPage) fetchCurves() (*map[string]*client.Curve, []string, error) {
-	result, err := c.client.GetCurves()
-	if err != nil {
-		return nil, nil, err
-	}
-
+func (c *CurvesPage) getCurveIds(curves map[string]*client.Curve) []string {
 	var curveIds []string
-	for _, c := range *result {
+	for _, c := range curves {
 		curveIds = append(curveIds, c.Config.ID)
 	}
 	sort.SliceStable(curveIds, func(i, j int) bool {
@@ -108,7 +104,7 @@ func (c *CurvesPage) fetchCurves() (*map[string]*client.Curve, []string, error) 
 		}
 	})
 
-	return result, curveIds, err
+	return curveIds
 }
 
 func (c *CurvesPage) GetLayout() *tview.Flex {
@@ -116,17 +112,15 @@ func (c *CurvesPage) GetLayout() *tview.Flex {
 }
 
 func (c *CurvesPage) Refresh() error {
-	curves, curveIds, err := c.fetchCurves()
-	if err != nil || curves == nil {
-		curves = &map[string]*client.Curve{}
-	}
+	curves := c.store.GetCurves()
+	curveIds := c.getCurveIds(curves)
 
 	var curveListItemsComponents []*CurveListItemComponent
 
 	oldCIds := maps.Keys(c.curveListItemComponents)
 	// remove now non-existing entries
 	for _, oldCId := range oldCIds {
-		_, ok := (*curves)[oldCId]
+		_, ok := curves[oldCId]
 		if !ok {
 			delete(c.curveListItemComponents, oldCId)
 		}
@@ -134,14 +128,14 @@ func (c *CurvesPage) Refresh() error {
 
 	// add new entries / update existing entries
 	for _, cId := range curveIds {
-		curve := (*curves)[cId]
+		curveState := c.store.GetCurveState(cId)
 		curveListItemComponent, ok := c.curveListItemComponents[cId]
 		if ok {
-			curveListItemComponent.SetCurve(curve)
+			curveListItemComponent.SetCurve(curveState)
 			curveListItemsComponents = append(curveListItemsComponents, curveListItemComponent)
 		} else {
-			curveListItemComponent = NewCurveListItemComponent(c.application, curve, c.onOpenSensor, c.onOpenCurve)
-			curveListItemComponent.SetCurve(curve)
+			curveListItemComponent = NewCurveListItemComponent(c.application, curveState, c.onOpenSensor, c.onOpenCurve)
+			curveListItemComponent.SetCurve(curveState)
 			c.curveListItemComponents[cId] = curveListItemComponent
 			curveListItemsComponents = append(curveListItemsComponents, curveListItemComponent)
 		}
@@ -149,7 +143,7 @@ func (c *CurvesPage) Refresh() error {
 
 	c.curveList.SetData(curveListItemsComponents)
 
-	return err
+	return nil
 }
 
 func (c *CurvesPage) ScrollToItem() {
