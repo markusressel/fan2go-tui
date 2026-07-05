@@ -93,6 +93,7 @@ func (c *GraphComponent) createLayout() *tview.Flex {
 
 	plotLayout := NewOverlayPlot()
 	c.plotLayout = plotLayout
+	plotLayout.SetOnLayoutChange(c.Refresh)
 	if len(c.config.Overlays) > 0 {
 		plotLayout.SetOverlays(c.config.Overlays)
 	}
@@ -117,8 +118,6 @@ func (c *GraphComponent) createLayout() *tview.Flex {
 	plotLayout.SetYAxisAutoScaleMax(c.config.YAxisAutoScaleMax)
 
 	plotLayout.SetYAxisLabelDataType(c.config.YAxisLabelDataType)
-
-	uiutil.SetupReactiveResize(c.application, plotLayout.Box, c.Refresh)
 
 	layout.AddItem(plotLayout, 0, 1, false)
 	_, _, width, _ := plotLayout.GetRect()
@@ -422,8 +421,13 @@ func (c *GraphComponent) applyZoom() {
 		return
 	}
 
-	_, _, width, _ := c.plotLayout.GetInnerRect()
-	availableSlots := width - 10
+	_, _, width, _ := c.plotLayout.GetPlotRect()
+	availableSlots := width
+	if availableSlots <= 0 {
+		_, _, innerWidth, _ := c.plotLayout.GetInnerRect()
+		availableSlots = innerWidth - 10
+	}
+
 	if availableSlots <= 0 {
 		return
 	}
@@ -452,7 +456,11 @@ func (c *GraphComponent) UpdateValueBufferSize() {
 		return
 	}
 
-	_, _, width, _ := c.plotLayout.GetInnerRect()
+	_, _, width, _ := c.plotLayout.GetPlotRect()
+	if width <= 0 {
+		_, _, innerWidth, _ := c.plotLayout.GetInnerRect()
+		width = innerWidth - 10
+	}
 	if width <= 0 {
 		return
 	}
