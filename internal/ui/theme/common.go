@@ -47,8 +47,12 @@ type Color struct {
 }
 
 type ShortcutMapColors struct {
-	KeyCombo tcell.Color
-	Name     tcell.Color
+	KeyCombo           tcell.Color
+	ViewKeyCombo       tcell.Color
+	NavigationKeyCombo tcell.Color
+	GlobalKeyCombo     tcell.Color
+	Name               tcell.Color
+	Separator          tcell.Color
 }
 
 type ConfigInfoComponentColors struct {

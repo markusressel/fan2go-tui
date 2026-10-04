@@ -147,9 +147,17 @@ func (c *FansPage) ScrollToItem() {
 	c.fanList.SelectEntry(c.fanList.GetSelectedItem())
 }
 
+func (c *FansPage) GetSelectedItem() *FanListItemComponent {
+	return c.fanList.GetSelectedItem()
+}
+
+func (c *FansPage) GetSelectedIndex() int {
+	return c.fanList.GetSelectedIndex()
+}
+
 func (c *FansPage) GetShortcutMap() []shortcut_helper.ShortcutEntry {
 	return []shortcut_helper.ShortcutEntry{
-		{KeyCombo: []string{"↑", "↓"}, Name: "Select"},
-		{KeyCombo: []string{"PgUp", "PgDn"}, Name: "Scroll"},
+		{KeyCombo: []string{"↑", "↓"}, Name: "Select fan", Group: shortcut_helper.GroupNavigation},
+		{KeyCombo: []string{shortcut_helper.KeyPgUp, shortcut_helper.KeyPgDn}, Name: "Scroll list", Group: shortcut_helper.GroupNavigation},
 	}
 }

@@ -3,6 +3,7 @@ package ui
 import (
 	"fan2go-tui/cmd/global"
 	"fan2go-tui/internal/configuration"
+	"fan2go-tui/internal/ui/shortcut_helper"
 	"fan2go-tui/internal/ui/status_message"
 	"fan2go-tui/internal/ui/theme"
 	uiutil "fan2go-tui/internal/ui/util"
@@ -32,6 +33,7 @@ type ApplicationHeaderComponent struct {
 
 	connectionStatusTextView *tview.TextView
 	connected                bool
+	shortcutHint             *tview.TextView
 }
 
 func NewApplicationHeader(
@@ -100,8 +102,7 @@ func (applicationHeader *ApplicationHeaderComponent) createLayout() {
 
 	applicationHeader.pageIndicatorTextView = pageIndicatorTextView
 
-	helpText := "Press '?' for help"
-	helpTextView := uiutil.CreateAttentionTextView(helpText)
+	shortcutHint := uiutil.CreateAttentionTextView(shortcutHintText)
 
 	layout.AddItem(nameTextView, len(nameText), 0, false)
 	layout.AddItem(versionTextView, len(versionText), 0, false)
@@ -109,12 +110,24 @@ func (applicationHeader *ApplicationHeaderComponent) createLayout() {
 	layout.AddItem(statusTextView, 0, 1, false)
 	layout.AddItem(pageIndicatorTextView, len(pageIndicatorText)+4, 0, false)
 	layout.AddItem(applicationHeader.updateIntervalTextView, len(pageIndicatorText)+4, 0, false)
-	layout.AddItem(helpTextView, len(helpText)+4, 0, false)
+	layout.AddItem(shortcutHint, 0, 0, false)
 
+	applicationHeader.shortcutHint = shortcutHint
 	applicationHeader.statusTextView = statusTextView
 	applicationHeader.layout = layout
 
 	applicationHeader.updateUi()
+	applicationHeader.UpdateShortcutHint()
+}
+
+const shortcutHintText = "? shortcuts"
+
+func (applicationHeader *ApplicationHeaderComponent) UpdateShortcutHint() {
+	width := 0
+	if shortcut_helper.ShortcutsHidden() {
+		width = len(shortcutHintText) + 4
+	}
+	applicationHeader.layout.ResizeItem(applicationHeader.shortcutHint, width, 0)
 }
 
 func (applicationHeader *ApplicationHeaderComponent) updateUi() {

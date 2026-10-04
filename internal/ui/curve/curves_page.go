@@ -161,7 +161,7 @@ func (c *CurvesPage) SelectCurveByID(curveID string) bool {
 
 func (c *CurvesPage) GetShortcutMap() []shortcut_helper.ShortcutEntry {
 	return []shortcut_helper.ShortcutEntry{
-		{KeyCombo: []string{"↑", "↓"}, Name: "Select"},
-		{KeyCombo: []string{"PgUp", "PgDn"}, Name: "Scroll"},
+		{KeyCombo: []string{"↑", "↓"}, Name: "Select curve", Group: shortcut_helper.GroupNavigation},
+		{KeyCombo: []string{shortcut_helper.KeyPgUp, shortcut_helper.KeyPgDn}, Name: "Scroll list", Group: shortcut_helper.GroupNavigation},
 	}
 }

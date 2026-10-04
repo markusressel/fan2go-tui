@@ -5,6 +5,7 @@ import (
 	"fan2go-tui/internal/configuration"
 	"fan2go-tui/internal/state"
 	"fan2go-tui/internal/ui/dialog"
+	"fan2go-tui/internal/ui/shortcut_helper"
 	"fan2go-tui/internal/ui/util"
 	"time"
 
@@ -14,7 +15,6 @@ import (
 
 const (
 	Main             util.Page = "main"
-	HelpDialog       util.Page = "help"
 	ConnectingDialog util.Page = "connecting"
 )
 
@@ -25,6 +25,7 @@ var (
 )
 
 func CreateUi(fullscreen bool) *tview.Application {
+	shortcut_helper.InitShortcutVisibility()
 	UpdateTicker = time.NewTicker(configuration.CurrentConfig.Ui.UpdateInterval)
 
 	application := tview.NewApplication()
@@ -61,18 +62,17 @@ func CreateUi(fullscreen bool) *tview.Application {
 				}
 			} else {
 				hasReceivedData = true
-				pagesLayout.HidePage(string(ConnectingDialog))
+				if frontPage, _ := pagesLayout.GetFrontPage(); frontPage == string(ConnectingDialog) {
+					pagesLayout.HidePage(string(ConnectingDialog))
+				}
 				mainPage.SetConnectionStatus(true, "")
 			}
 			mainPage.Refresh()
 		})
 	})
 
-	helpPage := dialog.NewHelpPage()
-
 	pagesLayout = tview.NewPages().
 		AddPage(string(Main), mainPage.layout, true, true).
-		AddPage(string(HelpDialog), helpPage.GetLayout(), true, false).
 		AddPage(string(ConnectingDialog), connectingDialog.GetLayout(), true, true)
 
 	pagesLayout.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
@@ -94,17 +94,12 @@ func CreateUi(fullscreen bool) *tview.Application {
 				return nil
 			}
 			return event
-		case string(HelpDialog):
-			if event.Key() == tcell.KeyEscape {
-				pagesLayout.HidePage(string(HelpDialog))
-				application.SetFocus(mainPage.layout)
-				return nil
-			}
-			return event
 		}
 
-		if event.Rune() == '?' || event.Key() == tcell.KeyF1 {
-			pagesLayout.ShowPage(string(HelpDialog))
+		if (event.Key() == tcell.KeyRune && event.Rune() == '?' && !util.IsTextInputActive(application.GetFocus())) ||
+			event.Key() == tcell.KeyF1 {
+			shortcut_helper.ToggleShortcuts()
+			mainPage.header.UpdateShortcutHint()
 			return nil
 		} else if event.Rune() == '+' {
 			slowDownUpdateInterval(mainPage)
@@ -117,18 +112,6 @@ func CreateUi(fullscreen bool) *tview.Application {
 			return nil
 		} else if event.Modifiers() == tcell.ModNone && event.Key() == tcell.KeyTab {
 			mainPage.NextPage()
-			return nil
-		}
-		return event
-	})
-
-	helpPage.GetLayout().SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		if event.Key() == tcell.KeyEscape {
-			pagesLayout.HidePage(string(HelpDialog))
-			application.SetFocus(mainPage.layout)
-			return nil
-		} else if event.Key() == tcell.KeyCtrlC || event.Key() == tcell.KeyCtrlQ {
-			application.Stop()
 			return nil
 		}
 		return event
