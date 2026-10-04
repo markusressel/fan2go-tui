@@ -150,6 +150,14 @@ func (c *CurvesPage) ScrollToItem() {
 	c.curveList.SelectEntry(c.curveList.GetSelectedItem())
 }
 
+func (c *CurvesPage) GetSelectedItem() *CurveListItemComponent {
+	return c.curveList.GetSelectedItem()
+}
+
+func (c *CurvesPage) GetSelectedIndex() int {
+	return c.curveList.GetSelectedIndex()
+}
+
 func (c *CurvesPage) SelectCurveByID(curveID string) bool {
 	curveListItem, ok := c.curveListItemComponents[curveID]
 	if !ok {
