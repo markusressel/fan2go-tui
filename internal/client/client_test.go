@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strconv"
+	"strings"
 	"testing"
 )
 
@@ -113,4 +115,80 @@ func loopbackInterface(t *testing.T) string {
 	}
 	t.Skip("no loopback interface")
 	return ""
+}
+
+func TestApiClient_EndpointsAndErrors(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/fan/cpu", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{"config": {"id": "cpu"}, "pwm": 100, "rpm": 1200}`))
+	})
+	mux.HandleFunc("/curve", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{"curve1": {"value": 50, "config": {"id": "curve1"}}}`))
+	})
+	mux.HandleFunc("/curve/curve1", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{"value": 50, "config": {"id": "curve1"}}`))
+	})
+	mux.HandleFunc("/sensor", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{"sensor1": {"name": "s1", "movingAvg": 45000, "config": {"id": "sensor1"}}}`))
+	})
+	mux.HandleFunc("/sensor/sensor1", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{"name": "s1", "movingAvg": 45000, "config": {"id": "sensor1"}}`))
+	})
+	mux.HandleFunc("/error-500", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	u, err := url.Parse(server.URL)
+	if err != nil {
+		t.Fatalf("failed to parse test server url: %v", err)
+	}
+	host := u.Hostname()
+	port, _ := strconv.Atoi(u.Port())
+	api := NewApiClient(host, port)
+
+	// GetFan
+	fan, err := api.GetFan("cpu")
+	if err != nil || fan == nil || fan.Rpm != 1200 {
+		t.Errorf("GetFan failed: %v, %v", fan, err)
+	}
+
+	// GetCurves
+	curves, err := api.GetCurves()
+	if err != nil || curves == nil || (*curves)["curve1"] == nil {
+		t.Errorf("GetCurves failed: %v, %v", curves, err)
+	}
+
+	// GetCurve
+	curve, err := api.GetCurve("curve1")
+	if err != nil || curve == nil || curve.Config.ID != "curve1" {
+		t.Errorf("GetCurve failed: %v, %v", curve, err)
+	}
+
+	// GetSensors
+	sensors, err := api.GetSensors()
+	if err != nil || sensors == nil || (*sensors)["sensor1"] == nil {
+		t.Errorf("GetSensors failed: %v, %v", sensors, err)
+	}
+
+	// GetSensor
+	sensor, err := api.GetSensor("sensor1")
+	if err != nil || sensor == nil || sensor.Name != "s1" {
+		t.Errorf("GetSensor failed: %v, %v", sensor, err)
+	}
+
+	// 404 error
+	_, err = api.GetFan("non-existent-404")
+	if err == nil || !strings.Contains(err.Error(), "Cannot reach fan2go daemon") {
+		t.Errorf("expected daemon 404 error, got %v", err)
+	}
+
+	// 500 error
+	var dummy map[string]*Fan
+	_, err = doGet(http.DefaultClient, server.URL+"/error-500", dummy)
+	if err == nil || !strings.Contains(err.Error(), "Unexpected API status code") {
+		t.Errorf("expected 500 status code error, got %v", err)
+	}
 }

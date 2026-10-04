@@ -145,6 +145,14 @@ func (c *SensorsPage) ScrollToItem() {
 	c.sensorList.SelectEntry(c.sensorList.GetSelectedItem())
 }
 
+func (c *SensorsPage) GetSelectedItem() *SensorListItemComponent {
+	return c.sensorList.GetSelectedItem()
+}
+
+func (c *SensorsPage) GetSelectedIndex() int {
+	return c.sensorList.GetSelectedIndex()
+}
+
 func (c *SensorsPage) SelectSensorByID(sensorID string) bool {
 	sensorListItem, ok := c.sensorListItemComponents[sensorID]
 	if !ok {
