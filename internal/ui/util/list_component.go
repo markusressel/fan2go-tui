@@ -370,7 +370,12 @@ func (c *ListComponent[T]) updateVisibleEntries() {
 		c.entryVisibilityMap[entry] = index >= c.startIndex && index < c.startIndex+maxVisibleItems
 	}
 
-	selected := c.GetSelectedItem()
+	var selected *T
+	if c.selectedIndex >= 0 && c.selectedIndex < len(c.entries) {
+		selected = c.entries[c.selectedIndex]
+	} else {
+		selected = c.GetSelectedItem()
+	}
 	// cleanup the entries layout
 	c.entriesLayout.Clear()
 	// create a layout for each visible entry
@@ -392,6 +397,7 @@ func (c *ListComponent[T]) SelectEntry(entry *T) {
 	entryLayout := c.getLayout(entryToSelect)
 	c.selectedIndex = indexToSelect
 	c.scrollTo(entryToSelect)
+	c.selectedIndex = indexToSelect
 	c.application.SetFocus(entryLayout)
 	c.selectionChangedCallback(entry)
 }
@@ -511,13 +517,14 @@ func (c *ListComponent[T]) GetSelectedItem() *T {
 			return entry
 		}
 	}
-	if c.selectedIndex == -1 || c.selectedIndex >= len(c.entries) {
-		if len(c.entries) > 0 {
-			return c.entries[0]
-		}
-		return nil
+	if c.selectedIndex >= 0 && c.selectedIndex < len(c.entries) {
+		return c.entries[c.selectedIndex]
 	}
-	return c.entries[c.selectedIndex]
+	if len(c.entries) > 0 {
+		c.selectedIndex = 0
+		return c.entries[0]
+	}
+	return nil
 }
 
 func (c *ListComponent[T]) hideScrollbar() {

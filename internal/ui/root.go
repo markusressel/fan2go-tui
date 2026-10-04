@@ -62,7 +62,9 @@ func CreateUi(fullscreen bool) *tview.Application {
 				}
 			} else {
 				hasReceivedData = true
-				pagesLayout.HidePage(string(ConnectingDialog))
+				if frontPage, _ := pagesLayout.GetFrontPage(); frontPage == string(ConnectingDialog) {
+					pagesLayout.HidePage(string(ConnectingDialog))
+				}
 				mainPage.SetConnectionStatus(true, "")
 			}
 			mainPage.Refresh()
