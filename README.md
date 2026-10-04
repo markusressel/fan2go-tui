@@ -49,6 +49,20 @@ sudo cp ./bin/fan2go-tui /usr/bin/fan2go-tui
 sudo chmod ug+x /usr/bin/fan2go-tui
 ```
 
+## Demo Mode
+
+To preview or test `fan2go-tui` without a running `fan2go` daemon on physical hardware, start the demo simulation server:
+
+```shell
+fan2go-tui demo
+```
+
+This starts a mock server simulating realistic, dynamic sensor temperatures, curve evaluations, and fan responses. You can then connect to it by running `fan2go-tui` in another terminal, or launch both server and UI together:
+
+```shell
+fan2go-tui demo --ui
+```
+
 ## Configuration
 
 ### fan2go (daemon)

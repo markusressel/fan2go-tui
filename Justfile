@@ -45,6 +45,9 @@ build:
 run: build
     ./{{OUTPUT_BIN}}
 
+demo: build
+    ./{{OUTPUT_BIN}} demo --ui
+
 # Deploy to custom bin directory
 deploy-custom: clean build
     mkdir -p ~/.custom/bin/
