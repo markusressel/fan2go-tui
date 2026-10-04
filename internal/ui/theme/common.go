@@ -18,6 +18,9 @@ type HeaderColors struct {
 
 	Version           tcell.Color
 	VersionBackground tcell.Color
+
+	DisconnectedBadge           tcell.Color
+	DisconnectedBadgeBackground tcell.Color
 }
 
 type DialogColors struct {

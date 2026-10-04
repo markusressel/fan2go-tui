@@ -175,3 +175,9 @@ func (s *Store) GetSensors() map[string]*client.Sensor {
 	}
 	return result
 }
+
+func (s *Store) HasData() bool {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+	return len(s.Fans) > 0 || len(s.Curves) > 0 || len(s.Sensors) > 0
+}

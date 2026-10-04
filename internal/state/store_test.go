@@ -102,3 +102,17 @@ func TestStore_Sensors(t *testing.T) {
 		t.Fatalf("expected sensor-1 to be removed")
 	}
 }
+
+func TestStore_HasData(t *testing.T) {
+	store := NewStore()
+	if store.HasData() {
+		t.Fatalf("expected empty store to return false for HasData")
+	}
+
+	store.UpdateFans(map[string]*client.Fan{
+		"fan-1": {Config: client.FanConfig{ID: "fan-1"}},
+	})
+	if !store.HasData() {
+		t.Fatalf("expected store with fans to return true for HasData")
+	}
+}

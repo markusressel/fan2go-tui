@@ -28,6 +28,9 @@ var (
 
 			Version:           OnSecondary,
 			VersionBackground: SecondaryColor,
+
+			DisconnectedBadge:           OnPrimaryColor,
+			DisconnectedBadgeBackground: tcell.ColorDarkRed,
 		},
 		Dialog: DialogColors{
 			Border: PrimaryVariantColor,

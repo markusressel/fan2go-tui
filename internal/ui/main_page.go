@@ -206,6 +206,10 @@ func (mainPage *MainPage) OpenSensorByID(sensorID string) {
 	}
 }
 
+func (mainPage *MainPage) SetConnectionStatus(connected bool, message string) {
+	mainPage.header.SetConnectionStatus(connected, message)
+}
+
 func (mainPage *MainPage) clearStatusMessage() {
 	mainPage.header.SetStatus(status_message.NewInfoStatusMessage(""))
 }
