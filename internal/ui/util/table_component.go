@@ -60,8 +60,8 @@ func (c *RowSelectionTable[T]) createLayout() {
 	table := tview.NewTable()
 
 	table.SetMouseCapture(func(action tview.MouseAction, event *tcell.EventMouse) (tview.MouseAction, *tcell.EventMouse) {
-		switch action {
-		case tview.MouseLeftDoubleClick:
+		// mouse captures get all mouse events, not only those on the table (https://github.com/rivo/tview/issues/926)
+		if action == tview.MouseLeftDoubleClick && table.InRect(event.Position()) {
 			c.doubleClickCallback()
 			return action, nil
 		}
