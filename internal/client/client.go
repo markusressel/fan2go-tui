@@ -315,12 +315,16 @@ func NewApiClient(host string, port int) Fan2goApiClient {
 	}
 }
 
-// joinHostPort joins the host and the port of the fan2go API, e.g. "127.0.0.1:9001". IPv6 addresses may be
+// JoinHostPort joins the host and the port of the fan2go API, e.g. "127.0.0.1:9001". IPv6 addresses may be
 // configured with or without brackets, and with the zone index needed for link-local addresses, e.g.
 // "[fe80::1%eth0]" (like the API host in the fan2go config).
-func joinHostPort(host string, port int) string {
+func JoinHostPort(host string, port int) string {
 	host = strings.TrimSuffix(strings.TrimPrefix(host, "["), "]")
 	return net.JoinHostPort(host, strconv.Itoa(port))
+}
+
+func joinHostPort(host string, port int) string {
+	return JoinHostPort(host, port)
 }
 
 // endpointUrl returns the URL of an API endpoint. Built as a url.URL rather than formatted, so the zone index of a

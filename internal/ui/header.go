@@ -29,6 +29,9 @@ type ApplicationHeaderComponent struct {
 	pagesMap               orderedmap.OrderedMap[Page, uiutil.PagesPage]
 	page                   Page
 	updateIntervalTextView *tview.TextView
+
+	connectionStatusTextView *tview.TextView
+	connected                bool
 }
 
 func NewApplicationHeader(
@@ -43,6 +46,7 @@ func NewApplicationHeader(
 		version:     versionText,
 		pagesMap:    pagesMap,
 		page:        pagesMap.Keys()[0],
+		connected:   true,
 	}
 
 	applicationHeader.createLayout()
@@ -67,6 +71,10 @@ func (applicationHeader *ApplicationHeaderComponent) createLayout() {
 	versionText := fmt.Sprintf("  %s  ", applicationHeader.version)
 	versionTextView.SetText(versionText)
 	versionTextView.SetTextAlign(tview.AlignCenter)
+
+	connectionStatusTextView := tview.NewTextView().
+		SetTextAlign(tview.AlignCenter)
+	applicationHeader.connectionStatusTextView = connectionStatusTextView
 
 	statusTextView := tview.NewTextView()
 	statusTextView.SetBorderPadding(0, 0, 1, 1)
@@ -97,6 +105,7 @@ func (applicationHeader *ApplicationHeaderComponent) createLayout() {
 
 	layout.AddItem(nameTextView, len(nameText), 0, false)
 	layout.AddItem(versionTextView, len(versionText), 0, false)
+	layout.AddItem(connectionStatusTextView, 0, 0, false)
 	layout.AddItem(statusTextView, 0, 1, false)
 	layout.AddItem(pageIndicatorTextView, len(pageIndicatorText)+4, 0, false)
 	layout.AddItem(applicationHeader.updateIntervalTextView, len(pageIndicatorText)+4, 0, false)
@@ -117,7 +126,32 @@ func (applicationHeader *ApplicationHeaderComponent) updateUi() {
 	applicationHeader.pageIndicatorTextView.SetText(pageIndicatorText)
 }
 
+func (applicationHeader *ApplicationHeaderComponent) SetConnectionStatus(connected bool, message string) {
+	applicationHeader.connected = connected
+	if connected {
+		applicationHeader.connectionStatusTextView.SetText("")
+		applicationHeader.layout.ResizeItem(applicationHeader.connectionStatusTextView, 0, 0)
+		applicationHeader.ResetStatus()
+	} else {
+		badgeText := " DISCONNECTED "
+		applicationHeader.connectionStatusTextView.
+			SetText(badgeText).
+			SetTextColor(theme.Colors.Header.DisconnectedBadge).
+			SetBackgroundColor(theme.Colors.Header.DisconnectedBadgeBackground)
+		applicationHeader.layout.ResizeItem(applicationHeader.connectionStatusTextView, len(badgeText), 0)
+
+		if message != "" {
+			applicationHeader.statusTextView.SetText(message).SetTextColor(tcell.ColorRed)
+			applicationHeader.lastStatus = status_message.NewErrorStatusMessage(message)
+		}
+	}
+	applicationHeader.application.ForceDraw()
+}
+
 func (applicationHeader *ApplicationHeaderComponent) SetStatus(status *status_message.StatusMessage) {
+	if !applicationHeader.connected && status.Message == "" {
+		return
+	}
 	applicationHeader.statusTextView.SetText(status.Message).SetTextColor(status.Color)
 	applicationHeader.application.ForceDraw()
 	if status.Duration > 0 {
@@ -135,6 +169,9 @@ func (applicationHeader *ApplicationHeaderComponent) SetStatus(status *status_me
 }
 
 func (applicationHeader *ApplicationHeaderComponent) ResetStatus() {
+	if !applicationHeader.connected {
+		return
+	}
 	applicationHeader.statusTextView.SetText("").SetTextColor(tcell.ColorWhite)
 	applicationHeader.application.ForceDraw()
 }

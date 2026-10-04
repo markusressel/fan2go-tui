@@ -5,7 +5,6 @@ import (
 	"fan2go-tui/internal/configuration"
 	"fan2go-tui/internal/state"
 	"fan2go-tui/internal/ui/dialog"
-	"fan2go-tui/internal/ui/status_message"
 	"fan2go-tui/internal/ui/util"
 	"time"
 
@@ -14,8 +13,9 @@ import (
 )
 
 const (
-	Main       util.Page = "main"
-	HelpDialog util.Page = "help"
+	Main             util.Page = "main"
+	HelpDialog       util.Page = "help"
+	ConnectingDialog util.Page = "connecting"
 )
 
 var (
@@ -38,12 +38,31 @@ func CreateUi(fullscreen bool) *tview.Application {
 
 	mainPage := NewMainPage(application, store)
 
+	serverAddress := client.JoinHostPort(host, port)
+	connectingDialog := dialog.NewConnectingDialog(serverAddress)
+
+	hasReceivedData := false
+	dismissedConnectingDialog := false
+
+	var pagesLayout *tview.Pages
+
 	poller := state.NewPoller(apiClient, store, func(err error) {
 		application.QueueUpdateDraw(func() {
 			if err != nil {
-				mainPage.showStatusMessage(status_message.NewErrorStatusMessage(err.Error()))
+				if !hasReceivedData && !store.HasData() {
+					connectingDialog.SetError(err)
+					if !dismissedConnectingDialog {
+						pagesLayout.ShowPage(string(ConnectingDialog))
+					} else {
+						mainPage.SetConnectionStatus(false, err.Error())
+					}
+				} else {
+					mainPage.SetConnectionStatus(false, err.Error())
+				}
 			} else {
-				mainPage.clearStatusMessage()
+				hasReceivedData = true
+				pagesLayout.HidePage(string(ConnectingDialog))
+				mainPage.SetConnectionStatus(true, "")
 			}
 			mainPage.Refresh()
 		})
@@ -51,22 +70,40 @@ func CreateUi(fullscreen bool) *tview.Application {
 
 	helpPage := dialog.NewHelpPage()
 
-	pagesLayout := tview.NewPages().
+	pagesLayout = tview.NewPages().
 		AddPage(string(Main), mainPage.layout, true, true).
-		AddPage(string(HelpDialog), helpPage.GetLayout(), true, false)
+		AddPage(string(HelpDialog), helpPage.GetLayout(), true, false).
+		AddPage(string(ConnectingDialog), connectingDialog.GetLayout(), true, true)
 
 	pagesLayout.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		// ignore events, if some other page is open
-		//name, _ := pagesLayout.GetFrontPage()
-		//fileBrowserPage, _ := mainPage.fileBrowser.GetLayout().GetFrontPage()
-		//if name != string(Main) || fileBrowserPage != string(file_browser.FileBrowserPage) {
-		//	return event
-		//}
-
 		if event.Key() == tcell.KeyCtrlC || event.Key() == tcell.KeyCtrlQ {
 			application.Stop()
 			return nil
-		} else if event.Rune() == '?' || event.Key() == tcell.KeyF1 {
+		}
+
+		frontPage, _ := pagesLayout.GetFrontPage()
+		switch frontPage {
+		case string(ConnectingDialog):
+			if event.Key() == tcell.KeyEscape {
+				dismissedConnectingDialog = true
+				pagesLayout.HidePage(string(ConnectingDialog))
+				if connectingDialog.LastError() != nil {
+					mainPage.SetConnectionStatus(false, connectingDialog.LastError().Error())
+				}
+				application.SetFocus(mainPage.layout)
+				return nil
+			}
+			return event
+		case string(HelpDialog):
+			if event.Key() == tcell.KeyEscape {
+				pagesLayout.HidePage(string(HelpDialog))
+				application.SetFocus(mainPage.layout)
+				return nil
+			}
+			return event
+		}
+
+		if event.Rune() == '?' || event.Key() == tcell.KeyF1 {
 			pagesLayout.ShowPage(string(HelpDialog))
 			return nil
 		} else if event.Rune() == '+' {
@@ -88,6 +125,26 @@ func CreateUi(fullscreen bool) *tview.Application {
 	helpPage.GetLayout().SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyEscape {
 			pagesLayout.HidePage(string(HelpDialog))
+			application.SetFocus(mainPage.layout)
+			return nil
+		} else if event.Key() == tcell.KeyCtrlC || event.Key() == tcell.KeyCtrlQ {
+			application.Stop()
+			return nil
+		}
+		return event
+	})
+
+	connectingDialog.GetLayout().SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		if event.Key() == tcell.KeyEscape {
+			dismissedConnectingDialog = true
+			pagesLayout.HidePage(string(ConnectingDialog))
+			if connectingDialog.LastError() != nil {
+				mainPage.SetConnectionStatus(false, connectingDialog.LastError().Error())
+			}
+			application.SetFocus(mainPage.layout)
+			return nil
+		} else if event.Key() == tcell.KeyCtrlC || event.Key() == tcell.KeyCtrlQ {
+			application.Stop()
 			return nil
 		}
 		return event
