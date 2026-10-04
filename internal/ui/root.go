@@ -30,9 +30,9 @@ func CreateUi(fullscreen bool) *tview.Application {
 	application := tview.NewApplication()
 	application.EnableMouse(true)
 
-	baseUrl := configuration.CurrentConfig.Api.Host
+	host := configuration.CurrentConfig.Api.Host
 	port := configuration.CurrentConfig.Api.Port
-	apiClient := client.NewApiClient(baseUrl, port)
+	apiClient := client.NewApiClient(host, port)
 
 	store := state.NewStore()
 
