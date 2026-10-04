@@ -3,7 +3,9 @@ ui:
   updateInterval: 500ms
 
 api:
-  # (optional) The hostname of the fan2go daemon api server
+  # (optional) The hostname of the fan2go daemon api server.
+  # IPv6 addresses can be written with or without brackets. Link-local addresses need the zone index, the interface
+  # to connect through, like in the fan2go config, e.g. "[fe80::18c2:b5ff:fec0:71b8%eth0]"
   host: 127.0.0.1
   # (optional) The port of the fan2go daemon api server
   port: 9001

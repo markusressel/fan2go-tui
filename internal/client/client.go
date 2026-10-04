@@ -6,7 +6,11 @@ import (
 	"fan2go-tui/internal/logging"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
+	"net/url"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -299,16 +303,32 @@ type Fan2goApiClient interface {
 }
 
 type Fan2goApiClientEcho struct {
-	baseUrl   string
+	// hostPort is the host and port of the fan2go API, see joinHostPort
+	hostPort  string
 	webclient *http.Client
 }
 
-func NewApiClient(baseUrl string, port int) Fan2goApiClient {
-	baseUrl = fmt.Sprintf("%s:%d", baseUrl, port)
+func NewApiClient(host string, port int) Fan2goApiClient {
 	return &Fan2goApiClientEcho{
-		baseUrl:   baseUrl,
+		hostPort:  joinHostPort(host, port),
 		webclient: createWebserver(),
 	}
+}
+
+// joinHostPort joins the host and the port of the fan2go API, e.g. "127.0.0.1:9001". IPv6 addresses may be
+// configured with or without brackets, and with the zone index needed for link-local addresses, e.g.
+// "[fe80::1%eth0]" (like the API host in the fan2go config).
+func joinHostPort(host string, port int) string {
+	host = strings.TrimSuffix(strings.TrimPrefix(host, "["), "]")
+	return net.JoinHostPort(host, strconv.Itoa(port))
+}
+
+// endpointUrl returns the URL of an API endpoint. Built as a url.URL rather than formatted, so the zone index of a
+// link-local IPv6 address is encoded as URLs require ("%25eth0", a plain "%eth0" is an invalid escape), and labels
+// are escaped.
+func (client *Fan2goApiClientEcho) endpointUrl(segments ...string) string {
+	endpoint := url.URL{Scheme: "http", Host: client.hostPort, Path: "/" + strings.Join(segments, "/")}
+	return endpoint.String()
 }
 
 func createWebserver() *http.Client {
@@ -316,14 +336,14 @@ func createWebserver() *http.Client {
 }
 
 func (client *Fan2goApiClientEcho) GetFans() (*map[string]*Fan, error) {
-	url := fmt.Sprintf("http://%s/fan", client.baseUrl)
+	url := client.endpointUrl("fan")
 
 	var data map[string]*Fan
 	return doGet(client.webclient, url, data)
 }
 
 func (client *Fan2goApiClientEcho) GetFan(label string) (*Fan, error) {
-	url := fmt.Sprintf("http://%s/fan/%s", client.baseUrl, label)
+	url := client.endpointUrl("fan", label)
 
 	var data *Fan
 	result, err := doGet(client.webclient, url, data)
@@ -335,7 +355,7 @@ func (client *Fan2goApiClientEcho) GetFan(label string) (*Fan, error) {
 }
 
 func (client *Fan2goApiClientEcho) GetCurves() (*map[string]*Curve, error) {
-	url := fmt.Sprintf("http://%s/curve", client.baseUrl)
+	url := client.endpointUrl("curve")
 
 	var data map[string]*Curve
 	result, err := doGet(client.webclient, url, data)
@@ -347,7 +367,7 @@ func (client *Fan2goApiClientEcho) GetCurves() (*map[string]*Curve, error) {
 }
 
 func (client *Fan2goApiClientEcho) GetCurve(label string) (*Curve, error) {
-	url := fmt.Sprintf("http://%s/curve/%s", client.baseUrl, label)
+	url := client.endpointUrl("curve", label)
 
 	var data *Curve
 	result, err := doGet(client.webclient, url, data)
@@ -359,7 +379,7 @@ func (client *Fan2goApiClientEcho) GetCurve(label string) (*Curve, error) {
 }
 
 func (client *Fan2goApiClientEcho) GetSensors() (*map[string]*Sensor, error) {
-	url := fmt.Sprintf("http://%s/sensor", client.baseUrl)
+	url := client.endpointUrl("sensor")
 
 	var data map[string]*Sensor
 	result, err := doGet(client.webclient, url, data)
@@ -371,7 +391,7 @@ func (client *Fan2goApiClientEcho) GetSensors() (*map[string]*Sensor, error) {
 }
 
 func (client *Fan2goApiClientEcho) GetSensor(label string) (*Sensor, error) {
-	url := fmt.Sprintf("http://%s/sensor/%s", client.baseUrl, label)
+	url := client.endpointUrl("sensor", label)
 
 	var data *Sensor
 	result, err := doGet(client.webclient, url, data)
@@ -387,7 +407,9 @@ func doGet[T any](client *http.Client, url string, data T) (*T, error) {
 	// Build the request
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		logging.Warning("Error is req: %v", err)
+		// e.g. an invalid host in the config: without a request, sending it would panic
+		logging.Warning("Error in req: %v", err)
+		return nil, err
 	}
 
 	// Send it
@@ -407,9 +429,9 @@ func doGet[T any](client *http.Client, url string, data T) (*T, error) {
 
 	// Check the status code
 	if resp.StatusCode == http.StatusNotFound {
-		return nil, errors.New(fmt.Sprintf("Cannot reach fan2go daemon, did you enable its API?"))
+		return nil, errors.New("Cannot reach fan2go daemon, did you enable its API?")
 	} else if resp.StatusCode != http.StatusOK {
-		return nil, errors.New(fmt.Sprintf("Unexpected API status code: %s", resp.Status))
+		return nil, fmt.Errorf("Unexpected API status code: %s", resp.Status)
 	}
 
 	// Use json.Decode for reading streams of JSON data
