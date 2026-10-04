@@ -78,3 +78,60 @@ func TestListComponent_ScrollingAndVisibility(t *testing.T) {
 		}
 	})
 }
+
+func TestListComponent_SelectionPreservedAcrossSetData(t *testing.T) {
+	app := tview.NewApplication()
+	config := NewListComponentConfig().WithMaxVisibleItems(5)
+
+	entries := make([]*int, 10)
+	for i := 0; i < 10; i++ {
+		val := i
+		entries[i] = &val
+	}
+
+	list := NewListComponent[int](
+		app,
+		config,
+		func(entry *int) *tview.Flex { return tview.NewFlex() },
+		func(entries []*int, inverted bool) []*int { return entries },
+	)
+
+	list.SetData(entries)
+
+	// Initially select index 3
+	list.SelectEntry(entries[3])
+	if list.GetSelectedIndex() != 3 {
+		t.Fatalf("expected selected index 3, got %d", list.GetSelectedIndex())
+	}
+	if list.GetSelectedItem() != entries[3] {
+		t.Fatalf("expected selected item %v, got %v", entries[3], list.GetSelectedItem())
+	}
+
+	// Refresh with same data
+	list.SetData(entries)
+	if list.GetSelectedIndex() != 3 {
+		t.Errorf("expected selected index to remain 3 after SetData, got %d", list.GetSelectedIndex())
+	}
+	if list.GetSelectedItem() != entries[3] {
+		t.Errorf("expected selected item to remain %v after SetData, got %v", entries[3], list.GetSelectedItem())
+	}
+
+	// Next entry via shiftSelection
+	list.shiftSelection(1)
+	if list.GetSelectedIndex() != 4 {
+		t.Errorf("expected selected index 4 after shiftSelection, got %d", list.GetSelectedIndex())
+	}
+
+	// Refresh again
+	list.SetData(entries)
+	if list.GetSelectedIndex() != 4 {
+		t.Errorf("expected selected index to remain 4 after SetData, got %d", list.GetSelectedIndex())
+	}
+
+	// Triggering entriesLayout focus callback should not reset to 0
+	list.entriesLayout.Focus(func(p tview.Primitive) {})
+	if list.GetSelectedIndex() != 4 {
+		t.Errorf("expected selected index to remain 4 after focus, got %d", list.GetSelectedIndex())
+	}
+}
+

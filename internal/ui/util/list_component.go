@@ -81,25 +81,14 @@ func (c *ListComponent[T]) createLayout() {
 	layout.AddItem(c.scrollbarComponent.GetLayout(), 1, 0, false)
 
 	c.entriesLayout.SetFocusFunc(func() {
-		// ensure the first item is automatically selected, if there is any
 		data := c.GetData()
-		if data != nil && len(data) > 0 {
+		if len(data) > 0 {
 			layout.Blur()
-			if c.selectedIndex == -1 {
-				c.selectedIndex = 0
+			selected := c.GetSelectedItem()
+			if selected == nil || !slices.Contains(data, selected) {
+				selected = data[0]
 			}
-			itemLayout := c.getLayout(data[0])
-
-			c.SelectEntry(c.GetSelectedItem())
-			c.application.SetFocus(itemLayout)
-		}
-	})
-
-	c.entriesLayout.Focus(func(item tview.Primitive) {
-		for idx, entry := range c.entries {
-			if item == c.getLayout(entry) {
-				c.selectedIndex = idx
-			}
+			c.SelectEntry(selected)
 		}
 	})
 
@@ -184,6 +173,7 @@ func (c *ListComponent[T]) GetData() []*T {
 }
 
 func (c *ListComponent[T]) SetData(entries []*T) {
+	hadFocus := c.HasFocus()
 	selectedEntryBefore := c.GetSelectedItem()
 
 	c.entriesMutex.Lock()
@@ -192,37 +182,50 @@ func (c *ListComponent[T]) SetData(entries []*T) {
 
 	if len(entries) == 0 {
 		c.selectedIndex = -1
+		c.updateLayout()
+		return
 	}
 
 	c.updateLayout()
 
-	if len(entries) == 0 {
-		return
-	}
-
 	if selectedEntryBefore != nil && slices.Contains(entries, selectedEntryBefore) {
-		c.selectedIndex = slices.Index(entries, selectedEntryBefore)
-		c.scrollTo(selectedEntryBefore)
+		if hadFocus {
+			c.SelectEntry(selectedEntryBefore)
+		} else {
+			c.selectedIndex = slices.Index(entries, selectedEntryBefore)
+			c.scrollTo(selectedEntryBefore)
+		}
 		c.application.ForceDraw()
 		return
 	}
 
 	if c.selectedIndex < 0 || c.selectedIndex >= len(entries) {
-		c.SelectFirst()
+		if hadFocus {
+			c.SelectFirst()
+		} else {
+			c.selectedIndex = 0
+			c.scrollTo(entries[0])
+		}
+		c.application.ForceDraw()
 		return
 	}
 
+	if hadFocus {
+		c.SelectEntry(entries[c.selectedIndex])
+	} else {
+		c.scrollTo(entries[c.selectedIndex])
+	}
 	c.application.ForceDraw()
 }
 
-func (c *ListComponent[comparable]) SortBy(inverted bool) {
+func (c *ListComponent[T]) SortBy(inverted bool) {
 	c.entriesMutex.Lock()
 	c.sortInverted = inverted
 	c.entries = c.sortListEntries(c.entries, c.sortInverted)
 	c.entriesMutex.Unlock()
 }
 
-func (c *ListComponent[abc]) HasFocus() bool {
+func (c *ListComponent[T]) HasFocus() bool {
 	return c.layout.HasFocus()
 }
 
@@ -310,10 +313,7 @@ func (c *ListComponent[T]) selectAtDataIndex(data []*T, targetIndex int) {
 	}
 
 	target := data[targetIndex]
-	targetLayout := c.getLayout(target)
-	c.selectedIndex = slices.Index(c.entries, target)
-	c.application.SetFocus(targetLayout)
-	c.selectionChangedCallback(target)
+	c.SelectEntry(target)
 }
 
 func (c *ListComponent[T]) scrollSelectedEntryHorizontal(delta int) bool {
@@ -370,13 +370,15 @@ func (c *ListComponent[T]) updateVisibleEntries() {
 		c.entryVisibilityMap[entry] = index >= c.startIndex && index < c.startIndex+maxVisibleItems
 	}
 
+	selected := c.GetSelectedItem()
 	// cleanup the entries layout
 	c.entriesLayout.Clear()
 	// create a layout for each visible entry
 	for _, entry := range data {
 		currentVisibility := c.entryVisibilityMap[entry]
 		if currentVisibility {
-			c.entriesLayout.AddItem(c.getLayout(entry), 0, 1, false)
+			isFocused := selected != nil && entry == selected
+			c.entriesLayout.AddItem(c.getLayout(entry), 0, 1, isFocused)
 		}
 	}
 }
@@ -389,9 +391,9 @@ func (c *ListComponent[T]) SelectEntry(entry *T) {
 	entryToSelect := c.entries[indexToSelect]
 	entryLayout := c.getLayout(entryToSelect)
 	c.selectedIndex = indexToSelect
+	c.scrollTo(entryToSelect)
 	c.application.SetFocus(entryLayout)
 	c.selectionChangedCallback(entry)
-	c.scrollTo(entryToSelect)
 }
 
 func (c *ListComponent[T]) selectPreviousEntry() {
@@ -408,19 +410,28 @@ func (c *ListComponent[T]) selectNextEntry() {
 
 func (c *ListComponent[T]) shiftSelection(rows int) *T {
 	data := c.GetData()
+	if len(data) == 0 {
+		return nil
+	}
+	currentIndex := -1
 	for idx, entry := range data {
-		entryLayout := c.getLayout(entry)
-		if entryLayout.HasFocus() {
-			nextEntryIndex := (len(data) + idx + rows) % len(data)
-			nextEntry := data[nextEntryIndex]
-			nextEntryLayout := c.getLayout(nextEntry)
-			c.selectedIndex = slices.Index(c.entries, nextEntry)
-			c.application.SetFocus(nextEntryLayout)
-			c.selectionChangedCallback(nextEntry)
-			return nextEntry
+		if c.getLayout(entry).HasFocus() {
+			currentIndex = idx
+			break
 		}
 	}
-	return nil
+	if currentIndex == -1 {
+		if c.selectedIndex >= 0 && c.selectedIndex < len(c.entries) {
+			currentIndex = slices.Index(data, c.entries[c.selectedIndex])
+		}
+		if currentIndex == -1 {
+			currentIndex = 0
+		}
+	}
+	nextEntryIndex := (len(data) + currentIndex + rows) % len(data)
+	nextEntry := data[nextEntryIndex]
+	c.SelectEntry(nextEntry)
+	return nextEntry
 }
 
 func (c *ListComponent[T]) scrollTo(selection *T) {
@@ -493,7 +504,17 @@ func (c *ListComponent[T]) GetSelectedIndex() int {
 }
 
 func (c *ListComponent[T]) GetSelectedItem() *T {
-	if c.selectedIndex == -1 {
+	data := c.GetData()
+	for _, entry := range data {
+		if c.getLayout(entry).HasFocus() {
+			c.selectedIndex = slices.Index(c.entries, entry)
+			return entry
+		}
+	}
+	if c.selectedIndex == -1 || c.selectedIndex >= len(c.entries) {
+		if len(c.entries) > 0 {
+			return c.entries[0]
+		}
 		return nil
 	}
 	return c.entries[c.selectedIndex]
