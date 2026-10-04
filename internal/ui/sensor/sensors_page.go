@@ -156,7 +156,7 @@ func (c *SensorsPage) SelectSensorByID(sensorID string) bool {
 
 func (c *SensorsPage) GetShortcutMap() []shortcut_helper.ShortcutEntry {
 	return []shortcut_helper.ShortcutEntry{
-		{KeyCombo: []string{"↑", "↓"}, Name: "Select"},
-		{KeyCombo: []string{"PgUp", "PgDn"}, Name: "Scroll"},
+		{KeyCombo: []string{"↑", "↓"}, Name: "Select sensor", Group: shortcut_helper.GroupNavigation},
+		{KeyCombo: []string{shortcut_helper.KeyPgUp, shortcut_helper.KeyPgDn}, Name: "Scroll list", Group: shortcut_helper.GroupNavigation},
 	}
 }

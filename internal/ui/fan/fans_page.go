@@ -149,7 +149,7 @@ func (c *FansPage) ScrollToItem() {
 
 func (c *FansPage) GetShortcutMap() []shortcut_helper.ShortcutEntry {
 	return []shortcut_helper.ShortcutEntry{
-		{KeyCombo: []string{"↑", "↓"}, Name: "Select"},
-		{KeyCombo: []string{"PgUp", "PgDn"}, Name: "Scroll"},
+		{KeyCombo: []string{"↑", "↓"}, Name: "Select fan", Group: shortcut_helper.GroupNavigation},
+		{KeyCombo: []string{shortcut_helper.KeyPgUp, shortcut_helper.KeyPgDn}, Name: "Scroll list", Group: shortcut_helper.GroupNavigation},
 	}
 }

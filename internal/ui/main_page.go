@@ -50,8 +50,6 @@ func NewMainPage(application *tview.Application, store *state.Store) *MainPage {
 		pagesMap:    *orderedmap.NewOrderedMap[Page, util.PagesPage](),
 	}
 
-	mainPage.shortcutMap = shortcut_helper.NewShortcutMap(application)
-
 	mainPage.layout = mainPage.createLayout()
 	mainPage.layout.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		key := event.Key()
@@ -98,9 +96,15 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 	)
 	mainPage.header = header
 
+	shortcutMap := shortcut_helper.NewShortcutMap(mainPage.application).SetCollapsible()
+	shortcutMap.SetOnHeightChanged(func(height int) {
+		mainPageLayout.ResizeItem(shortcutMap.GetLayout(), height, 0)
+	})
+	mainPage.shortcutMap = shortcutMap
+
 	mainPageLayout.AddItem(header.layout, 1, 0, false)
 	mainPageLayout.AddItem(mainPagePagerLayout, 0, 1, true)
-	mainPageLayout.AddItem(mainPage.shortcutMap.GetLayout(), 1, 0, false)
+	mainPageLayout.AddItem(shortcutMap.GetLayout(), 1, 0, false)
 
 	for page, pagesPage := range mainPage.pagesMap.Iterator() {
 		mainPage.mainPagePagerLayout.AddPage(
@@ -236,11 +240,11 @@ func (mainPage *MainPage) updateShortcutMap() {
 		shortcutMap := c.GetShortcutMap()
 
 		globalShortcutMapEntries := []shortcut_helper.ShortcutEntry{
-			{KeyCombo: []string{"+", "-"}, Name: "Refresh Interval"},
-			{KeyCombo: []string{"Tab"}, Name: "Next"},
-			{KeyCombo: []string{"1-3"}, Name: "Switch"},
-			{KeyCombo: []string{"?", "F1"}, Name: "Help"},
-			{KeyCombo: []string{"Ctrl+Q"}, Name: "Quit"},
+			{KeyCombo: []string{"+", "-"}, Name: "Refresh interval", Group: shortcut_helper.GroupView},
+			{KeyCombo: []string{"1", "2", "3"}, Name: "Switch page", Group: shortcut_helper.GroupNavigation},
+			{KeyCombo: []string{shortcut_helper.KeyTab, shortcut_helper.Shift(shortcut_helper.KeyTab)}, Name: "Cycle page", Group: shortcut_helper.GroupNavigation},
+			shortcut_helper.ShortcutHide,
+			{KeyCombo: []string{shortcut_helper.Ctrl("q")}, Name: "Quit", Group: shortcut_helper.GroupGlobal},
 		}
 
 		shortcutMap = append(shortcutMap, globalShortcutMapEntries...)
