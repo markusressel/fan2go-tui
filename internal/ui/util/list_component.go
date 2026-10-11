@@ -24,6 +24,11 @@ type ListComponent[T comparable] struct {
 	startIndex         int
 	selectedIndex      int
 
+	// pendingScrollEntry is the entry to show at row pendingScrollOffset once the size of the list is known, see
+	// RestoreSelection
+	pendingScrollEntry  *T
+	pendingScrollOffset int
+
 	getLayout                func(entry *T) (layout *tview.Flex)
 	inputCapture             func(event *tcell.EventKey) *tcell.EventKey
 	selectionChangedCallback func(selectedEntry *T)
@@ -356,6 +361,7 @@ func (c *ListComponent[T]) updateVisibleEntries() {
 	if len(data) == 0 {
 		c.startIndex = 0
 	} else {
+		c.applyPendingScroll(data, maxVisibleItems)
 		if c.startIndex+maxVisibleItems > len(data) {
 			c.startIndex = len(data) - maxVisibleItems
 		}
@@ -393,6 +399,10 @@ func (c *ListComponent[T]) SelectEntry(entry *T) {
 	if indexToSelect == -1 {
 		return
 	}
+	if c.pendingScrollEntry != entry {
+		// another entry was selected before the scroll position was restored
+		c.pendingScrollEntry = nil
+	}
 	entryToSelect := c.entries[indexToSelect]
 	entryLayout := c.getLayout(entryToSelect)
 	c.selectedIndex = indexToSelect
@@ -416,6 +426,39 @@ func (c *ListComponent[T]) SelectEntryKeepingFocus(entry *T) {
 	c.selectedIndex = indexToSelect
 	c.scrollTo(entry)
 	c.selectionChangedCallback(entry)
+}
+
+// RestoreSelection selects entry like SelectEntryKeepingFocus, and scrolls the list so entry is shown at row offset
+// of the visible entries (see GetScrollOffset), as far as possible. Until the size of the list is known, the scroll
+// position is kept pending.
+func (c *ListComponent[T]) RestoreSelection(entry *T, offset int) {
+	if !slices.Contains(c.entries, entry) {
+		return
+	}
+	c.pendingScrollEntry = entry
+	c.pendingScrollOffset = offset
+	c.SelectEntryKeepingFocus(entry)
+	c.updateLayout()
+}
+
+// GetScrollOffset returns the row of entry within the visible entries, e.g. 0 if it is the first one shown.
+func (c *ListComponent[T]) GetScrollOffset(entry *T) int {
+	if c.pendingScrollEntry != nil && c.pendingScrollEntry == entry {
+		return c.pendingScrollOffset
+	}
+	return slices.Index(c.GetData(), entry) - c.startIndex
+}
+
+// applyPendingScroll scrolls to the position given to RestoreSelection, once the size of the list is known.
+func (c *ListComponent[T]) applyPendingScroll(data []*T, maxVisibleItems int) {
+	if c.pendingScrollEntry == nil || !c.hasKnownSize() {
+		return
+	}
+	index := slices.Index(data, c.pendingScrollEntry)
+	if index >= 0 {
+		c.startIndex = index - min(max(c.pendingScrollOffset, 0), maxVisibleItems-1)
+	}
+	c.pendingScrollEntry = nil
 }
 
 func (c *ListComponent[T]) selectPreviousEntry() {
@@ -562,15 +605,27 @@ func (c *ListComponent[T]) GetMaxVisibleItems() int {
 		return 1
 	}
 
-	_, _, width, height := c.layout.GetInnerRect()
-	// During startup, primitives may report a placeholder 1x1 rect before real layout is applied.
-	if height <= 1 || width <= 1 || (len(c.entryVisibilityMap) == 0 && height < c.config.MinHeightPerEntry) {
+	if !c.hasKnownSize() {
 		if len(c.entries) > 0 {
 			return len(c.entries)
 		}
 		return 1
 	}
 
+	_, _, _, height := c.layout.GetInnerRect()
 	dynamicMaxVisibleItems := util.Coerce(float64(height/c.config.MinHeightPerEntry), 1, float64(1000))
 	return int(dynamicMaxVisibleItems)
+}
+
+// hasKnownSize returns false during startup, when the list may report a placeholder 1x1 rect before the real layout
+// is applied.
+func (c *ListComponent[T]) hasKnownSize() bool {
+	if c.config.MaxVisibleItems > 0 {
+		return true
+	}
+	if c.layout == nil || c.entriesLayout == nil {
+		return false
+	}
+	_, _, width, height := c.layout.GetInnerRect()
+	return height > 1 && width > 1 && (len(c.entryVisibilityMap) > 0 || height >= c.config.MinHeightPerEntry)
 }

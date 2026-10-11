@@ -8,8 +8,9 @@ import (
 // ListSelection remembers the selection of a ListComponent (see SelectionMemory), and selects the remembered entry
 // once the list has entries, e.g. after the first data was received from the fan2go daemon.
 type ListSelection[T comparable] struct {
-	list   *ListComponent[T]
-	memory *SelectionMemory[T]
+	list     *ListComponent[T]
+	identify func(entry *T) string
+	memory   *SelectionMemory[T]
 	// key is the key of the selection in memory, see Persist
 	key string
 	// restored is true once the remembered entry was selected; until then, the selection is not remembered, so the
@@ -20,8 +21,9 @@ type ListSelection[T comparable] struct {
 // NewListSelection remembers the selection of list, identifying the entries with identify (e.g. by their ID).
 func NewListSelection[T comparable](list *ListComponent[T], identify func(entry *T) string) *ListSelection[T] {
 	selection := &ListSelection[T]{
-		list:   list,
-		memory: NewSelectionMemory(identify),
+		list:     list,
+		identify: identify,
+		memory:   NewSelectionMemory(identify),
 	}
 	list.SetSelectionChangedCallback(selection.remember)
 	return selection
@@ -40,7 +42,8 @@ func (s *ListSelection[T]) Persist(store *uistate.Store, namespace string, key s
 }
 
 // Update must be called after the entries of the list were set: the first time the list has entries, the remembered
-// entry is selected, afterwards the selected entry is remembered (e.g. one selected with the mouse).
+// entry is selected and scrolled to its remembered position, afterwards the selected entry and the scroll position
+// are remembered (e.g. an entry selected with the mouse).
 func (s *ListSelection[T]) Update() {
 	if s.restored {
 		s.remember(s.list.GetSelectedItem())
@@ -51,12 +54,20 @@ func (s *ListSelection[T]) Update() {
 		return
 	}
 	s.restored = true
-	s.list.SelectEntryKeepingFocus(entry)
+	offset := 0
+	if info := s.memory.Get(s.key); info != nil {
+		offset = info.Offset
+	}
+	s.list.RestoreSelection(entry, offset)
 }
 
 func (s *ListSelection[T]) remember(entry *T) {
 	if !s.restored || entry == nil {
 		return
 	}
-	s.memory.Remember(s.key, slices.Index(s.list.GetData(), entry), entry)
+	s.memory.RememberInfo(s.key, SelectionInfo{
+		Index:  slices.Index(s.list.GetData(), entry),
+		Key:    s.identify(entry),
+		Offset: s.list.GetScrollOffset(entry),
+	})
 }

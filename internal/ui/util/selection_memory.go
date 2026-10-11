@@ -11,6 +11,8 @@ type SelectionInfo struct {
 	Index int `json:"index"`
 	// Key identifies the selected entry, empty if the header row was selected
 	Key string `json:"key,omitempty"`
+	// Offset is the row of the entry within the visible entries, to restore the scroll position
+	Offset int `json:"offset,omitempty"`
 }
 
 // SelectionMemory remembers the selection of a list by a key, e.g. the selected fan of each fan2go daemon, so the
