@@ -16,6 +16,9 @@
 * [x] Visualize detected and configured fans
 * [x] Monitor curve values
 * [x] Inspect sensor readings
+* [x] Remembers the shown page, the selected fan, curve and sensor of each fan2go daemon and whether the shortcuts
+  are hidden between runs (in `~/.local/state/fan2go-tui/state.json`). `--fresh` (or `ui.restoreSession: false` in
+  the configuration) starts on the first page instead.
 
 # How to use
 

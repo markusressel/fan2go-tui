@@ -6,7 +6,10 @@ import (
 	"fan2go-tui/internal/state"
 	"fan2go-tui/internal/ui/dialog"
 	"fan2go-tui/internal/ui/shortcut_helper"
+	"fan2go-tui/internal/ui/status_message"
 	"fan2go-tui/internal/ui/util"
+	"fan2go-tui/internal/uistate"
+	"fmt"
 	"time"
 
 	"github.com/gdamore/tcell/v2"
@@ -24,7 +27,15 @@ var (
 	UpdateIntervalStepSize = 100 * time.Millisecond
 )
 
+// CreateUi creates the application, restoring the last session with the configured fan2go daemon (see
+// configuration.UiConfig.RestoreSession), and remembering the session in uistate.Current.
 func CreateUi(fullscreen bool) *tview.Application {
+	application, _ := createUi(fullscreen)
+	return application
+}
+
+// createUi creates the application, see CreateUi, and returns its main page as well (for tests).
+func createUi(fullscreen bool) (*tview.Application, *MainPage) {
 	shortcut_helper.InitShortcutVisibility()
 	UpdateTicker = time.NewTicker(configuration.CurrentConfig.Ui.UpdateInterval)
 
@@ -40,6 +51,10 @@ func CreateUi(fullscreen bool) *tview.Application {
 	mainPage := NewMainPage(application, store)
 
 	serverAddress := client.JoinHostPort(host, port)
+	mainPage.PersistSession(uistate.Current, serverAddress, configuration.CurrentConfig.Ui.RestoreSession)
+	if version, newer := uistate.Current.NewerVersion(); newer {
+		mainPage.header.SetDefaultStatus(newerStateVersionMessage(version))
+	}
 	connectingDialog := dialog.NewConnectingDialog(serverAddress)
 
 	hasReceivedData := false
@@ -148,7 +163,7 @@ func CreateUi(fullscreen bool) *tview.Application {
 		}
 	}()
 
-	return application.SetRoot(pagesLayout, fullscreen)
+	return application.SetRoot(pagesLayout, fullscreen), mainPage
 }
 
 func speedUpUpdateInterval(mainPage *MainPage) {
@@ -165,4 +180,12 @@ func slowDownUpdateInterval(mainPage *MainPage) {
 	configuration.CurrentConfig.Ui.UpdateInterval += UpdateIntervalStepSize
 	UpdateTicker.Reset(configuration.CurrentConfig.Ui.UpdateInterval)
 	mainPage.UpdateHeader()
+}
+
+// newerStateVersionMessage is the warning shown if the remembered state was saved by a newer version of the
+// application, see uistate.Store.NewerVersion.
+func newerStateVersionMessage(version int) *status_message.StatusMessage {
+	return status_message.NewWarningStatusMessage(fmt.Sprintf(
+		"Remembered settings are from a newer fan2go-tui (format %d) and are not saved. Please update fan2go-tui.",
+		version))
 }

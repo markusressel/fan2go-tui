@@ -26,6 +26,9 @@ func TestConfiguration_DefaultsAndLoad(t *testing.T) {
 	if CurrentConfig.Profiling.Enabled {
 		t.Errorf("expected profiling disabled by default")
 	}
+	if !CurrentConfig.Ui.RestoreSession {
+		t.Errorf("expected the session to be restored by default")
+	}
 }
 
 func TestConfiguration_ConfigFileLoading(t *testing.T) {

@@ -5,12 +5,20 @@ import (
 	"fan2go-tui/internal/state"
 	"fan2go-tui/internal/ui/shortcut_helper"
 	"fan2go-tui/internal/ui/util"
+	"fan2go-tui/internal/uistate"
 	"sort"
 	"strings"
 
 	"github.com/rivo/tview"
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
+)
+
+const (
+	// selectionNamespace is the namespace of the selected fan of each fan2go daemon, see PersistSelection
+	selectionNamespace = "fans.selection"
+	// maxRememberedServers is the number of fan2go daemons the selection is remembered for
+	maxRememberedServers = 20
 )
 
 type FansPage struct {
@@ -21,6 +29,8 @@ type FansPage struct {
 	layout *tview.Flex
 
 	fanList *util.ListComponent[FanListItemComponent]
+	// selection remembers the selected fan, see PersistSelection
+	selection *util.ListSelection[FanListItemComponent]
 
 	fanListItemComponents map[string]*FanListItemComponent
 	onOpenCurve           func(curveID string)
@@ -77,6 +87,9 @@ func (c *FansPage) createLayout() *tview.Flex {
 		},
 	)
 	c.fanList = fanListComponent
+	c.selection = util.NewListSelection(c.fanList, func(entry *FanListItemComponent) string {
+		return entry.FanState.Fan.Config.ID
+	})
 	fansPageLayout.AddItem(c.fanList.GetLayout(), 0, 1, true)
 
 	return fansPageLayout
@@ -139,6 +152,7 @@ func (c *FansPage) Refresh() error {
 	}
 
 	c.fanList.SetData(fanListItemsComponents)
+	c.selection.Update()
 
 	return nil
 }
@@ -160,4 +174,10 @@ func (c *FansPage) GetShortcutMap() []shortcut_helper.ShortcutEntry {
 		{KeyCombo: []string{"↑", "↓"}, Name: "Select fan", Group: shortcut_helper.GroupNavigation},
 		{KeyCombo: []string{shortcut_helper.KeyPgUp, shortcut_helper.KeyPgDn}, Name: "Scroll list", Group: shortcut_helper.GroupNavigation},
 	}
+}
+
+// PersistSelection remembers the selected fan of the fan2go daemon at the address server in store, and selects the
+// one remembered in the last run if restore is true. Must be called before the first Refresh.
+func (c *FansPage) PersistSelection(store *uistate.Store, server string, restore bool) {
+	c.selection.Persist(store, selectionNamespace, server, maxRememberedServers, restore)
 }

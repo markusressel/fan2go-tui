@@ -402,6 +402,22 @@ func (c *ListComponent[T]) SelectEntry(entry *T) {
 	c.selectionChangedCallback(entry)
 }
 
+// SelectEntryKeepingFocus selects entry like SelectEntry, but only focuses it if the list has the focus, so a list
+// that is not shown does not take it.
+func (c *ListComponent[T]) SelectEntryKeepingFocus(entry *T) {
+	if c.HasFocus() {
+		c.SelectEntry(entry)
+		return
+	}
+	indexToSelect := slices.Index(c.entries, entry)
+	if indexToSelect == -1 {
+		return
+	}
+	c.selectedIndex = indexToSelect
+	c.scrollTo(entry)
+	c.selectionChangedCallback(entry)
+}
+
 func (c *ListComponent[T]) selectPreviousEntry() {
 	newSelection := c.shiftSelection(-1)
 	c.scrollTo(newSelection)

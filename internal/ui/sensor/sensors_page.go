@@ -5,12 +5,20 @@ import (
 	"fan2go-tui/internal/state"
 	"fan2go-tui/internal/ui/shortcut_helper"
 	"fan2go-tui/internal/ui/util"
+	"fan2go-tui/internal/uistate"
 	"sort"
 	"strings"
 
 	"github.com/rivo/tview"
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
+)
+
+const (
+	// selectionNamespace is the namespace of the selected sensor of each fan2go daemon, see PersistSelection
+	selectionNamespace = "sensors.selection"
+	// maxRememberedServers is the number of fan2go daemons the selection is remembered for
+	maxRememberedServers = 20
 )
 
 type SensorsPage struct {
@@ -24,6 +32,8 @@ type SensorsPage struct {
 	sensorRowLayout *tview.Flex
 
 	sensorList *util.ListComponent[SensorListItemComponent]
+	// selection remembers the selected sensor, see PersistSelection
+	selection *util.ListSelection[SensorListItemComponent]
 
 	sensorListItemComponents map[string]*SensorListItemComponent
 }
@@ -76,6 +86,9 @@ func (c *SensorsPage) createLayout() *tview.Flex {
 		},
 	)
 	c.sensorList = sensorListComponent
+	c.selection = util.NewListSelection(c.sensorList, func(entry *SensorListItemComponent) string {
+		return entry.SensorState.Sensor.Config.ID
+	})
 	sensorsPageLayout.AddItem(c.sensorList.GetLayout(), 0, 1, true)
 
 	return sensorsPageLayout
@@ -137,6 +150,7 @@ func (c *SensorsPage) Refresh() error {
 	}
 
 	c.sensorList.SetData(sensorListItemsComponents)
+	c.selection.Update()
 
 	return nil
 }
@@ -167,4 +181,10 @@ func (c *SensorsPage) GetShortcutMap() []shortcut_helper.ShortcutEntry {
 		{KeyCombo: []string{"↑", "↓"}, Name: "Select sensor", Group: shortcut_helper.GroupNavigation},
 		{KeyCombo: []string{shortcut_helper.KeyPgUp, shortcut_helper.KeyPgDn}, Name: "Scroll list", Group: shortcut_helper.GroupNavigation},
 	}
+}
+
+// PersistSelection remembers the selected sensor of the fan2go daemon at the address server in store, and selects the
+// one remembered in the last run if restore is true. Must be called before the first Refresh.
+func (c *SensorsPage) PersistSelection(store *uistate.Store, server string, restore bool) {
+	c.selection.Persist(store, selectionNamespace, server, maxRememberedServers, restore)
 }

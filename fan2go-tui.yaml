@@ -1,6 +1,9 @@
 ui:
   # (optional) Defines the default update interval on startup for fetching data from the fan2go daemon
   updateInterval: 500ms
+  # (optional) Whether to restore the last session (page and selected fan, curve and sensor) when connecting to the
+  # same fan2go daemon again. --fresh skips it for a single run.
+  restoreSession: true
 
 api:
   # (optional) The hostname of the fan2go daemon api server.

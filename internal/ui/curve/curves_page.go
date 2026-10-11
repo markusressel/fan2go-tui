@@ -5,12 +5,20 @@ import (
 	"fan2go-tui/internal/state"
 	"fan2go-tui/internal/ui/shortcut_helper"
 	"fan2go-tui/internal/ui/util"
+	"fan2go-tui/internal/uistate"
 	"sort"
 	"strings"
 
 	"github.com/rivo/tview"
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
+)
+
+const (
+	// selectionNamespace is the namespace of the selected curve of each fan2go daemon, see PersistSelection
+	selectionNamespace = "curves.selection"
+	// maxRememberedServers is the number of fan2go daemons the selection is remembered for
+	maxRememberedServers = 20
 )
 
 type CurvesPage struct {
@@ -25,6 +33,8 @@ type CurvesPage struct {
 	curveRowLayout *tview.Flex
 
 	curveList *util.ListComponent[CurveListItemComponent]
+	// selection remembers the selected curve, see PersistSelection
+	selection *util.ListSelection[CurveListItemComponent]
 
 	curveListItemComponents map[string]*CurveListItemComponent
 	onOpenSensor            func(sensorID string)
@@ -81,6 +91,9 @@ func (c *CurvesPage) createLayout() *tview.Flex {
 		},
 	)
 	c.curveList = curveListComponent
+	c.selection = util.NewListSelection(c.curveList, func(entry *CurveListItemComponent) string {
+		return entry.CurveState.Curve.Config.ID
+	})
 	curvesPageLayout.AddItem(c.curveList.GetLayout(), 0, 1, true)
 
 	return curvesPageLayout
@@ -142,6 +155,7 @@ func (c *CurvesPage) Refresh() error {
 	}
 
 	c.curveList.SetData(curveListItemsComponents)
+	c.selection.Update()
 
 	return nil
 }
@@ -172,4 +186,10 @@ func (c *CurvesPage) GetShortcutMap() []shortcut_helper.ShortcutEntry {
 		{KeyCombo: []string{"↑", "↓"}, Name: "Select curve", Group: shortcut_helper.GroupNavigation},
 		{KeyCombo: []string{shortcut_helper.KeyPgUp, shortcut_helper.KeyPgDn}, Name: "Scroll list", Group: shortcut_helper.GroupNavigation},
 	}
+}
+
+// PersistSelection remembers the selected curve of the fan2go daemon at the address server in store, and selects the
+// one remembered in the last run if restore is true. Must be called before the first Refresh.
+func (c *CurvesPage) PersistSelection(store *uistate.Store, server string, restore bool) {
+	c.selection.Persist(store, selectionNamespace, server, maxRememberedServers, restore)
 }

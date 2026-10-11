@@ -7,4 +7,6 @@ var (
 	NoColor bool
 	NoStyle bool
 	Verbose bool
+	// Fresh starts without restoring the last session, see configuration.UiConfig.RestoreSession
+	Fresh bool
 )

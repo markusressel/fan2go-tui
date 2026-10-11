@@ -18,6 +18,8 @@ type Configuration struct {
 
 type UiConfig struct {
 	UpdateInterval time.Duration `json:"updateInterval"`
+	// RestoreSession restores the last session (page and selections) when connecting to the same fan2go daemon again
+	RestoreSession bool `json:"restoreSession"`
 }
 
 var (
@@ -56,8 +58,10 @@ func InitConfig(cfgFile string) {
 func setDefaultValues() {
 	viper.SetDefault("Ui", UiConfig{
 		UpdateInterval: defaultUpdateInterval,
+		RestoreSession: true,
 	})
 	viper.SetDefault("Ui.UpdateInterval", defaultUpdateInterval)
+	viper.SetDefault("Ui.RestoreSession", true)
 
 	viper.SetDefault("Api", ApiConfig{
 		Host: "127.0.0.1",

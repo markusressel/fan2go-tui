@@ -5,6 +5,7 @@ import (
 	"fan2go-tui/internal/configuration"
 	"fan2go-tui/internal/logging"
 	"fan2go-tui/internal/ui"
+	"fan2go-tui/internal/uistate"
 	"fmt"
 	"net/http"
 	"net/http/pprof"
@@ -17,6 +18,8 @@ import (
 )
 
 func RunApplication() {
+	uistate.Init()
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -87,7 +90,11 @@ func RunApplication() {
 		})
 	}
 
-	if err := g.Run(); err != nil {
+	err := g.Run()
+	if flushErr := uistate.Current.Flush(); flushErr != nil {
+		logging.Error("Cannot save state: %v", flushErr)
+	}
+	if err != nil {
 		logging.Error("%v", err)
 		_, _ = fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
