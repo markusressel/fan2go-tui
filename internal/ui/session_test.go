@@ -57,9 +57,9 @@ func startUi(t *testing.T, statePath string) *runningUi {
 	if err := screen.Init(); err != nil {
 		t.Fatalf("failed to init screen: %v", err)
 	}
-	screen.SetSize(120, 40)
-	app, mainPage := createUi(false)
+	app, mainPage := createUi(true)
 	app.SetScreen(screen)
+	screen.SetSize(120, 40)
 	go func() { _ = app.Run() }()
 	t.Cleanup(app.Stop)
 	return &runningUi{t: t, app: app, mainPage: mainPage, screen: screen}
@@ -170,6 +170,57 @@ func TestSession_IsRestored(t *testing.T) {
 	ui.waitFor("selection of the fresh start restored", func(page Page, fanID string, _ string) bool {
 		return page == FansPage && fanID == "case-intake"
 	})
+	ui.stop()
+}
+
+// visibleFans returns the indices of the first and the last fan shown.
+func (ui *runningUi) visibleFans() (first int, last int) {
+	ui.onUiThread(func() {
+		fansPage, _ := ui.mainPage.pagesMap.Get(FansPage)
+		first, last = fansPage.(*fan.FansPage).GetVisibleRange()
+	})
+	return first, last
+}
+
+// waitForVisibleFans waits until the fans first to last are shown.
+func (ui *runningUi) waitForVisibleFans(message string, first int, last int) {
+	ui.t.Helper()
+	deadline := time.Now().Add(5 * time.Second)
+	for {
+		shownFirst, shownLast := ui.visibleFans()
+		if shownFirst == first && shownLast == last {
+			return
+		}
+		if time.Now().After(deadline) {
+			ui.t.Fatalf("%s: expected fans %d-%d to be shown, got %d-%d", message, first, last, shownFirst, shownLast)
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
+}
+
+// The scroll position of the list is restored with the selection, not only scrolled far enough to show it.
+func TestSession_ScrollPositionIsRestored(t *testing.T) {
+	startDemoServer(t)
+	statePath := filepath.Join(t.TempDir(), "state.json")
+
+	ui := startUi(t, statePath)
+	ui.waitFor("fans loaded", func(_ Page, fanID string, _ string) bool { return fanID == "case-exhaust" })
+	ui.waitForVisibleFans("first fans shown", 0, 1)
+	for range 3 {
+		ui.pressKey(tcell.KeyDown, 0)
+	}
+	ui.waitFor("last fan selected", func(_ Page, fanID string, _ string) bool { return fanID == "gpu-fan" })
+	ui.pressKey(tcell.KeyUp, 0)
+	ui.waitFor("third fan selected", func(_ Page, fanID string, _ string) bool { return fanID == "cpu-fan" })
+	ui.waitForVisibleFans("last fans shown", 2, 3)
+	ui.stop()
+
+	ui = startUi(t, statePath)
+	ui.waitFor("fan restored", func(_ Page, fanID string, _ string) bool { return fanID == "cpu-fan" })
+	ui.waitForVisibleFans("scroll position restored", 2, 3)
+	// not undone by the next update
+	time.Sleep(3 * configuration.CurrentConfig.Ui.UpdateInterval)
+	ui.waitForVisibleFans("scroll position kept", 2, 3)
 	ui.stop()
 }
 

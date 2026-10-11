@@ -165,6 +165,11 @@ func (c *FansPage) GetSelectedItem() *FanListItemComponent {
 	return c.fanList.GetSelectedItem()
 }
 
+// GetVisibleRange returns the indices of the first and the last fan shown.
+func (c *FansPage) GetVisibleRange() (int, int) {
+	return c.fanList.GetVisibleRange()
+}
+
 func (c *FansPage) GetSelectedIndex() int {
 	return c.fanList.GetSelectedIndex()
 }
