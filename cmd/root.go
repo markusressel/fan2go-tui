@@ -23,6 +23,7 @@ var rootCmd = &cobra.Command{
 		configPath := configuration.DetectAndReadConfigFile()
 		logging.Info("Using configuration file at: %s", configPath)
 		configuration.LoadConfig()
+		applyFreshFlag()
 		err := configuration.Validate(configPath)
 		if err != nil {
 			logging.Error("Config Validation Error: %v", err.Error())
@@ -38,6 +39,15 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&global.NoColor, "no-color", "", false, "Disable all terminal output coloration")
 	rootCmd.PersistentFlags().BoolVarP(&global.NoStyle, "no-style", "", false, "Disable all terminal output styling")
 	rootCmd.PersistentFlags().BoolVarP(&global.Verbose, "verbose", "v", false, "More verbose output")
+	rootCmd.PersistentFlags().BoolVarP(&global.Fresh, "fresh", "", false, "Start without restoring the last session")
+}
+
+// applyFreshFlag disables restoring the last session if --fresh is given. Must be called after loading the
+// configuration.
+func applyFreshFlag() {
+	if global.Fresh {
+		configuration.CurrentConfig.Ui.RestoreSession = false
+	}
 }
 
 func setupUi() {

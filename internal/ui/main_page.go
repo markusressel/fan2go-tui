@@ -8,6 +8,7 @@ import (
 	"fan2go-tui/internal/ui/shortcut_helper"
 	"fan2go-tui/internal/ui/status_message"
 	"fan2go-tui/internal/ui/util"
+	"fan2go-tui/internal/uistate"
 	"slices"
 	"sync"
 
@@ -39,6 +40,10 @@ type MainPage struct {
 	refreshMutex        sync.Mutex
 
 	pagesMap orderedmap.OrderedMap[Page, util.PagesPage]
+
+	// sessionStore and server are where the session is remembered, see PersistSession
+	sessionStore *uistate.Store
+	server       string
 }
 
 func NewMainPage(application *tview.Application, store *state.Store) *MainPage {
@@ -157,15 +162,20 @@ func (mainPage *MainPage) GetPageAtIndex(i int) Page {
 }
 
 func (mainPage *MainPage) SetPage(page Page) {
-	mainPage.page = page
-	mainPage.header.SetPage(page)
-
-	mainPage.mainPagePagerLayout.SwitchToPage(string(page))
+	mainPage.showPage(page)
+	mainPage.rememberSession()
 	mainPage.application.ForceDraw()
 	mainPage.Refresh()
 
 	mainPage.scrollCurrentPageToItem()
 	mainPage.updateShortcutMap()
+}
+
+// showPage shows page, without refreshing it.
+func (mainPage *MainPage) showPage(page Page) {
+	mainPage.page = page
+	mainPage.header.SetPage(page)
+	mainPage.mainPagePagerLayout.SwitchToPage(string(page))
 }
 
 func (mainPage *MainPage) scrollCurrentPageToItem() {

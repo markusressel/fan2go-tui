@@ -1,9 +1,13 @@
 package shortcut_helper
 
 import (
+	"fan2go-tui/internal/uistate"
 	"sync/atomic"
 	"weak"
 )
+
+// toggleHideShortcuts is the key of the setting in uistate.Current.
+const toggleHideShortcuts = "ui.hideShortcuts"
 
 var (
 	// shortcutsHidden is whether collapsible shortcut maps are hidden.
@@ -15,9 +19,9 @@ var (
 	collapsibleMaps []weak.Pointer[ShortcutMapComponent]
 )
 
-// InitShortcutVisibility resets shortcut visibility state. Called when the UI is created.
+// InitShortcutVisibility loads the setting from uistate.Current. Called when the UI is created.
 func InitShortcutVisibility() {
-	shortcutsHidden.Store(false)
+	shortcutsHidden.Store(uistate.Current.Toggle(toggleHideShortcuts, false))
 	collapsibleMaps = nil
 }
 
@@ -26,11 +30,12 @@ func ShortcutsHidden() bool {
 	return shortcutsHidden.Load()
 }
 
-// ToggleShortcuts hides or shows all collapsible shortcut maps.
+// ToggleShortcuts hides or shows all collapsible shortcut maps, and remembers the setting.
 // Must be called on the UI thread.
 func ToggleShortcuts() {
 	hidden := !shortcutsHidden.Load()
 	shortcutsHidden.Store(hidden)
+	uistate.Current.SetToggle(toggleHideShortcuts, hidden)
 
 	alive := collapsibleMaps[:0]
 	for _, pointer := range collapsibleMaps {

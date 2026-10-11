@@ -36,6 +36,7 @@ or with the '--ui' flag to launch the TUI directly connected to the simulated se
 		configPath := configuration.DetectAndReadConfigFile()
 		logging.Info("Using configuration file at: %s", configPath)
 		configuration.LoadConfig()
+		applyFreshFlag()
 
 		host := demoHost
 		port := demoPort

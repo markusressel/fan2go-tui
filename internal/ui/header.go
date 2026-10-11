@@ -26,7 +26,9 @@ type ApplicationHeaderComponent struct {
 	statusTextView        *tview.TextView
 	pageIndicatorTextView *tview.TextView
 
-	lastStatus             *status_message.StatusMessage
+	lastStatus *status_message.StatusMessage
+	// defaultStatus is shown when there is no other status, see SetDefaultStatus
+	defaultStatus          *status_message.StatusMessage
 	pagesMap               orderedmap.OrderedMap[Page, uiutil.PagesPage]
 	page                   Page
 	updateIntervalTextView *tview.TextView
@@ -161,8 +163,22 @@ func (applicationHeader *ApplicationHeaderComponent) SetConnectionStatus(connect
 	applicationHeader.application.ForceDraw()
 }
 
+// SetDefaultStatus shows status whenever there is no other status, e.g. a warning that must not be missed.
+func (applicationHeader *ApplicationHeaderComponent) SetDefaultStatus(status *status_message.StatusMessage) {
+	applicationHeader.defaultStatus = status
+	lastStatus := applicationHeader.lastStatus
+	if lastStatus == nil || lastStatus.Message == "" {
+		applicationHeader.ResetStatus()
+	}
+}
+
 func (applicationHeader *ApplicationHeaderComponent) SetStatus(status *status_message.StatusMessage) {
 	if !applicationHeader.connected && status.Message == "" {
+		return
+	}
+	if status.Message == "" && applicationHeader.defaultStatus != nil {
+		applicationHeader.lastStatus = status
+		applicationHeader.ResetStatus()
 		return
 	}
 	applicationHeader.statusTextView.SetText(status.Message).SetTextColor(status.Color)
@@ -185,7 +201,11 @@ func (applicationHeader *ApplicationHeaderComponent) ResetStatus() {
 	if !applicationHeader.connected {
 		return
 	}
-	applicationHeader.statusTextView.SetText("").SetTextColor(tcell.ColorWhite)
+	if status := applicationHeader.defaultStatus; status != nil {
+		applicationHeader.statusTextView.SetText(status.Message).SetTextColor(status.Color)
+	} else {
+		applicationHeader.statusTextView.SetText("").SetTextColor(tcell.ColorWhite)
+	}
 	applicationHeader.application.ForceDraw()
 }
 
