@@ -3,6 +3,7 @@ package graph
 import (
 	"math"
 	"slices"
+	"sort"
 	"strconv"
 
 	"golang.org/x/exp/maps"
@@ -67,12 +68,28 @@ func (p *DiscreteIntSeriesValueProvider) X(i int) float64 {
 	return float64(p.keys[i])
 }
 
+// F returns the value at x, interpolated linearly between the neighbouring keys, so a graph sampling the values at
+// non-integer x (depending on its width) shows the same curve at every width. Outside the keys, it returns NaN.
 func (p *DiscreteIntSeriesValueProvider) F(x float64) float64 {
-	val, ok := p.values[int(math.Floor(x))]
-	if !ok {
+	if p == nil || len(p.keys) == 0 || math.IsNaN(x) || math.IsInf(x, 0) {
 		return math.NaN()
 	}
-	return val
+	// index of the first key after x
+	next := sort.Search(len(p.keys), func(i int) bool { return float64(p.keys[i]) > x })
+	if next == 0 {
+		return math.NaN()
+	}
+	x0 := float64(p.keys[next-1])
+	y0 := p.values[p.keys[next-1]]
+	if x == x0 {
+		return y0
+	}
+	if next == len(p.keys) {
+		return math.NaN()
+	}
+	x1 := float64(p.keys[next])
+	y1 := p.values[p.keys[next]]
+	return y0 + (y1-y0)*(x-x0)/(x1-x0)
 }
 
 func (p *DiscreteIntSeriesValueProvider) XLabel(_ int, x float64) string {

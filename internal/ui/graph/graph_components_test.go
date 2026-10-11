@@ -1,6 +1,7 @@
 package graph
 
 import (
+	"math"
 	"testing"
 
 	"github.com/gdamore/tcell/v2"
@@ -21,6 +22,18 @@ func TestSeriesValueProvider(t *testing.T) {
 	}
 	if p.F(10.0) != 100.0 {
 		t.Errorf("expected F(10)=100, got %v", p.F(10.0))
+	}
+	// between the keys, the values are interpolated, outside of them there are none
+	if p.F(12.5) != 125.0 {
+		t.Errorf("expected F(12.5)=125, got %v", p.F(12.5))
+	}
+	if p.F(30.0) != 300.0 {
+		t.Errorf("expected F(30)=300, got %v", p.F(30.0))
+	}
+	for _, x := range []float64{9.9, 30.1, math.NaN()} {
+		if !math.IsNaN(p.F(x)) {
+			t.Errorf("expected F(%v)=NaN, got %v", x, p.F(x))
+		}
 	}
 	if p.XLabel(1, 20.0) != "20" {
 		t.Errorf("expected XLabel(1, 20)=20, got %q", p.XLabel(1, 20.0))
