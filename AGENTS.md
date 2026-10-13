@@ -100,8 +100,9 @@ tview is not thread safe, and every update redraws the whole screen. Most UI bug
 - Standard `testing` (no testify). Table tests where several inputs share an assertion.
 - UI tests run a real `tview.Application` on `tcell.NewSimulationScreen("UTF-8")` and talk to the simulated daemon
   (see `startDemoServer`/`startUi` in `internal/ui/session_test.go`). `internal/testutil`: `RunApplication` (stops the
-  application at the end of the test, or with the returned function, and waits for it), `OnUiThread` (read or change widgets only there), `WaitFor`
-  (instead of sleeping after an injected key or for a background update).
+  application at the end of the test, or with the returned function, and waits for it; do not call `Stop` again
+  after `Run` returned), `OnUiThread` (read or change widgets only there), `WaitFor` (instead of sleeping after an
+  injected key or for a background update).
 - Tests that change `configuration.CurrentConfig` or `uistate.Current` restore them with `t.Cleanup`.
 - Regression tests start their comment with `// Regression:` (with the issue, if there is one) and fail without the
   fix.
