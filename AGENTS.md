@@ -11,8 +11,8 @@ daemon: it shows the fans, curves and sensors of the daemon, with graphs of thei
 - `just demo` (or `bin/fan2go-tui demo --ui`) runs the UI against a simulated daemon (`internal/demo`). Use it to try
   changes: no fan2go daemon or hardware is needed. `demo` alone only runs the simulated API (default `127.0.0.1:9001`),
   for a second terminal running `fan2go-tui`. `--port 0` picks a free port.
-- Before committing: `gofmt -l .` is empty, `go vet ./...`, `go test ./...` and `go test -race ./...` pass. CI
-  (`.github/workflows/go.yml`) runs `just test` (without `-race`) and builds; codespell checks the spelling (see
+- Before committing: `gofmt -l .` is empty, `go vet ./...`, `go test ./...` and `just test-race` pass. CI
+  (`.github/workflows/go.yml`) runs `just test` and `just test-race`, and builds; codespell checks the spelling (see
   `.codespellignore`).
 - Tests never need a fan2go daemon: UI tests start the simulated one (`demo.NewServer("127.0.0.1", 0, ...)`).
 - The log is written to `/tmp/fan2go-tui.log` (stdout belongs to the UI).
@@ -60,8 +60,10 @@ daemon: it shows the fans, curves and sensors of the daemon, with graphs of thei
 tview is not thread safe, and every update redraws the whole screen. Most UI bugs break one of these rules:
 
 - **The poller runs in the background.** `root.go` calls `poller.FetchAndUpdate()` on every tick of `UpdateTicker`
-  in a goroutine. Its callback switches to the UI thread with `application.QueueUpdateDraw` and calls
-  `MainPage.Refresh`, which refreshes only the shown page; the page reads the `Store`.
+  in a goroutine, until the context given to `CreateUi` is done (cancel it when the application stopped). Its
+  callback switches to the UI thread with `queueUpdateDraw` (`QueueUpdateDraw` that stops waiting when the context is
+  done: a stopped application runs no updates) and calls `MainPage.Refresh`, which refreshes only the shown page; the
+  page reads the `Store`.
 - **Widgets only on the UI thread:** in input/mouse handlers, draw functions, or `QueueUpdateDraw`. Never call
   `QueueUpdateDraw` (or `QueueUpdate`) from the UI thread itself: it blocks forever. Do not block the UI thread with
   network calls; fetch in the background like the poller.
@@ -98,8 +100,9 @@ tview is not thread safe, and every update redraws the whole screen. Most UI bug
 - Standard `testing` (no testify). Table tests where several inputs share an assertion.
 - UI tests run a real `tview.Application` on `tcell.NewSimulationScreen("UTF-8")` and talk to the simulated daemon
   (see `startDemoServer`/`startUi` in `internal/ui/session_test.go`). `internal/testutil`: `RunApplication` (stops the
-  application at the end of the test and waits for it), `OnUiThread` (read or change widgets only there), `WaitFor`
-  (instead of sleeping after an injected key or for a background update).
+  application at the end of the test, or with the returned function, and waits for it; do not call `Stop` again
+  after `Run` returned), `OnUiThread` (read or change widgets only there), `WaitFor` (instead of sleeping after an
+  injected key or for a background update).
 - Tests that change `configuration.CurrentConfig` or `uistate.Current` restore them with `t.Cleanup`.
 - Regression tests start their comment with `// Regression:` (with the issue, if there is one) and fail without the
   fix.

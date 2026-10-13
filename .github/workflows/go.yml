@@ -28,6 +28,9 @@ jobs:
       - name: Test
         run: just test
 
+      - name: Test with the race detector
+        run: just test-race
+
   build:
     name: Build linux/${{ matrix.goarch }}
     runs-on: ${{ matrix.runner }}

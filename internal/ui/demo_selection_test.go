@@ -149,7 +149,7 @@ func TestRealCreateUi_DemoModeSelection(t *testing.T) {
 	}
 	simScreen.SetSize(120, 40)
 
-	app := CreateUi(false)
+	app := CreateUi(t.Context(), false)
 	app.SetScreen(simScreen)
 
 	testutil.RunApplication(t, app)

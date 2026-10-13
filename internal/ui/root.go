@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"context"
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/configuration"
 	"fan2go-tui/internal/state"
@@ -28,14 +29,15 @@ var (
 )
 
 // CreateUi creates the application, restoring the last session with the configured fan2go daemon (see
-// configuration.UiConfig.RestoreSession), and remembering the session in uistate.Current.
-func CreateUi(fullscreen bool) *tview.Application {
-	application, _ := createUi(fullscreen)
+// configuration.UiConfig.RestoreSession), and remembering the session in uistate.Current. The fan2go daemon is polled
+// until ctx is done; cancel it when the application stopped.
+func CreateUi(ctx context.Context, fullscreen bool) *tview.Application {
+	application, _ := createUi(ctx, fullscreen)
 	return application
 }
 
 // createUi creates the application, see CreateUi, and returns its main page as well (for tests).
-func createUi(fullscreen bool) (*tview.Application, *MainPage) {
+func createUi(ctx context.Context, fullscreen bool) (*tview.Application, *MainPage) {
 	shortcut_helper.InitShortcutVisibility()
 	UpdateTicker = time.NewTicker(configuration.CurrentConfig.Ui.UpdateInterval)
 
@@ -63,7 +65,7 @@ func createUi(fullscreen bool) (*tview.Application, *MainPage) {
 	var pagesLayout *tview.Pages
 
 	poller := state.NewPoller(apiClient, store, func(err error) {
-		application.QueueUpdateDraw(func() {
+		queueUpdateDraw(ctx, application, func() {
 			if err != nil {
 				if !hasReceivedData && !store.HasData() {
 					connectingDialog.SetError(err)
@@ -157,15 +159,38 @@ func createUi(fullscreen bool) (*tview.Application, *MainPage) {
 	// the ticker of this UI, UpdateTicker is replaced by the next call (in tests)
 	ticker := UpdateTicker
 	go func() {
+		defer ticker.Stop()
 		// Initial fetch
 		poller.FetchAndUpdate()
 		for {
-			<-ticker.C
-			poller.FetchAndUpdate()
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				poller.FetchAndUpdate()
+			}
 		}
 	}()
 
 	return application.SetRoot(pagesLayout, fullscreen), mainPage
+}
+
+// queueUpdateDraw runs f on the UI thread and waits for it, like application.QueueUpdateDraw, but only until ctx is
+// done: once the application stopped, it runs no queued updates anymore, and QueueUpdateDraw would wait forever. The
+// call itself is left waiting then (one goroutine, until the process exits).
+func queueUpdateDraw(ctx context.Context, application *tview.Application, f func()) {
+	if ctx.Err() != nil {
+		return
+	}
+	done := make(chan struct{})
+	go func() {
+		application.QueueUpdateDraw(f)
+		close(done)
+	}()
+	select {
+	case <-done:
+	case <-ctx.Done():
+	}
 }
 
 func speedUpUpdateInterval(mainPage *MainPage) {

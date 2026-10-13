@@ -63,7 +63,10 @@ func RunApplication() {
 		g.Add(func() error {
 			pterm.Info.Printfln("Launching UI...")
 			logging.Info("Launching UI...")
-			return ui.CreateUi(true).Run()
+			// stops polling the fan2go daemon when the UI stopped
+			uiCtx, stopUi := context.WithCancel(ctx)
+			defer stopUi()
+			return ui.CreateUi(uiCtx, true).Run()
 		}, func(err error) {
 			if err != nil {
 				logging.Warning("Error stopping UI: %v", err.Error())
