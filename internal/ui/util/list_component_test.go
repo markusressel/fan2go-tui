@@ -134,4 +134,3 @@ func TestListComponent_SelectionPreservedAcrossSetData(t *testing.T) {
 		t.Errorf("expected selected index to remain 4 after focus, got %d", list.GetSelectedIndex())
 	}
 }
-

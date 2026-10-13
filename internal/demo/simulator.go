@@ -14,16 +14,16 @@ type Simulator struct {
 	curves  map[string]*client.Curve
 	sensors map[string]*client.Sensor
 
-	elapsed    float64
-	pidState   *pidController
-	cpuFanCal  map[int]float64
-	gpuFanCal  map[int]float64
-	rng        *rand.Rand
+	elapsed   float64
+	pidState  *pidController
+	cpuFanCal map[int]float64
+	gpuFanCal map[int]float64
+	rng       *rand.Rand
 }
 
 type pidController struct {
-	integral   float64
-	lastError  float64
+	integral  float64
+	lastError float64
 }
 
 func strPtr(s string) *string {
@@ -40,11 +40,11 @@ func durationPtr(d time.Duration) *time.Duration {
 
 func NewSimulator() *Simulator {
 	s := &Simulator{
-		fans:      make(map[string]*client.Fan),
-		curves:    make(map[string]*client.Curve),
-		sensors:   make(map[string]*client.Sensor),
-		pidState:  &pidController{},
-		rng:       rand.New(rand.NewSource(time.Now().UnixNano())),
+		fans:     make(map[string]*client.Fan),
+		curves:   make(map[string]*client.Curve),
+		sensors:  make(map[string]*client.Sensor),
+		pidState: &pidController{},
+		rng:      rand.New(rand.NewSource(time.Now().UnixNano())),
 	}
 
 	s.initData()
