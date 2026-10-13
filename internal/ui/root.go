@@ -154,11 +154,13 @@ func createUi(fullscreen bool) (*tview.Application, *MainPage) {
 		})
 	}()
 
+	// the ticker of this UI, UpdateTicker is replaced by the next call (in tests)
+	ticker := UpdateTicker
 	go func() {
 		// Initial fetch
 		poller.FetchAndUpdate()
 		for {
-			<-UpdateTicker.C
+			<-ticker.C
 			poller.FetchAndUpdate()
 		}
 	}()

@@ -3,8 +3,8 @@ package fan
 import (
 	"fan2go-tui/internal/demo"
 	"fan2go-tui/internal/state"
+	"fan2go-tui/internal/testutil"
 	"testing"
-	"time"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -27,33 +27,31 @@ func TestFansPage_SelectionPreservedAcrossDrawAndRefresh(t *testing.T) {
 	fansPage := NewFansPage(app, store, nil)
 	pages := tview.NewPages().AddPage("fans", fansPage.GetLayout(), true, true)
 	app.SetRoot(pages, true)
-	go func() { _ = app.Run() }()
-	defer app.Stop()
+	testutil.RunApplication(t, app)
 
-	// Initial refresh and scroll to item
-	_ = fansPage.Refresh()
-	fansPage.ScrollToItem()
-
-	app.Draw()
-
-	initialSelected := fansPage.fanList.GetSelectedItem()
-	if initialSelected == nil {
+	var firstID string
+	testutil.OnUiThread(t, app, func() {
+		// Initial refresh and scroll to item
+		_ = fansPage.Refresh()
+		fansPage.ScrollToItem()
+		if initialSelected := fansPage.fanList.GetSelectedItem(); initialSelected != nil {
+			firstID = initialSelected.FanState.Fan.Config.ID
+		}
+	})
+	if firstID == "" {
 		t.Fatalf("expected initial selection, got nil")
 	}
-	firstID := initialSelected.FanState.Fan.Config.ID
-	t.Logf("initial selected fan: %s", firstID)
 
 	simScreen.InjectKey(tcell.KeyDown, 0, tcell.ModNone)
-	time.Sleep(100 * time.Millisecond)
 	simScreen.InjectKey(tcell.KeyDown, 0, tcell.ModNone)
-	time.Sleep(100 * time.Millisecond)
-
-	selectedAfterDown := fansPage.fanList.GetSelectedItem()
-	if selectedAfterDown == nil {
-		t.Fatalf("expected selection after KeyDown, got nil")
-	}
-	secondID := selectedAfterDown.FanState.Fan.Config.ID
-	t.Logf("selected fan after 2x KeyDown: %s", secondID)
+	var secondID string
+	testutil.WaitFor(t, app, "third fan selected after 2x KeyDown", func() bool {
+		if fansPage.fanList.GetSelectedIndex() != 2 {
+			return false
+		}
+		secondID = fansPage.fanList.GetSelectedItem().FanState.Fan.Config.ID
+		return true
+	})
 	if secondID == firstID {
 		t.Fatalf("selection did not change after KeyDown (still %s)", firstID)
 	}
@@ -61,17 +59,15 @@ func TestFansPage_SelectionPreservedAcrossDrawAndRefresh(t *testing.T) {
 	// Simulate refresh
 	sim.Tick(0.25)
 	store.UpdateFans(sim.GetFans())
-	_ = fansPage.Refresh()
-
-	app.Draw()
-
-	selectedAfterRefresh := fansPage.fanList.GetSelectedItem()
-	if selectedAfterRefresh == nil {
-		t.Fatalf("expected selection after Refresh, got nil")
-	}
-	refreshID := selectedAfterRefresh.FanState.Fan.Config.ID
-	t.Logf("selected fan after Refresh: %s", refreshID)
-	if refreshID != secondID {
-		t.Fatalf("expected %s selected after Refresh, got %s", secondID, refreshID)
-	}
+	testutil.OnUiThread(t, app, func() {
+		_ = fansPage.Refresh()
+	})
+	testutil.OnUiThread(t, app, func() {
+		selectedAfterRefresh := fansPage.fanList.GetSelectedItem()
+		if selectedAfterRefresh == nil {
+			t.Errorf("expected selection after Refresh, got nil")
+		} else if refreshID := selectedAfterRefresh.FanState.Fan.Config.ID; refreshID != secondID {
+			t.Errorf("expected %s selected after Refresh, got %s", secondID, refreshID)
+		}
+	})
 }

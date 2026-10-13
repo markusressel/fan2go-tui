@@ -6,6 +6,7 @@ import (
 	"fan2go-tui/internal/configuration"
 	"fan2go-tui/internal/demo"
 	"fan2go-tui/internal/state"
+	"fan2go-tui/internal/testutil"
 	"fan2go-tui/internal/ui/dialog"
 	"fan2go-tui/internal/ui/fan"
 	"testing"
@@ -76,38 +77,29 @@ func TestDemoMode_SelectionPreservedAcrossPollTicks(t *testing.T) {
 
 	app.SetRoot(pagesLayout, true)
 
-	go func() { _ = app.Run() }()
-	defer app.Stop()
+	testutil.RunApplication(t, app)
 
 	// Initial fetch
 	poller.FetchAndUpdate()
-	time.Sleep(100 * time.Millisecond)
-
-	mainPage.Init()
-	time.Sleep(100 * time.Millisecond)
+	testutil.OnUiThread(t, app, mainPage.Init)
 
 	// Get FansPage
-	fansPage, ok := mainPage.GetCurrentPage().(*fan.FansPage)
-	if !ok {
-		t.Fatalf("expected FansPage, got %T", mainPage.GetCurrentPage())
+	var fansPage *fan.FansPage
+	testutil.OnUiThread(t, app, func() {
+		fansPage, _ = mainPage.GetCurrentPage().(*fan.FansPage)
+	})
+	if fansPage == nil {
+		t.Fatalf("expected FansPage")
 	}
 
-	initialItem := fansPage.GetSelectedItem()
-	t.Logf("Initial item: %+v", initialItem)
-
-	// Press KeyDown to navigate to 2nd fan
+	// Press KeyDown twice to navigate to the 3rd fan
 	simScreen.InjectKey(tcell.KeyDown, 0, tcell.ModNone)
-	time.Sleep(100 * time.Millisecond)
-
-	selectedAfterDown := fansPage.GetSelectedItem()
-	t.Logf("Selected after KeyDown: %+v", selectedAfterDown)
-
-	// Inject another KeyDown to navigate to 3rd fan
 	simScreen.InjectKey(tcell.KeyDown, 0, tcell.ModNone)
-	time.Sleep(100 * time.Millisecond)
-
-	selectedAfterDown2 := fansPage.GetSelectedItem()
-	t.Logf("Selected after 2nd KeyDown: %+v", selectedAfterDown2)
+	var selectedAfterDown2 *fan.FanListItemComponent
+	testutil.WaitFor(t, app, "third fan selected", func() bool {
+		selectedAfterDown2 = fansPage.GetSelectedItem()
+		return fansPage.GetSelectedIndex() == 2
+	})
 
 	focusBeforeTicks := app.GetFocus()
 	t.Logf("Focus before poll ticks: %T (%+v)", focusBeforeTicks, focusBeforeTicks)
@@ -122,8 +114,8 @@ func TestDemoMode_SelectionPreservedAcrossPollTicks(t *testing.T) {
 	focusAfterTicks := app.GetFocus()
 	t.Logf("Focus after poll ticks: %T (%+v)", focusAfterTicks, focusAfterTicks)
 
-	selectedAfterTicks := fansPage.GetSelectedItem()
-	t.Logf("Selected after poll ticks: %+v", selectedAfterTicks)
+	var selectedAfterTicks *fan.FanListItemComponent
+	testutil.OnUiThread(t, app, func() { selectedAfterTicks = fansPage.GetSelectedItem() })
 
 	if selectedAfterTicks != selectedAfterDown2 {
 		t.Fatalf("Selection was reset! Expected %v, got %v", selectedAfterDown2, selectedAfterTicks)
@@ -145,6 +137,8 @@ func TestRealCreateUi_DemoModeSelection(t *testing.T) {
 		_ = server.Shutdown(ctx)
 	}()
 
+	config := configuration.CurrentConfig
+	t.Cleanup(func() { configuration.CurrentConfig = config })
 	configuration.CurrentConfig.Api.Host = "127.0.0.1"
 	configuration.CurrentConfig.Api.Port = server.Port()
 	configuration.CurrentConfig.Ui.UpdateInterval = 200 * time.Millisecond
@@ -158,8 +152,7 @@ func TestRealCreateUi_DemoModeSelection(t *testing.T) {
 	app := CreateUi(false)
 	app.SetScreen(simScreen)
 
-	go func() { _ = app.Run() }()
-	defer app.Stop()
+	testutil.RunApplication(t, app)
 
 	// Wait for poller to receive initial data and hide connecting dialog
 	time.Sleep(500 * time.Millisecond)

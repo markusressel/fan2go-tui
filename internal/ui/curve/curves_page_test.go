@@ -4,8 +4,8 @@ import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/demo"
 	"fan2go-tui/internal/state"
+	"fan2go-tui/internal/testutil"
 	"testing"
-	"time"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -28,55 +28,53 @@ func TestCurvesPage_RefreshAndSelection(t *testing.T) {
 	curvesPage := NewCurvesPage(app, store, nil, nil)
 	pages := tview.NewPages().AddPage("curves", curvesPage.GetLayout(), true, true)
 	app.SetRoot(pages, true)
-	go func() { _ = app.Run() }()
-	defer app.Stop()
+	testutil.RunApplication(t, app)
 
-	_ = curvesPage.Refresh()
-	curvesPage.ScrollToItem()
-	app.Draw()
-
-	initial := curvesPage.GetSelectedItem()
-	if initial == nil {
+	var initialID string
+	testutil.OnUiThread(t, app, func() {
+		_ = curvesPage.Refresh()
+		curvesPage.ScrollToItem()
+		if initial := curvesPage.GetSelectedItem(); initial != nil {
+			initialID = initial.CurveState.Curve.Config.ID
+		}
+	})
+	if initialID == "" {
 		t.Fatalf("expected initial curve selected, got nil")
 	}
-	initialID := initial.CurveState.Curve.Config.ID
 
 	// KeyDown to select next
 	simScreen.InjectKey(tcell.KeyDown, 0, tcell.ModNone)
-	time.Sleep(100 * time.Millisecond)
+	testutil.WaitFor(t, app, "another curve selected after KeyDown", func() bool {
+		selected := curvesPage.GetSelectedItem()
+		return selected != nil && selected.CurveState.Curve.Config.ID != initialID
+	})
 
-	selectedAfterDown := curvesPage.GetSelectedItem()
-	if selectedAfterDown == nil {
-		t.Fatalf("expected selection after KeyDown, got nil")
-	}
-	nextID := selectedAfterDown.CurveState.Curve.Config.ID
-	if nextID == initialID {
-		t.Fatalf("expected different curve selected after KeyDown")
-	}
+	testutil.OnUiThread(t, app, func() {
+		// SelectCurveByID
+		if !curvesPage.SelectCurveByID(initialID) {
+			t.Errorf("expected SelectCurveByID(%s) to succeed", initialID)
+		}
+		if curvesPage.GetSelectedItem().CurveState.Curve.Config.ID != initialID {
+			t.Errorf("expected %s selected after SelectCurveByID", initialID)
+		}
 
-	// SelectCurveByID
-	ok := curvesPage.SelectCurveByID(initialID)
-	if !ok {
-		t.Fatalf("expected SelectCurveByID(%s) to succeed", initialID)
-	}
-	if curvesPage.GetSelectedItem().CurveState.Curve.Config.ID != initialID {
-		t.Fatalf("expected %s selected after SelectCurveByID", initialID)
-	}
-
-	// SelectCurveByID with unknown ID
-	if curvesPage.SelectCurveByID("non-existent-curve") {
-		t.Fatalf("expected SelectCurveByID with non-existent ID to return false")
-	}
+		// SelectCurveByID with unknown ID
+		if curvesPage.SelectCurveByID("non-existent-curve") {
+			t.Errorf("expected SelectCurveByID with non-existent ID to return false")
+		}
+	})
 
 	// Refresh preserves selection
 	sim.Tick(0.25)
 	store.UpdateCurves(sim.GetCurves())
-	_ = curvesPage.Refresh()
-	app.Draw()
-
-	if curvesPage.GetSelectedItem().CurveState.Curve.Config.ID != initialID {
-		t.Fatalf("expected selection preserved across refresh")
-	}
+	testutil.OnUiThread(t, app, func() {
+		_ = curvesPage.Refresh()
+	})
+	testutil.OnUiThread(t, app, func() {
+		if curvesPage.GetSelectedItem().CurveState.Curve.Config.ID != initialID {
+			t.Errorf("expected selection preserved across refresh")
+		}
+	})
 }
 
 func TestCurvesPage_ShortcutMap(t *testing.T) {
