@@ -45,6 +45,8 @@ type runningUi struct {
 	app      *tview.Application
 	mainPage *MainPage
 	screen   tcell.SimulationScreen
+	// done is closed when Run returned
+	done chan struct{}
 }
 
 // startUi starts the UI with the state at statePath, like the application does.
@@ -60,14 +62,30 @@ func startUi(t *testing.T, statePath string) *runningUi {
 	app, mainPage := createUi(true)
 	app.SetScreen(screen)
 	screen.SetSize(120, 40)
-	go func() { _ = app.Run() }()
-	t.Cleanup(app.Stop)
-	return &runningUi{t: t, app: app, mainPage: mainPage, screen: screen}
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		_ = app.Run()
+	}()
+	ui := &runningUi{t: t, app: app, mainPage: mainPage, screen: screen, done: done}
+	t.Cleanup(ui.waitForStop)
+	return ui
+}
+
+// waitForStop quits the application and waits until it stopped, so it does not race with what comes next (the
+// next run, or the cleanups of the test).
+func (ui *runningUi) waitForStop() {
+	ui.app.Stop()
+	select {
+	case <-ui.done:
+	case <-time.After(5 * time.Second):
+		ui.t.Errorf("timeout waiting for the application to stop")
+	}
 }
 
 // stop quits the application and saves the state, like the application does.
 func (ui *runningUi) stop() {
-	ui.app.Stop()
+	ui.waitForStop()
 	if err := uistate.Current.Flush(); err != nil {
 		ui.t.Fatalf("cannot save state: %v", err)
 	}

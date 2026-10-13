@@ -11,14 +11,9 @@ daemon: it shows the fans, curves and sensors of the daemon, with graphs of thei
 - `just demo` (or `bin/fan2go-tui demo --ui`) runs the UI against a simulated daemon (`internal/demo`). Use it to try
   changes: no fan2go daemon or hardware is needed. `demo` alone only runs the simulated API (default `127.0.0.1:9001`),
   for a second terminal running `fan2go-tui`. `--port 0` picks a free port.
-- Before committing: `go vet ./...` and `go test ./...` pass, and the changed files are formatted (`gofmt -l` on them
-  is empty). CI (`.github/workflows/go.yml`) runs `just test` and builds; codespell checks the spelling (see
+- Before committing: `gofmt -l .` is empty, `go vet ./...`, `go test ./...` and `go test -race ./...` pass. CI
+  (`.github/workflows/go.yml`) runs `just test` (without `-race`) and builds; codespell checks the spelling (see
   `.codespellignore`).
-- Known, not caused by other changes:
-  - `gofmt -l .` lists `internal/demo/simulator.go` and `internal/ui/util/list_component_test.go`.
-  - `go test -race` fails in `internal/ui/...`: the page tests call `Refresh` from the test goroutine while the
-    application runs, and the graphs read the value history of `state.Store` without its lock (see below). The other
-    packages pass with `-race`; keep it that way.
 - Tests never need a fan2go daemon: UI tests start the simulated one (`demo.NewServer("127.0.0.1", 0, ...)`).
 - The log is written to `/tmp/fan2go-tui.log` (stdout belongs to the UI).
 
@@ -70,9 +65,10 @@ tview is not thread safe, and every update redraws the whole screen. Most UI bug
 - **Widgets only on the UI thread:** in input/mouse handlers, draw functions, or `QueueUpdateDraw`. Never call
   `QueueUpdateDraw` (or `QueueUpdate`) from the UI thread itself: it blocks forever. Do not block the UI thread with
   network calls; fetch in the background like the poller.
-- **`state.Store` is shared** between the poller and the UI: read it with its getters (they hold the lock). The
-  value histories (`FanState.RpmValues`, ...) are still read without the lock by the graph components, a known race;
-  do not add more of these, copy under the lock instead.
+- **`state.Store` is shared** between the poller and the UI: read it only with its getters. They hold the lock and
+  return copies (`GetFanState`, ...), as the poller keeps appending to the value histories.
+- **Sizes are read while drawing.** `util.SetupReactiveResize` checks the size of a box in its draw function and
+  queues the update from a goroutine; do not poll widget sizes from other goroutines.
 - **Keep the selection across refreshes.** Pages rebuild their list items from the store on every tick; the
   selected entry, its row and the scroll position must not jump (see `ListSelection`, and the tests named
   `...SelectionPreserved...`). Entries are identified by their configuration ID.
@@ -101,8 +97,9 @@ tview is not thread safe, and every update redraws the whole screen. Most UI bug
 
 - Standard `testing` (no testify). Table tests where several inputs share an assertion.
 - UI tests run a real `tview.Application` on `tcell.NewSimulationScreen("UTF-8")` and talk to the simulated daemon
-  (see `startDemoServer`/`startUi` in `internal/ui/session_test.go`). Read or change widgets on the UI thread
-  (`onUiThread` there, `QueueUpdate` + wait), and poll with a deadline for background results instead of sleeping.
+  (see `startDemoServer`/`startUi` in `internal/ui/session_test.go`). `internal/testutil`: `RunApplication` (stops the
+  application at the end of the test and waits for it), `OnUiThread` (read or change widgets only there), `WaitFor`
+  (instead of sleeping after an injected key or for a background update).
 - Tests that change `configuration.CurrentConfig` or `uistate.Current` restore them with `t.Cleanup`.
 - Regression tests start their comment with `// Regression:` (with the issue, if there is one) and fail without the
   fix.

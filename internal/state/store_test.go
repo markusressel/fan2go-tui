@@ -116,3 +116,39 @@ func TestStore_HasData(t *testing.T) {
 		t.Fatalf("expected store with fans to return true for HasData")
 	}
 }
+
+// Regression: the UI read the value history of the states returned by the getters while the poller appended to it,
+// without the lock of the store (a data race, found by "go test -race"). The getters return copies now.
+func TestStore_StatesAreCopies(t *testing.T) {
+	store := NewStore()
+	update := func(value int) {
+		store.UpdateFans(map[string]*client.Fan{"fan": {Config: client.FanConfig{ID: "fan"}, Rpm: value, Pwm: value}})
+		store.UpdateCurves(map[string]*client.Curve{"curve": {Config: client.CurveConfig{ID: "curve"}, Value: float64(value)}})
+		store.UpdateSensors(map[string]*client.Sensor{"sensor": {Config: client.SensorConfig{ID: "sensor"}, MovingAvg: float64(value)}})
+	}
+	update(1)
+
+	fanState, curveState, sensorState := store.GetFanState("fan"), store.GetCurveState("curve"), store.GetSensorState("sensor")
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		for value := 2; value < 100; value++ {
+			update(value)
+		}
+	}()
+	// read while the store is updated, like the UI does
+	for range 100 {
+		_ = append([]float64{}, fanState.RpmValues...)
+		_ = append([]float64{}, fanState.PwmValues...)
+		_ = append([]float64{}, curveState.Values...)
+		_ = append([]float64{}, sensorState.Values...)
+	}
+	<-done
+
+	if len(fanState.RpmValues) != 1 || len(fanState.PwmValues) != 1 || len(curveState.Values) != 1 || len(sensorState.Values) != 1 {
+		t.Errorf("expected the returned states to keep their values")
+	}
+	if fanState = store.GetFanState("fan"); len(fanState.RpmValues) != 99 || fanState.RpmValues[98] != 99 {
+		t.Errorf("expected the new state to have all values, got %v", fanState.RpmValues)
+	}
+}

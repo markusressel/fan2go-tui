@@ -2,6 +2,7 @@ package state
 
 import (
 	"fan2go-tui/internal/client"
+	"slices"
 	"sync"
 )
 
@@ -130,20 +131,38 @@ func (s *Store) UpdateSensors(sensors map[string]*client.Sensor) {
 	}
 }
 
+// GetFanState returns a copy of the state of the fan, or nil if there is none. A copy, as the poller appends to the
+// value history while the UI reads it.
 func (s *Store) GetFanState(id string) *FanState {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
-	return s.Fans[id]
+	fs := s.Fans[id]
+	if fs == nil {
+		return nil
+	}
+	return &FanState{Fan: fs.Fan, RpmValues: slices.Clone(fs.RpmValues), PwmValues: slices.Clone(fs.PwmValues)}
 }
+
+// GetCurveState returns a copy of the state of the curve, or nil if there is none, see GetFanState.
 func (s *Store) GetCurveState(id string) *CurveState {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
-	return s.Curves[id]
+	cs := s.Curves[id]
+	if cs == nil {
+		return nil
+	}
+	return &CurveState{Curve: cs.Curve, Values: slices.Clone(cs.Values)}
 }
+
+// GetSensorState returns a copy of the state of the sensor, or nil if there is none, see GetFanState.
 func (s *Store) GetSensorState(id string) *SensorState {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
-	return s.Sensors[id]
+	ss := s.Sensors[id]
+	if ss == nil {
+		return nil
+	}
+	return &SensorState{Sensor: ss.Sensor, Values: slices.Clone(ss.Values)}
 }
 
 func (s *Store) GetFans() map[string]*client.Fan {

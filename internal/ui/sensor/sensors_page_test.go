@@ -4,8 +4,8 @@ import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/demo"
 	"fan2go-tui/internal/state"
+	"fan2go-tui/internal/testutil"
 	"testing"
-	"time"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -28,55 +28,53 @@ func TestSensorsPage_RefreshAndSelection(t *testing.T) {
 	sensorsPage := NewSensorsPage(app, store)
 	pages := tview.NewPages().AddPage("sensors", sensorsPage.GetLayout(), true, true)
 	app.SetRoot(pages, true)
-	go func() { _ = app.Run() }()
-	defer app.Stop()
+	testutil.RunApplication(t, app)
 
-	_ = sensorsPage.Refresh()
-	sensorsPage.ScrollToItem()
-	app.Draw()
-
-	initial := sensorsPage.GetSelectedItem()
-	if initial == nil {
+	var initialID string
+	testutil.OnUiThread(t, app, func() {
+		_ = sensorsPage.Refresh()
+		sensorsPage.ScrollToItem()
+		if initial := sensorsPage.GetSelectedItem(); initial != nil {
+			initialID = initial.SensorState.Sensor.Config.ID
+		}
+	})
+	if initialID == "" {
 		t.Fatalf("expected initial sensor selected, got nil")
 	}
-	initialID := initial.SensorState.Sensor.Config.ID
 
 	// KeyDown to select next
 	simScreen.InjectKey(tcell.KeyDown, 0, tcell.ModNone)
-	time.Sleep(100 * time.Millisecond)
+	testutil.WaitFor(t, app, "another sensor selected after KeyDown", func() bool {
+		selected := sensorsPage.GetSelectedItem()
+		return selected != nil && selected.SensorState.Sensor.Config.ID != initialID
+	})
 
-	selectedAfterDown := sensorsPage.GetSelectedItem()
-	if selectedAfterDown == nil {
-		t.Fatalf("expected selection after KeyDown, got nil")
-	}
-	nextID := selectedAfterDown.SensorState.Sensor.Config.ID
-	if nextID == initialID {
-		t.Fatalf("expected different sensor selected after KeyDown")
-	}
+	testutil.OnUiThread(t, app, func() {
+		// SelectSensorByID
+		if !sensorsPage.SelectSensorByID(initialID) {
+			t.Errorf("expected SelectSensorByID(%s) to succeed", initialID)
+		}
+		if sensorsPage.GetSelectedItem().SensorState.Sensor.Config.ID != initialID {
+			t.Errorf("expected %s selected after SelectSensorByID", initialID)
+		}
 
-	// SelectSensorByID
-	ok := sensorsPage.SelectSensorByID(initialID)
-	if !ok {
-		t.Fatalf("expected SelectSensorByID(%s) to succeed", initialID)
-	}
-	if sensorsPage.GetSelectedItem().SensorState.Sensor.Config.ID != initialID {
-		t.Fatalf("expected %s selected after SelectSensorByID", initialID)
-	}
-
-	// SelectSensorByID with unknown ID
-	if sensorsPage.SelectSensorByID("non-existent-sensor") {
-		t.Fatalf("expected SelectSensorByID with non-existent ID to return false")
-	}
+		// SelectSensorByID with unknown ID
+		if sensorsPage.SelectSensorByID("non-existent-sensor") {
+			t.Errorf("expected SelectSensorByID with non-existent ID to return false")
+		}
+	})
 
 	// Refresh preserves selection
 	sim.Tick(0.25)
 	store.UpdateSensors(sim.GetSensors())
-	_ = sensorsPage.Refresh()
-	app.Draw()
-
-	if sensorsPage.GetSelectedItem().SensorState.Sensor.Config.ID != initialID {
-		t.Fatalf("expected selection preserved across refresh")
-	}
+	testutil.OnUiThread(t, app, func() {
+		_ = sensorsPage.Refresh()
+	})
+	testutil.OnUiThread(t, app, func() {
+		if sensorsPage.GetSelectedItem().SensorState.Sensor.Config.ID != initialID {
+			t.Errorf("expected selection preserved across refresh")
+		}
+	})
 }
 
 func TestSensorsPage_ShortcutMap(t *testing.T) {
