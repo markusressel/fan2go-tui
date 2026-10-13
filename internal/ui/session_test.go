@@ -47,6 +47,8 @@ type runningUi struct {
 	screen   tcell.SimulationScreen
 	// done is closed when Run returned
 	done chan struct{}
+	// cancel stops polling the fan2go daemon
+	cancel context.CancelFunc
 }
 
 // startUi starts the UI with the state at statePath, like the application does.
@@ -59,7 +61,8 @@ func startUi(t *testing.T, statePath string) *runningUi {
 	if err := screen.Init(); err != nil {
 		t.Fatalf("failed to init screen: %v", err)
 	}
-	app, mainPage := createUi(true)
+	ctx, cancel := context.WithCancel(t.Context())
+	app, mainPage := createUi(ctx, true)
 	app.SetScreen(screen)
 	screen.SetSize(120, 40)
 	done := make(chan struct{})
@@ -67,7 +70,7 @@ func startUi(t *testing.T, statePath string) *runningUi {
 		defer close(done)
 		_ = app.Run()
 	}()
-	ui := &runningUi{t: t, app: app, mainPage: mainPage, screen: screen, done: done}
+	ui := &runningUi{t: t, app: app, mainPage: mainPage, screen: screen, done: done, cancel: cancel}
 	t.Cleanup(ui.waitForStop)
 	return ui
 }
@@ -75,6 +78,7 @@ func startUi(t *testing.T, statePath string) *runningUi {
 // waitForStop quits the application and waits until it stopped, so it does not race with what comes next (the
 // next run, or the cleanups of the test).
 func (ui *runningUi) waitForStop() {
+	ui.cancel()
 	ui.app.Stop()
 	select {
 	case <-ui.done:

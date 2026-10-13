@@ -3,6 +3,7 @@
 package testutil
 
 import (
+	"sync"
 	"testing"
 	"time"
 
@@ -14,21 +15,28 @@ const timeout = 5 * time.Second
 
 // RunApplication runs application in the background. At the end of the test, it is stopped, and the cleanup waits
 // until Run returned, so the cleanups registered before (e.g. restoring the configuration) do not race with it.
-func RunApplication(t *testing.T, application *tview.Application) {
+// The returned function stops it earlier, the same way; call it instead of application.Stop, which must not be called
+// again after Run returned.
+func RunApplication(t *testing.T, application *tview.Application) (stop func()) {
 	t.Helper()
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
 		_ = application.Run()
 	}()
-	t.Cleanup(func() {
-		application.Stop()
-		select {
-		case <-done:
-		case <-time.After(timeout):
-			t.Errorf("timeout waiting for the application to stop")
-		}
-	})
+	var once sync.Once
+	stop = func() {
+		once.Do(func() {
+			application.Stop()
+			select {
+			case <-done:
+			case <-time.After(timeout):
+				t.Errorf("timeout waiting for the application to stop")
+			}
+		})
+	}
+	t.Cleanup(stop)
+	return stop
 }
 
 // OnUiThread runs f on the UI thread of application, redraws, and waits for it. Must not be called from the UI

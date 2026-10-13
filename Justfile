@@ -23,6 +23,10 @@ test:
     go clean --testcache
     go test -v ./...
 
+# Run all tests with the race detector (needs cgo)
+test-race:
+    CGO_ENABLED=1 go test -race -count=1 ./...
+
 # Run all tests with coverage and show summary
 coverage:
     go test -coverprofile=coverage.out ./...
