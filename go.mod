@@ -3,7 +3,7 @@ module fan2go-tui
 go 1.26.0
 
 require (
-	github.com/asecurityteam/rolling v2.0.4+incompatible
+	github.com/asecurityteam/rolling v2.2.3+incompatible
 	github.com/elliotchance/orderedmap/v2 v2.7.0
 	github.com/gdamore/tcell/v2 v2.13.10
 	github.com/mitchellh/go-homedir v1.1.0
