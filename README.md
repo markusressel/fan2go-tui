@@ -36,7 +36,13 @@ yay -S fan2go-tui-git
 <details>
 <summary>Community Maintained Packages</summary>
 
-None yet
+### Gentoo ![Gentoo](https://img.shields.io/badge/Gentoo-%2354487A.svg?logo=gentoo&logoColor=white)
+
+Enable the repository as read in [Project:GURU/Information for End Users](https://wiki.gentoo.org/wiki/Project:GURU/Information_for_End_Users) then emerge the package:
+
+```sh
+emerge --ask sys-power/fan2go-tui
+```
 
 </details>
 
