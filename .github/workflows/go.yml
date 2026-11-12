@@ -104,6 +104,11 @@ jobs:
       - name: Generate build files (${{ matrix.goarch }})
         run: |
           OUTPUT_BIN="dist/fan2go-tui-linux-${{ matrix.goarch }}"
+          # release builds take their version from the tag, so the Justfile default doesn't have to be bumped
+          VERSION_ARG=""
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            VERSION_ARG="VERSION=${GITHUB_REF_NAME}"
+          fi
           
           # Pass cross-compilation variables explicitly as arguments to just
           just \
@@ -111,6 +116,7 @@ jobs:
             GOARCH="${{ matrix.goarch }}" \
             CC="${{ matrix.cc }}" \
             OUTPUT_BIN="${OUTPUT_BIN}" \
+            ${VERSION_ARG} \
             ${{ matrix.just_target }}
           
           file "${OUTPUT_BIN}"
