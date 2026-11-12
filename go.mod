@@ -4,7 +4,6 @@ go 1.26.0
 
 require (
 	github.com/asecurityteam/rolling/v2 v2.2.3
-	github.com/elliotchance/orderedmap/v2 v2.7.0
 	github.com/elliotchance/orderedmap/v3 v3.1.1
 	github.com/gdamore/tcell/v2 v2.13.10
 	github.com/mitchellh/go-homedir v1.1.0

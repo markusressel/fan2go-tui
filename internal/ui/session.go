@@ -31,7 +31,7 @@ func (mainPage *MainPage) PersistSession(store *uistate.Store, server string, re
 	mainPage.server = server
 	store.SetLimit(sessionNamespace, maxRememberedSessions)
 
-	for _, pagesPage := range mainPage.pagesMap.Iterator() {
+	for _, pagesPage := range mainPage.pagesMap.AllFromFront() {
 		if persister, ok := pagesPage.(selectionPersister); ok {
 			persister.PersistSelection(store, server, restore)
 		}

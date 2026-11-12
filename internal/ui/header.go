@@ -8,10 +8,11 @@ import (
 	"fan2go-tui/internal/ui/theme"
 	uiutil "fan2go-tui/internal/ui/util"
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 
-	"github.com/elliotchance/orderedmap/v2"
+	"github.com/elliotchance/orderedmap/v3"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
@@ -29,7 +30,7 @@ type ApplicationHeaderComponent struct {
 	lastStatus *status_message.StatusMessage
 	// defaultStatus is shown when there is no other status, see SetDefaultStatus
 	defaultStatus          *status_message.StatusMessage
-	pagesMap               orderedmap.OrderedMap[Page, uiutil.PagesPage]
+	pagesMap               *orderedmap.OrderedMap[Page, uiutil.PagesPage]
 	page                   Page
 	updateIntervalTextView *tview.TextView
 
@@ -40,7 +41,7 @@ type ApplicationHeaderComponent struct {
 
 func NewApplicationHeader(
 	application *tview.Application,
-	pagesMap orderedmap.OrderedMap[Page, uiutil.PagesPage],
+	pagesMap *orderedmap.OrderedMap[Page, uiutil.PagesPage],
 ) *ApplicationHeaderComponent {
 	versionText := fmt.Sprintf("%s-(#%s)-%s", global.Version, global.Commit, global.Date)
 
@@ -49,7 +50,7 @@ func NewApplicationHeader(
 		name:        "fan2go-tui",
 		version:     versionText,
 		pagesMap:    pagesMap,
-		page:        pagesMap.Keys()[0],
+		page:        slices.Collect(pagesMap.Keys())[0],
 		connected:   true,
 	}
 
@@ -92,8 +93,8 @@ func (applicationHeader *ApplicationHeaderComponent) createLayout() {
 
 	page := applicationHeader.page
 	pageName := string(applicationHeader.page)
-	pageIdx := indexOf(page, applicationHeader.pagesMap.Keys())
-	pageCount := len(applicationHeader.pagesMap.Keys())
+	pageIdx := indexOf(page, slices.Collect(applicationHeader.pagesMap.Keys()))
+	pageCount := applicationHeader.pagesMap.Len()
 	pageIndicatorText := fmt.Sprintf("%-7s %d/%d", pageName, pageIdx+1, pageCount)
 
 	pageIndicatorTextView := tview.NewTextView()
@@ -135,8 +136,8 @@ func (applicationHeader *ApplicationHeaderComponent) UpdateShortcutHint() {
 func (applicationHeader *ApplicationHeaderComponent) updateUi() {
 	page := applicationHeader.page
 	pageName := strings.ToUpper(string(applicationHeader.page))
-	pageIdx := indexOf(page, applicationHeader.pagesMap.Keys())
-	pageCount := len(applicationHeader.pagesMap.Keys())
+	pageIdx := indexOf(page, slices.Collect(applicationHeader.pagesMap.Keys()))
+	pageCount := applicationHeader.pagesMap.Len()
 	pageIndicatorText := fmt.Sprintf("%-7s %d/%d", pageName, pageIdx+1, pageCount)
 	applicationHeader.pageIndicatorTextView.SetText(pageIndicatorText)
 }

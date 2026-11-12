@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elliotchance/orderedmap/v2"
+	"github.com/elliotchance/orderedmap/v3"
 	"github.com/rivo/tview"
 )
 
@@ -27,7 +27,7 @@ func TestApplicationHeaderComponent_ConnectionStatus(t *testing.T) {
 	pagesMap := orderedmap.NewOrderedMap[Page, uiutil.PagesPage]()
 	pagesMap.Set(FansPage, &dummyPage{layout: tview.NewFlex()})
 
-	header := NewApplicationHeader(app, *pagesMap)
+	header := NewApplicationHeader(app, pagesMap)
 
 	if !header.connected {
 		t.Fatalf("expected initially connected to be true")
@@ -71,5 +71,27 @@ func TestApplicationHeaderComponent_ConnectionStatus(t *testing.T) {
 	}
 	if text := header.statusTextView.GetText(true); text != "" {
 		t.Fatalf("expected cleared statusTextView after reconnect, got %q", text)
+	}
+}
+
+func TestApplicationHeaderComponent_PageIndicator(t *testing.T) {
+	app := tview.NewApplication()
+	pagesMap := orderedmap.NewOrderedMap[Page, uiutil.PagesPage]()
+	pagesMap.Set(FansPage, &dummyPage{layout: tview.NewFlex()})
+	pagesMap.Set(CurvesPage, &dummyPage{layout: tview.NewFlex()})
+	pagesMap.Set(SensorsPage, &dummyPage{layout: tview.NewFlex()})
+
+	header := NewApplicationHeader(app, pagesMap)
+
+	if header.page != FansPage {
+		t.Fatalf("expected initial page to be the first one %q, got %q", FansPage, header.page)
+	}
+	if text := header.pageIndicatorTextView.GetText(true); !strings.Contains(text, "FANS") || !strings.Contains(text, "1/3") {
+		t.Fatalf("expected page indicator for FANS 1/3, got %q", text)
+	}
+
+	header.SetPage(SensorsPage)
+	if text := header.pageIndicatorTextView.GetText(true); !strings.Contains(text, "SENSORS") || !strings.Contains(text, "3/3") {
+		t.Fatalf("expected page indicator for SENSORS 3/3, got %q", text)
 	}
 }
