@@ -10,7 +10,7 @@ OUTPUT_BIN := "bin/" + NAME
 PACKAGE := "github.com/markusressel/" + NAME
 GIT_REV := `git rev-parse --short HEAD 2>/dev/null || echo "unknown"`
 DATE := `date -u +"%Y-%m-%dT%H:%M:%SZ"`
-VERSION := "0.4.0"
+VERSION := "0.5.0"
 
 # agg renders the demo as a GIF, see demo-gif
 AGG := "agg"
