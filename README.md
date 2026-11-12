@@ -29,9 +29,20 @@
 
 ### Arch Linux ![](https://img.shields.io/badge/Arch_Linux-1793D1?logo=arch-linux&logoColor=white)
 
+Stable releases:
+
+```shell
+yay -S fan2go-tui
+```
+
+Development version, built from the latest `main`. It contains unreleased changes, including breaking ones:
+
 ```shell
 yay -S fan2go-tui-git
 ```
+
+Both packages print upgrade notes when an update contains breaking changes. The full notes for every version are on
+the [releases page](https://github.com/markusressel/fan2go-tui/releases).
 
 <details>
 <summary>Community Maintained Packages</summary>
