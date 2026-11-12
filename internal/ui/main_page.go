@@ -12,7 +12,7 @@ import (
 	"slices"
 	"sync"
 
-	"github.com/elliotchance/orderedmap/v2"
+	"github.com/elliotchance/orderedmap/v3"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
@@ -97,7 +97,7 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 
 	header := NewApplicationHeader(
 		mainPage.application,
-		mainPage.pagesMap,
+		&mainPage.pagesMap,
 	)
 	mainPage.header = header
 
@@ -111,7 +111,7 @@ func (mainPage *MainPage) createLayout() *tview.Flex {
 	mainPageLayout.AddItem(mainPagePagerLayout, 0, 1, true)
 	mainPageLayout.AddItem(shortcutMap.GetLayout(), 1, 0, false)
 
-	for page, pagesPage := range mainPage.pagesMap.Iterator() {
+	for page, pagesPage := range mainPage.pagesMap.AllFromFront() {
 		mainPage.mainPagePagerLayout.AddPage(
 			string(page),
 			pagesPage.GetLayout(),
@@ -157,7 +157,7 @@ func (mainPage *MainPage) GetCurrentPage() util.PagesPage {
 }
 
 func (mainPage *MainPage) GetPageAtIndex(i int) Page {
-	page := mainPage.pagesMap.Keys()[i]
+	page := slices.Collect(mainPage.pagesMap.Keys())[i]
 	return page
 }
 
@@ -187,14 +187,14 @@ func (mainPage *MainPage) scrollCurrentPageToItem() {
 }
 
 func (mainPage *MainPage) PreviousPage() {
-	keys := mainPage.pagesMap.Keys()
+	keys := slices.Collect(mainPage.pagesMap.Keys())
 	currentIndex := slices.Index(keys, mainPage.page)
 	nextIndex := (len(keys) + currentIndex - 1) % len(keys)
 	mainPage.SetPage(keys[nextIndex])
 }
 
 func (mainPage *MainPage) NextPage() {
-	keys := mainPage.pagesMap.Keys()
+	keys := slices.Collect(mainPage.pagesMap.Keys())
 	currentIndex := slices.Index(keys, mainPage.page)
 	nextIndex := (currentIndex + 1) % len(keys)
 	mainPage.SetPage(keys[nextIndex])
