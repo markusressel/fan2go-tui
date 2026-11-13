@@ -183,7 +183,7 @@ func TestApiClient_EndpointsAndErrors(t *testing.T) {
 
 	// 404 error
 	_, err = api.GetFan("non-existent-404")
-	if err == nil || !strings.Contains(err.Error(), "Cannot reach fan2go daemon") {
+	if !errors.Is(err, ErrNotFound) {
 		t.Errorf("expected daemon 404 error, got %v", err)
 	}
 

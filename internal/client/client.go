@@ -331,8 +331,8 @@ type Fan2goApiClient interface {
 }
 
 // ErrNotFound is returned for a 404 response: the API is not enabled, or (for a single item or a newer endpoint)
-// the daemon does not know it.
-var ErrNotFound = errors.New("Cannot reach fan2go daemon, did you enable its API?")
+// the daemon does not know it. The UI shows it with a capitalized hint, see util.ErrorMessage in internal/ui/util.
+var ErrNotFound = errors.New("fan2go API not found (is it enabled?)")
 
 type Fan2goApiClientEcho struct {
 	// hostPort is the host and port of the fan2go API, see joinHostPort
