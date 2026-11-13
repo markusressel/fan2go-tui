@@ -234,6 +234,7 @@ func (mainPage *MainPage) showStatusMessage(status *status_message.StatusMessage
 
 func (mainPage *MainPage) UpdateHeader() {
 	mainPage.header.Refresh()
+	mainPage.header.SetWarningCount(mainPage.store.GetWarningCount())
 }
 
 func (mainPage *MainPage) setShortcutMap(shortcutEntries []shortcut_helper.ShortcutEntry) {

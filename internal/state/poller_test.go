@@ -10,10 +10,14 @@ type mockApiClient struct {
 	fansErr    error
 	curvesErr  error
 	sensorsErr error
+	// warningsErr is returned by GetWarnings, e.g. client.ErrNotFound for a daemon without the warnings API
+	warningsErr error
 
 	fans    map[string]*client.Fan
 	curves  map[string]*client.Curve
 	sensors map[string]*client.Sensor
+	// warnings is nil for a daemon that answers /warnings with null
+	warnings []client.WarningEntry
 }
 
 func (m *mockApiClient) GetFans() (*map[string]*client.Fan, error) {
@@ -68,6 +72,13 @@ func (m *mockApiClient) GetSensor(label string) (*client.Sensor, error) {
 		return nil, errors.New("not found")
 	}
 	return s, nil
+}
+
+func (m *mockApiClient) GetWarnings() (*[]client.WarningEntry, error) {
+	if m.warningsErr != nil {
+		return nil, m.warningsErr
+	}
+	return &m.warnings, nil
 }
 
 func TestPoller_FetchAndUpdate(t *testing.T) {
@@ -139,5 +150,71 @@ func TestPoller_FetchAndUpdate_WithErrors(t *testing.T) {
 	}
 	if passedErr != expectedErr {
 		t.Fatalf("expected fan error, got: %v", passedErr)
+	}
+}
+
+func TestPoller_FetchAndUpdate_Warnings(t *testing.T) {
+	for _, test := range []struct {
+		name              string
+		client            *mockApiClient
+		expectedCount     int
+		expectedSupported bool
+	}{
+		{
+			name: "warnings",
+			client: &mockApiClient{warnings: []client.WarningEntry{
+				{Kind: "fan", ID: "fan-1", Code: "flatRpmCurve", Message: "flat"},
+				{Kind: "sensor", ID: "sensor-1", Code: "test", Message: "test"},
+			}},
+			expectedCount:     2,
+			expectedSupported: true,
+		},
+		{
+			name:              "no warnings",
+			client:            &mockApiClient{warnings: []client.WarningEntry{}},
+			expectedSupported: true,
+		},
+		{
+			name:              "null",
+			client:            &mockApiClient{},
+			expectedSupported: true,
+		},
+		{
+			name:   "daemon without the warnings API",
+			client: &mockApiClient{warningsErr: client.ErrNotFound},
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			store := NewStore()
+			var passedErr error
+			NewPoller(test.client, store, func(err error) { passedErr = err }).FetchAndUpdate()
+
+			if passedErr != nil {
+				t.Fatalf("expected no error, got: %v", passedErr)
+			}
+			count, supported := store.GetWarningCount()
+			if count != test.expectedCount || supported != test.expectedSupported {
+				t.Fatalf("expected %d warnings (supported: %v), got %d (supported: %v)",
+					test.expectedCount, test.expectedSupported, count, supported)
+			}
+		})
+	}
+}
+
+// Other errors of /warnings are not reported (the other endpoints report a daemon that cannot be reached), and keep
+// the last warnings.
+func TestPoller_FetchAndUpdate_WarningsError(t *testing.T) {
+	store := NewStore()
+	store.UpdateWarnings([]client.WarningEntry{{Kind: "fan", ID: "fan-1", Code: "flatRpmCurve", Message: "flat"}})
+	mockClient := &mockApiClient{warningsErr: errors.New("connection reset")}
+
+	var passedErr error
+	NewPoller(mockClient, store, func(err error) { passedErr = err }).FetchAndUpdate()
+
+	if passedErr != nil {
+		t.Fatalf("expected no error, got: %v", passedErr)
+	}
+	if count, supported := store.GetWarningCount(); count != 1 || !supported {
+		t.Fatalf("expected the last warning, got %d (supported: %v)", count, supported)
 	}
 }

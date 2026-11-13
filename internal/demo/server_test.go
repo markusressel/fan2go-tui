@@ -85,13 +85,30 @@ func TestServer_IntegrationWithApiClient(t *testing.T) {
 		t.Fatalf("unexpected cpu-temp: %v", cpuTemp)
 	}
 
-	// 7. Nonexistent items
+	// 7. GetWarnings: the example warnings of a fan and a sensor, also in the fan and the sensor
+	warnings, err := apiClient.GetWarnings()
+	if err != nil {
+		t.Fatalf("GetWarnings failed: %v", err)
+	}
+	if warnings == nil || len(*warnings) != 2 ||
+		(*warnings)[0].Kind != "fan" || (*warnings)[0].ID != "case-exhaust" || (*warnings)[0].Code != "flatRpmCurve" ||
+		(*warnings)[1].Kind != "sensor" || (*warnings)[1].ID != "nvme-temp" {
+		t.Fatalf("unexpected warnings: %v", warnings)
+	}
+	if fanWarnings := (*fans)["case-exhaust"].Warnings; len(fanWarnings) != 1 || fanWarnings[0].Code != "flatRpmCurve" {
+		t.Fatalf("unexpected warnings of case-exhaust: %v", fanWarnings)
+	}
+	if sensorWarnings := (*sensors)["nvme-temp"].Warnings; len(sensorWarnings) != 1 {
+		t.Fatalf("unexpected warnings of nvme-temp: %v", sensorWarnings)
+	}
+
+	// 8. Nonexistent items
 	_, err = apiClient.GetFan("nonexistent-fan")
 	if err == nil {
 		t.Fatalf("expected error for nonexistent fan, got nil")
 	}
 
-	// 8. Index endpoint
+	// 9. Index endpoint
 	resp, err := http.Get(fmt.Sprintf("http://127.0.0.1:%d/", port))
 	if err != nil {
 		t.Fatalf("GET / failed: %v", err)

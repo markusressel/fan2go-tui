@@ -15,8 +15,9 @@ type FanInfoComponent struct {
 
 	layout *tview.Flex
 
-	configComponent *txwidgets.ConfigInfoComponent
-	onOpenCurve     func(curveID string)
+	warningsComponent *txwidgets.WarningsComponent
+	configComponent   *txwidgets.ConfigInfoComponent
+	onOpenCurve       func(curveID string)
 }
 
 func NewFanInfoComponent(application *tview.Application, fan *client.Fan, onOpenCurve func(curveID string)) *FanInfoComponent {
@@ -33,6 +34,10 @@ func NewFanInfoComponent(application *tview.Application, fan *client.Fan, onOpen
 
 func (c *FanInfoComponent) createLayout() *tview.Flex {
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
+
+	// hidden until there are warnings, see refresh
+	c.warningsComponent = txwidgets.NewWarningsComponent()
+	layout.AddItem(c.warningsComponent.GetPrimitive(), 0, 0, false)
 
 	configComponent := txwidgets.NewConfigInfoComponent()
 	configComponent.SetFieldClickablePredicate(func(sectionTitle, label, value string) bool {
@@ -60,9 +65,12 @@ func (c *FanInfoComponent) SetFan(fan *client.Fan) {
 
 func (c *FanInfoComponent) refresh() {
 	if c.Fan == nil {
+		c.setWarnings(nil)
 		c.configComponent.SetSections(nil)
 		return
 	}
+
+	c.setWarnings(c.Fan.Warnings)
 
 	config := c.Fan.Config
 	c.configComponent.SetSections(txwidgets.FanConfigSections(config))
@@ -72,4 +80,14 @@ func (c *FanInfoComponent) ScrollHorizontal(delta int) {
 	if c.configComponent != nil {
 		c.configComponent.ScrollHorizontal(delta)
 	}
+}
+
+// setWarnings shows the warnings of the fan above its configuration, and hides them if there are none.
+func (c *FanInfoComponent) setWarnings(warnings []client.Warning) {
+	c.warningsComponent.SetWarnings(warnings)
+	proportion := 0
+	if c.warningsComponent.HasWarnings() {
+		proportion = 1
+	}
+	c.layout.ResizeItem(c.warningsComponent.GetPrimitive(), 0, proportion)
 }

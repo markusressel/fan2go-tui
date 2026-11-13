@@ -2,6 +2,7 @@ package curve
 
 import (
 	"fan2go-tui/internal/state"
+	"fan2go-tui/internal/ui/txwidgets"
 	uiutil "fan2go-tui/internal/ui/util"
 
 	"github.com/rivo/tview"
@@ -13,6 +14,8 @@ type CurveListItemComponent struct {
 	CurveState *state.CurveState
 
 	layout *tview.Flex
+	// window is the bordered box of the curve, its title shows whether the curve has warnings
+	window *tview.Flex
 
 	curveInfoComponent  *CurveInfoComponent
 	curveGraphComponent *CurveGraphComponent
@@ -34,6 +37,8 @@ func (c *CurveListItemComponent) createLayout(onOpenSensor func(sensorID string)
 
 	curveColumnLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
 	uiutil.SetupWindow(curveColumnLayout, c.CurveState.Curve.Config.ID)
+	c.window = curveColumnLayout
+	c.refreshWindowTitle()
 	curveColumnLayout.SetTitleAlign(tview.AlignLeft)
 	curveColumnLayout.SetBorder(true)
 	rootLayout.AddItem(curveColumnLayout, 0, 1, true)
@@ -65,6 +70,7 @@ func (c *CurveListItemComponent) SetCurve(curveState *state.CurveState) {
 }
 
 func (c *CurveListItemComponent) refresh() {
+	c.refreshWindowTitle()
 	c.curveInfoComponent.SetCurve(c.CurveState.Curve)
 	c.curveGraphComponent.SetCurve(c.CurveState)
 }
@@ -73,4 +79,12 @@ func (c *CurveListItemComponent) ScrollHorizontal(delta int) {
 	if c.curveInfoComponent != nil {
 		c.curveInfoComponent.ScrollHorizontal(delta)
 	}
+}
+
+// refreshWindowTitle marks the title of the window if the curve has warnings.
+func (c *CurveListItemComponent) refreshWindowTitle() {
+	if c.window == nil || c.CurveState == nil || c.CurveState.Curve == nil {
+		return
+	}
+	txwidgets.SetWindowWarnings(c.window.Box, c.CurveState.Curve.Config.ID, c.CurveState.Curve.Warnings)
 }

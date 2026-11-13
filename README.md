@@ -16,6 +16,8 @@
 * [x] Visualize detected and configured fans
 * [x] Monitor curve values
 * [x] Inspect sensor readings
+* [x] Show the warnings the daemon detects about fans, sensors and curves (e.g. a fan that doesn't react to PWM), with
+  their count in the header (needs a fan2go version with the warnings API)
 * [x] Remembers the shown page, the selected fan, curve and sensor of each fan2go daemon and whether the shortcuts
   are hidden between runs (in `~/.local/state/fan2go-tui/state.json`). `--fresh` (or `ui.restoreSession: false` in
   the configuration) starts on the first page instead.

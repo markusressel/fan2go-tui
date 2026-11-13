@@ -28,6 +28,9 @@ type Store struct {
 	Curves  map[string]*CurveState
 	Sensors map[string]*SensorState
 
+	// warnings are all current warnings of the daemon (from /warnings), nil if the daemon has no warnings API
+	warnings []client.WarningEntry
+
 	maxHistory int
 }
 
@@ -193,6 +196,24 @@ func (s *Store) GetSensors() map[string]*client.Sensor {
 		result[id] = ss.Sensor
 	}
 	return result
+}
+
+// UpdateWarnings replaces all current warnings of the daemon. nil if the daemon has no warnings API (it is older).
+func (s *Store) UpdateWarnings(warnings []client.WarningEntry) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	if warnings == nil {
+		s.warnings = nil
+		return
+	}
+	s.warnings = append(make([]client.WarningEntry, 0, len(warnings)), warnings...)
+}
+
+// GetWarningCount returns the number of current warnings of the daemon, and whether the daemon has a warnings API.
+func (s *Store) GetWarningCount() (count int, supported bool) {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+	return len(s.warnings), s.warnings != nil
 }
 
 func (s *Store) HasData() bool {
