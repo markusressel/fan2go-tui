@@ -2,6 +2,7 @@ package sensor
 
 import (
 	"fan2go-tui/internal/state"
+	"fan2go-tui/internal/ui/txwidgets"
 	uiutil "fan2go-tui/internal/ui/util"
 
 	"github.com/rivo/tview"
@@ -13,6 +14,8 @@ type SensorListItemComponent struct {
 	SensorState *state.SensorState
 
 	layout *tview.Flex
+	// window is the bordered box of the sensor, its title shows whether the sensor has warnings
+	window *tview.Flex
 
 	sensorInfoComponent  *SensorInfoComponent
 	sensorGraphComponent *SensorGraphComponent
@@ -34,6 +37,8 @@ func (c *SensorListItemComponent) createLayout() *tview.Flex {
 
 	sensorColumnLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
 	uiutil.SetupWindow(sensorColumnLayout, c.SensorState.Sensor.Config.ID)
+	c.window = sensorColumnLayout
+	c.refreshWindowTitle()
 	sensorColumnLayout.SetTitleAlign(tview.AlignLeft)
 	sensorColumnLayout.SetBorder(true)
 	rootLayout.AddItem(sensorColumnLayout, 0, 1, true)
@@ -65,6 +70,7 @@ func (c *SensorListItemComponent) SetSensor(sensorState *state.SensorState) {
 }
 
 func (c *SensorListItemComponent) refresh() {
+	c.refreshWindowTitle()
 	c.sensorInfoComponent.SetSensor(c.SensorState.Sensor)
 	c.sensorGraphComponent.SetSensor(c.SensorState)
 }
@@ -73,4 +79,12 @@ func (c *SensorListItemComponent) ScrollHorizontal(delta int) {
 	if c.sensorInfoComponent != nil {
 		c.sensorInfoComponent.ScrollHorizontal(delta)
 	}
+}
+
+// refreshWindowTitle marks the title of the window if the sensor has warnings.
+func (c *SensorListItemComponent) refreshWindowTitle() {
+	if c.window == nil || c.SensorState == nil || c.SensorState.Sensor == nil {
+		return
+	}
+	txwidgets.SetWindowWarnings(c.window.Box, c.SensorState.Sensor.Config.ID, c.SensorState.Sensor.Warnings)
 }

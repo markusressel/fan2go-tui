@@ -6,6 +6,7 @@ import (
 	"fan2go-tui/internal/ui/shortcut_helper"
 	"fan2go-tui/internal/ui/status_message"
 	"fan2go-tui/internal/ui/theme"
+	"fan2go-tui/internal/ui/txwidgets"
 	uiutil "fan2go-tui/internal/ui/util"
 	"fmt"
 	"slices"
@@ -36,7 +37,9 @@ type ApplicationHeaderComponent struct {
 
 	connectionStatusTextView *tview.TextView
 	connected                bool
-	shortcutHint             *tview.TextView
+	// warningCountTextView shows the number of warnings of the daemon, hidden if there are none
+	warningCountTextView *tview.TextView
+	shortcutHint         *tview.TextView
 }
 
 func NewApplicationHeader(
@@ -81,6 +84,12 @@ func (applicationHeader *ApplicationHeaderComponent) createLayout() {
 		SetTextAlign(tview.AlignCenter)
 	applicationHeader.connectionStatusTextView = connectionStatusTextView
 
+	warningCountTextView := tview.NewTextView().
+		SetTextAlign(tview.AlignCenter).
+		SetTextColor(theme.Colors.Header.WarningBadge)
+	warningCountTextView.SetBackgroundColor(theme.Colors.Header.WarningBadgeBackground)
+	applicationHeader.warningCountTextView = warningCountTextView
+
 	statusTextView := tview.NewTextView()
 	statusTextView.SetBorderPadding(0, 0, 1, 1)
 	statusTextView.SetTextColor(tcell.ColorGray)
@@ -110,6 +119,7 @@ func (applicationHeader *ApplicationHeaderComponent) createLayout() {
 	layout.AddItem(nameTextView, len(nameText), 0, false)
 	layout.AddItem(versionTextView, len(versionText), 0, false)
 	layout.AddItem(connectionStatusTextView, 0, 0, false)
+	layout.AddItem(warningCountTextView, 0, 0, false)
 	layout.AddItem(statusTextView, 0, 1, false)
 	layout.AddItem(pageIndicatorTextView, len(pageIndicatorText)+4, 0, false)
 	layout.AddItem(applicationHeader.updateIntervalTextView, len(pageIndicatorText)+4, 0, false)
@@ -162,6 +172,24 @@ func (applicationHeader *ApplicationHeaderComponent) SetConnectionStatus(connect
 		}
 	}
 	applicationHeader.application.ForceDraw()
+}
+
+// SetWarningCount shows the number of warnings of the daemon (of all fans, sensors and curves) as a badge. The badge
+// is hidden if there are none, or if the daemon has no warnings API (supported is false).
+func (applicationHeader *ApplicationHeaderComponent) SetWarningCount(count int, supported bool) {
+	text := ""
+	if supported && count > 0 {
+		noun := "warnings"
+		if count == 1 {
+			noun = "warning"
+		}
+		text = fmt.Sprintf(" %s %d %s ", txwidgets.WarningMarker, count, noun)
+	}
+	if text == applicationHeader.warningCountTextView.GetText(false) {
+		return
+	}
+	applicationHeader.warningCountTextView.SetText(text)
+	applicationHeader.layout.ResizeItem(applicationHeader.warningCountTextView, tview.TaggedStringWidth(text), 0)
 }
 
 // SetDefaultStatus shows status whenever there is no other status, e.g. a warning that must not be missed.

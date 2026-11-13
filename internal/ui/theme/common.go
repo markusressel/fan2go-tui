@@ -21,6 +21,9 @@ type HeaderColors struct {
 
 	DisconnectedBadge           tcell.Color
 	DisconnectedBadgeBackground tcell.Color
+
+	WarningBadge           tcell.Color
+	WarningBadgeBackground tcell.Color
 }
 
 type DialogColors struct {
@@ -44,6 +47,15 @@ type Color struct {
 	List                ListsColors
 	ConfigInfoComponent ConfigInfoComponentColors
 	ShortcutMap         ShortcutMapColors
+	Warning             WarningColors
+}
+
+// WarningColors are the colors of the warnings the daemon reports about fans, sensors and curves.
+type WarningColors struct {
+	// Title is the color of the title of a fan, sensor or curve with warnings.
+	Title tcell.Color
+	// Text is the color of the warning messages.
+	Text tcell.Color
 }
 
 type ShortcutMapColors struct {

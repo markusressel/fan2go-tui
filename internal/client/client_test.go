@@ -1,10 +1,12 @@
 package client
 
 import (
+	"errors"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"reflect"
 	"strconv"
 	"strings"
 	"testing"
@@ -190,5 +192,99 @@ func TestApiClient_EndpointsAndErrors(t *testing.T) {
 	_, err = doGet(http.DefaultClient, server.URL+"/error-500", dummy)
 	if err == nil || !strings.Contains(err.Error(), "Unexpected API status code") {
 		t.Errorf("expected 500 status code error, got %v", err)
+	}
+}
+
+// newTestApiClient returns an API client for a test server with the given handler.
+func newTestApiClient(t *testing.T, handler http.Handler) Fan2goApiClient {
+	server := httptest.NewServer(handler)
+	t.Cleanup(server.Close)
+	u, err := url.Parse(server.URL)
+	if err != nil {
+		t.Fatalf("failed to parse test server url: %v", err)
+	}
+	port, _ := strconv.Atoi(u.Port())
+	return NewApiClient(u.Hostname(), port)
+}
+
+// The warnings of fans, sensors and curves are decoded if the daemon sends them; older daemons do not.
+func TestApiClient_ItemWarnings(t *testing.T) {
+	const warnings = `"warnings": [{"code": "flatRpmCurve", "message": "RPM stays at ~750"}]`
+	mux := http.NewServeMux()
+	mux.HandleFunc("/fan", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{
+			"with": {"config": {"id": "with"}, ` + warnings + `},
+			"empty": {"config": {"id": "empty"}, "warnings": []},
+			"old": {"config": {"id": "old"}}
+		}`))
+	})
+	mux.HandleFunc("/sensor", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{"with": {"config": {"id": "with"}, ` + warnings + `}, "old": {"config": {"id": "old"}}}`))
+	})
+	mux.HandleFunc("/curve", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{"with": {"config": {"id": "with"}, ` + warnings + `}, "old": {"config": {"id": "old"}}}`))
+	})
+	api := newTestApiClient(t, mux)
+	expected := []Warning{{Code: "flatRpmCurve", Message: "RPM stays at ~750"}}
+
+	fans, err := api.GetFans()
+	if err != nil {
+		t.Fatalf("GetFans: %v", err)
+	}
+	if actual := (*fans)["with"].Warnings; !reflect.DeepEqual(actual, expected) {
+		t.Errorf("fan warnings = %v, expected %v", actual, expected)
+	}
+	for _, id := range []string{"empty", "old"} {
+		if actual := (*fans)[id].Warnings; len(actual) != 0 {
+			t.Errorf("fan %s: expected no warnings, got %v", id, actual)
+		}
+	}
+
+	sensors, err := api.GetSensors()
+	if err != nil {
+		t.Fatalf("GetSensors: %v", err)
+	}
+	if actual := (*sensors)["with"].Warnings; !reflect.DeepEqual(actual, expected) {
+		t.Errorf("sensor warnings = %v, expected %v", actual, expected)
+	}
+	if actual := (*sensors)["old"].Warnings; len(actual) != 0 {
+		t.Errorf("expected no sensor warnings, got %v", actual)
+	}
+
+	curves, err := api.GetCurves()
+	if err != nil {
+		t.Fatalf("GetCurves: %v", err)
+	}
+	if actual := (*curves)["with"].Warnings; !reflect.DeepEqual(actual, expected) {
+		t.Errorf("curve warnings = %v, expected %v", actual, expected)
+	}
+	if actual := (*curves)["old"].Warnings; len(actual) != 0 {
+		t.Errorf("expected no curve warnings, got %v", actual)
+	}
+}
+
+func TestApiClient_GetWarnings(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/warnings", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`[{"kind": "fan", "id": "cpu", "code": "flatRpmCurve", "message": "RPM stays at ~750"}]`))
+	})
+
+	warnings, err := newTestApiClient(t, mux).GetWarnings()
+
+	if err != nil {
+		t.Fatalf("GetWarnings: %v", err)
+	}
+	expected := []WarningEntry{{Kind: "fan", ID: "cpu", Code: "flatRpmCurve", Message: "RPM stays at ~750"}}
+	if !reflect.DeepEqual(*warnings, expected) {
+		t.Errorf("GetWarnings = %v, expected %v", *warnings, expected)
+	}
+}
+
+// A daemon without the warnings API answers /warnings with 404.
+func TestApiClient_GetWarningsOfAnOlderDaemon(t *testing.T) {
+	warnings, err := newTestApiClient(t, http.NotFoundHandler()).GetWarnings()
+
+	if !errors.Is(err, ErrNotFound) || warnings != nil {
+		t.Errorf("expected ErrNotFound, got %v, %v", warnings, err)
 	}
 }

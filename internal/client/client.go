@@ -21,6 +21,26 @@ type Fan struct {
 	FanCurveData *map[int]float64 `json:"fanCurveData,omitempty"`
 
 	Config FanConfig `json:"config"`
+
+	Warnings []Warning `json:"warnings,omitempty"`
+}
+
+// Warning is a problem the fan2go daemon detected about a fan, sensor or curve. Daemons before the warnings API do
+// not send any.
+type Warning struct {
+	// Code is a stable identifier of the kind of warning, e.g. "flatRpmCurve".
+	Code string `json:"code"`
+	// Message is the human-readable description of the warning.
+	Message string `json:"message"`
+}
+
+// WarningEntry is a warning of /warnings, together with the item it is about.
+type WarningEntry struct {
+	// Kind is the kind of the item: "fan", "sensor" or "curve".
+	Kind    string `json:"kind"`
+	ID      string `json:"id"`
+	Code    string `json:"code"`
+	Message string `json:"message"`
 }
 
 type FanConfig struct {
@@ -177,6 +197,8 @@ type AcpiFanConfig struct {
 type Curve struct {
 	Config CurveConfig `json:"config"`
 	Value  float64     `json:"value"`
+
+	Warnings []Warning `json:"warnings,omitempty"`
 }
 
 type CurveConfig struct {
@@ -227,6 +249,8 @@ type Sensor struct {
 	Name      string       `json:"name"`
 	Config    SensorConfig `json:"configuration"`
 	MovingAvg float64      `json:"movingAvg"`
+
+	Warnings []Warning `json:"warnings,omitempty"`
 }
 
 type SensorConfig struct {
@@ -300,7 +324,15 @@ type Fan2goApiClient interface {
 
 	GetSensors() (*map[string]*Sensor, error)
 	GetSensor(label string) (*Sensor, error)
+
+	// GetWarnings returns the current warnings of all fans, sensors and curves. ErrNotFound if the daemon has no
+	// warnings API (before fan2go added it).
+	GetWarnings() (*[]WarningEntry, error)
 }
+
+// ErrNotFound is returned for a 404 response: the API is not enabled, or (for a single item or a newer endpoint)
+// the daemon does not know it.
+var ErrNotFound = errors.New("Cannot reach fan2go daemon, did you enable its API?")
 
 type Fan2goApiClientEcho struct {
 	// hostPort is the host and port of the fan2go API, see joinHostPort
@@ -406,6 +438,13 @@ func (client *Fan2goApiClientEcho) GetSensor(label string) (*Sensor, error) {
 	}
 }
 
+func (client *Fan2goApiClientEcho) GetWarnings() (*[]WarningEntry, error) {
+	url := client.endpointUrl("warnings")
+
+	var data []WarningEntry
+	return doGet(client.webclient, url, data)
+}
+
 func doGet[T any](client *http.Client, url string, data T) (*T, error) {
 
 	// Build the request
@@ -433,7 +472,7 @@ func doGet[T any](client *http.Client, url string, data T) (*T, error) {
 
 	// Check the status code
 	if resp.StatusCode == http.StatusNotFound {
-		return nil, errors.New("Cannot reach fan2go daemon, did you enable its API?")
+		return nil, ErrNotFound
 	} else if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("Unexpected API status code: %s", resp.Status)
 	}

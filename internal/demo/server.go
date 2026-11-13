@@ -76,6 +76,8 @@ func (s *Server) createMux() http.Handler {
 	mux.HandleFunc("GET /sensor", s.handleSensors)
 	mux.HandleFunc("GET /sensor/{id}", s.handleSensor)
 
+	mux.HandleFunc("GET /warnings", s.handleWarnings)
+
 	mux.HandleFunc("GET /", s.handleIndex)
 
 	return mux
@@ -237,6 +239,11 @@ func (s *Server) handleSensor(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, sensor)
 }
 
+// handleWarnings returns the warnings of all fans, sensors and curves, like /warnings of fan2go.
+func (s *Server) handleWarnings(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, http.StatusOK, s.simulator.GetWarnings())
+}
+
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		writeJSON(w, http.StatusNotFound, map[string]string{"error": "not found"})
@@ -253,6 +260,7 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 			"/curve/{id}",
 			"/sensor",
 			"/sensor/{id}",
+			"/warnings",
 		},
 	})
 }

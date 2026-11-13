@@ -3,6 +3,7 @@ package fan
 import (
 	"fan2go-tui/internal/client"
 	"fan2go-tui/internal/state"
+	"fan2go-tui/internal/ui/txwidgets"
 	uiutil "fan2go-tui/internal/ui/util"
 
 	"github.com/rivo/tview"
@@ -13,7 +14,9 @@ type FanListItemComponent struct {
 
 	FanState *state.FanState
 
-	layout          *tview.Flex
+	layout *tview.Flex
+	// window is the bordered box of the fan, its title shows whether the fan has warnings
+	window          *tview.Flex
 	graphHostLayout *tview.Flex
 
 	activeGraphVariant fanGraphVariant
@@ -54,6 +57,8 @@ func (c *FanListItemComponent) createLayout(onOpenCurve func(curveID string)) *t
 
 	fanColumnLayout := tview.NewFlex().SetDirection(tview.FlexColumn)
 	uiutil.SetupWindow(fanColumnLayout, c.FanState.Fan.Config.ID)
+	c.window = fanColumnLayout
+	c.refreshWindowTitle()
 	fanColumnLayout.SetTitleAlign(tview.AlignLeft)
 	fanColumnLayout.SetBorder(true)
 	rootLayout.AddItem(fanColumnLayout, 0, 1, true)
@@ -123,6 +128,7 @@ func (c *FanListItemComponent) SetFan(fanState *state.FanState) {
 }
 
 func (c *FanListItemComponent) refresh() {
+	c.refreshWindowTitle()
 	if c.fanInfoComponent != nil {
 		c.fanInfoComponent.SetFan(c.FanState.Fan)
 	}
@@ -138,4 +144,12 @@ func (c *FanListItemComponent) ScrollHorizontal(delta int) {
 	if c.fanInfoComponent != nil {
 		c.fanInfoComponent.ScrollHorizontal(delta)
 	}
+}
+
+// refreshWindowTitle marks the title of the window if the fan has warnings.
+func (c *FanListItemComponent) refreshWindowTitle() {
+	if c.window == nil || c.FanState == nil || c.FanState.Fan == nil {
+		return
+	}
+	txwidgets.SetWindowWarnings(c.window.Box, c.FanState.Fan.Config.ID, c.FanState.Fan.Warnings)
 }

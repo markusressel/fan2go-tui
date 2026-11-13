@@ -1,6 +1,7 @@
 package state
 
 import (
+	"errors"
 	"fan2go-tui/internal/client"
 	"sync"
 )
@@ -21,7 +22,7 @@ func NewPoller(apiClient client.Fan2goApiClient, store *Store, onUpdate func(err
 
 func (p *Poller) FetchAndUpdate() {
 	var wg sync.WaitGroup
-	wg.Add(3)
+	wg.Add(4)
 
 	var fanErr, curveErr, sensorErr error
 
@@ -55,6 +56,11 @@ func (p *Poller) FetchAndUpdate() {
 		}
 	}()
 
+	go func() {
+		defer wg.Done()
+		p.fetchWarnings()
+	}()
+
 	wg.Wait()
 	if p.onUpdate != nil {
 		var combinedErr error
@@ -66,5 +72,22 @@ func (p *Poller) FetchAndUpdate() {
 			combinedErr = sensorErr
 		}
 		p.onUpdate(combinedErr)
+	}
+}
+
+// fetchWarnings updates the warnings in the store. Its errors are not reported: a daemon without the warnings API
+// (404) is not an error, and the other endpoints report a daemon that cannot be reached.
+func (p *Poller) fetchWarnings() {
+	warnings, err := p.apiClient.GetWarnings()
+	switch {
+	case errors.Is(err, client.ErrNotFound):
+		p.store.UpdateWarnings(nil)
+	case err == nil && warnings != nil:
+		if *warnings == nil {
+			// "null" or an empty body: the API exists, there are no warnings
+			p.store.UpdateWarnings([]client.WarningEntry{})
+		} else {
+			p.store.UpdateWarnings(*warnings)
+		}
 	}
 }

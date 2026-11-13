@@ -2,8 +2,10 @@ package demo
 
 import (
 	"fan2go-tui/internal/client"
+	"maps"
 	"math"
 	"math/rand"
+	"slices"
 	"sync"
 	"time"
 )
@@ -99,6 +101,11 @@ func (s *Simulator) initData() {
 					Device: "/dev/nvme0n1",
 				},
 			},
+			// an example of a sensor warning, to show how the UI presents it
+			Warnings: []client.Warning{{
+				Code:    "readFailures",
+				Message: "Reading the sensor failed 3 times in a row, fan2go uses its last value.",
+			}},
 		},
 	}
 
@@ -264,6 +271,13 @@ func (s *Simulator) initData() {
 					RpmPath: "/sys/class/hwmon/hwmon3/fan1_input",
 				},
 			},
+			// shows how the UI presents warnings, with the text of the daemon
+			Warnings: []client.Warning{{
+				Code: "flatRpmCurve",
+				Message: "RPM stays at ~820 across the whole PWM range, so the fan doesn't react to PWM. " +
+					"Check the header (DC/PWM mode, BIOS fan setting, 3-pin fan on a PWM-only header). " +
+					"fan2go keeps controlling it with the configured range (maxPwm 255).",
+			}},
 		},
 		"gpu-fan": {
 			Pwm:          75,
@@ -511,4 +525,28 @@ func (s *Simulator) GetSensor(id string) (*client.Sensor, bool) {
 	}
 	sensorCopy := *sensor
 	return &sensorCopy, true
+}
+
+// GetWarnings returns the warnings of all fans, sensors and curves with the kind and ID of their item, like /warnings of
+// fan2go: fans first, then sensors, then curves, each sorted by ID.
+func (s *Simulator) GetWarnings() []client.WarningEntry {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+
+	result := []client.WarningEntry{}
+	add := func(kind string, id string, warnings []client.Warning) {
+		for _, warning := range warnings {
+			result = append(result, client.WarningEntry{Kind: kind, ID: id, Code: warning.Code, Message: warning.Message})
+		}
+	}
+	for _, id := range slices.Sorted(maps.Keys(s.fans)) {
+		add("fan", id, s.fans[id].Warnings)
+	}
+	for _, id := range slices.Sorted(maps.Keys(s.sensors)) {
+		add("sensor", id, s.sensors[id].Warnings)
+	}
+	for _, id := range slices.Sorted(maps.Keys(s.curves)) {
+		add("curve", id, s.curves[id].Warnings)
+	}
+	return result
 }

@@ -31,6 +31,9 @@ var (
 
 			DisconnectedBadge:           OnPrimaryColor,
 			DisconnectedBadgeBackground: tcell.ColorDarkRed,
+
+			WarningBadge:           tcell.ColorBlack,
+			WarningBadgeBackground: tcell.ColorYellow,
 		},
 		Dialog: DialogColors{
 			Border: PrimaryVariantColor,
@@ -91,6 +94,11 @@ var (
 			GlobalKeyCombo:     tcell.ColorIsRGB | tcell.ColorValid | 0x9AA5B1,
 			Name:               tcell.ColorLightGray,
 			Separator:          PrimaryVariantColor,
+		},
+		// the same color as warning status messages in the header
+		Warning: WarningColors{
+			Title: tcell.ColorYellow,
+			Text:  tcell.ColorYellow,
 		},
 	}
 
