@@ -113,7 +113,7 @@ func TestServer_IntegrationWithApiClient(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GET / failed: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("expected 200 OK on /, got %d", resp.StatusCode)
 	}

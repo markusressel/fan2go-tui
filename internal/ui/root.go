@@ -72,10 +72,10 @@ func createUi(ctx context.Context, fullscreen bool) (*tview.Application, *MainPa
 					if !dismissedConnectingDialog {
 						pagesLayout.ShowPage(string(ConnectingDialog))
 					} else {
-						mainPage.SetConnectionStatus(false, err.Error())
+						mainPage.SetConnectionStatus(false, util.ErrorMessage(err))
 					}
 				} else {
-					mainPage.SetConnectionStatus(false, err.Error())
+					mainPage.SetConnectionStatus(false, util.ErrorMessage(err))
 				}
 			} else {
 				hasReceivedData = true
@@ -105,7 +105,7 @@ func createUi(ctx context.Context, fullscreen bool) (*tview.Application, *MainPa
 				dismissedConnectingDialog = true
 				pagesLayout.HidePage(string(ConnectingDialog))
 				if connectingDialog.LastError() != nil {
-					mainPage.SetConnectionStatus(false, connectingDialog.LastError().Error())
+					mainPage.SetConnectionStatus(false, util.ErrorMessage(connectingDialog.LastError()))
 				}
 				application.SetFocus(mainPage.layout)
 				return nil
@@ -139,7 +139,7 @@ func createUi(ctx context.Context, fullscreen bool) (*tview.Application, *MainPa
 			dismissedConnectingDialog = true
 			pagesLayout.HidePage(string(ConnectingDialog))
 			if connectingDialog.LastError() != nil {
-				mainPage.SetConnectionStatus(false, connectingDialog.LastError().Error())
+				mainPage.SetConnectionStatus(false, util.ErrorMessage(connectingDialog.LastError()))
 			}
 			application.SetFocus(mainPage.layout)
 			return nil

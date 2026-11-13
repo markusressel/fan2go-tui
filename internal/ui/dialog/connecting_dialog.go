@@ -1,6 +1,7 @@
 package dialog
 
 import (
+	"fan2go-tui/internal/ui/util"
 	"fmt"
 
 	"github.com/rivo/tview"
@@ -71,7 +72,7 @@ func (d *ConnectingDialog) SetError(err error) {
 		d.SetConnecting()
 		return
 	}
-	d.detailsTextView.SetText(fmt.Sprintf("[red]Connection failed:[white]\n%s\n[yellow]Retrying automatically...[white]", err.Error()))
+	d.detailsTextView.SetText(fmt.Sprintf("[red]Connection failed:[white]\n%s\n[yellow]Retrying automatically...[white]", util.ErrorMessage(err)))
 }
 
 func (d *ConnectingDialog) GetLayout() *tview.Flex {
